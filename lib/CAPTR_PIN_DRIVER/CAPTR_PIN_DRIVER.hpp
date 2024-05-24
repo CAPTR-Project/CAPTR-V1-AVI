@@ -15,15 +15,16 @@ enum ControllerPin{
 
 struct HwPin{
     const int pin_number;
-    bool is_output;
+    bool output;
+    bool physical_state;
 };
 
 extern HwPin controller_pins[COUNT];
 
 void HwSetupPins(void);
-bool HwDigitalRead(FrontControllerPin x);
-void HwDigitalWrite(FrontControllerPin x, bool physical_state);
-int HwAnalogRead(FrontControllerPin x);
-void HwAnalogWrite(FrontControllerPin x, int value);
+bool HwDigitalRead(ControllerPin x);
+void HwDigitalWrite(ControllerPin x, bool physical_state);
+int HwAnalogRead(ControllerPin x);
+void HwAnalogWrite(ControllerPin x, int value);
 
 #endif

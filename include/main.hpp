@@ -1,3 +1,17 @@
+/*
+
+██████ ██████ ██████ ██████ ██████
+██     ██  ██ ██  ██   ██   ██  ██
+██     ██████ ██████   ██   ██████ 
+██     ██  ██ ██       ██   ██ ██  
+██████ ██  ██ ██       ██   ██  ██ 
+
+File: main.hpp
+Auth: Alex Wang, Yubo Wang
+Desc: Header file for MCU
+
+*/
+
 #include <Arduino.h>
 
 #include <Wire.h>
@@ -37,3 +51,23 @@ void initBMP(TwoWire* I2CBus);
  * @param I2CBus The I2C bus to use. Either Wire, Wire1, Wire2
  */
 void initIMU(TwoWire* I2CBus);
+
+enum class ControllerState
+{
+    LV_ON,
+    TVC_UP,
+    RECOVERY,
+    TVC_DOWN,
+    LAND,
+};
+
+enum class ErrorState
+{
+    NONE,
+
+    GENERAL,               
+
+    IMU, 
+    BARO,
+    RF
+};

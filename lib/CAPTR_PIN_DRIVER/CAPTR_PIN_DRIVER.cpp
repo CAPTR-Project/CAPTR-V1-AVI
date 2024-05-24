@@ -2,34 +2,34 @@
 
 HwPin controller_pins[COUNT] = {
 
-    [HW_PIN_IMU] = {
-        .pin_number = 7,
-        .output = true,
-        .physical_state = false,
-    },
+  [HW_PIN_IMU] = {
+    .pin_number = 7,
+    .output = true,
+    .physical_state = false,
+  },
 	
 	[HW_PIN_BARO] = {
-        .pin_number = 7,
-        .output = true,
-        .physical_state = false,
-    },
+    .pin_number = 7,
+    .output = true,
+    .physical_state = false,
+  },
 
-    [HW_PIN_SERVO_X] = {
-        .pin_number = 7,
-        .output = true,
-        .physical_state = false,
-    },
+  [HW_PIN_SERVO_X] = {
+    .pin_number = 7,
+    .output = true,
+    .physical_state = false,
+  },
 
-    [HW_PIN_SERVO_Y] = {
-        .pin_number = 7,
-        .output = true,
-        .physical_state = false,
-    },
-}
+  [HW_PIN_SERVO_Y] = {
+    .pin_number = 7,
+    .output = true,
+    .physical_state = false,
+  }
+};
 
 void HwSetupPins(void){
   for (int i = 0; i < COUNT; i++){
-    if (controller_pins[i].is_output) {
+    if (controller_pins[i].output) {
       pinMode(controller_pins[i].pin_number, OUTPUT);
       digitalWrite(controller_pins[i].pin_number, controller_pins[i].physical_state);
     } else {

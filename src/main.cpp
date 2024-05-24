@@ -1,7 +1,27 @@
+/*
+
+██████ ██████ ██████ ██████ ██████
+██     ██  ██ ██  ██   ██   ██  ██
+██     ██████ ██████   ██   ██████ 
+██     ██  ██ ██       ██   ██ ██  
+██████ ██  ██ ██       ██   ██  ██ 
+
+File: main.cpp
+Auth: Alex Wang, Yubo Wang
+Desc: Main file for MCU
+
+*/
+
+#include "Arduino.h"
 #include "main.hpp"
 
+#include "CAPTR_PIN_DRIVER.hpp"
+
+ControllerState MCU_state = ControllerState::LV_ON;
+
 void setup() {
-  // put your setup code here, to run once:
+  HwSetupPins();
+  
   Serial.begin(115200);
 
   initBMP(BMP390_CHIP_ID, &Wire);
@@ -9,12 +29,20 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
   double altitude = bmp.readAltitude(1013.25);
   
   lsm_accel->getEvent(&accelMain);
   lsm_gyro->getEvent(&gyro);
   
+
+  switch(MCU_state)
+  {
+    case ControllerState::LV_ON:
+
+    case ControllerState::TVC_UP:
+
+    case ControllerState::TVC_DOWN:
+  }
 }
 
 // put function definitions here:
