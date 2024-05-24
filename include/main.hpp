@@ -6,6 +6,7 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BMP3XX.h>
 #include <Adafruit_LSM6DS3TRC.h>
+#include <Adafruit_LIS3MDL.h>
 #include <RH_RF95.h>
 #include <RHReliableDatagram.h>
 #include <TinyGPS++.h>
@@ -23,9 +24,10 @@
 
 // Variables
 Adafruit_BMP3XX bmp; // barometer
-Adafruit_LSM6DS3TRC lsm; // IMU
+Adafruit_LSM6DS3TRC imu; // IMU
+Adafruit_LIS3MDL lis_mag; // Magnetometer
 Adafruit_Sensor *lsm_accel, *lsm_gyro;
-sensors_event_t accelMain, gyro;
+sensors_event_t accelMainData, gyroData, magData;
 // radio
 RH_RF95 rf95_driver(RFM95_CS, RFM95_INT);
 RHReliableDatagram manager(rf95_driver, SELF_RADIO_ADDRESS);
@@ -49,6 +51,13 @@ void initBMP(TwoWire* I2CBus);
  * @param I2CBus The I2C bus to use. Either Wire, Wire1, Wire2
  */
 void initIMU(TwoWire* I2CBus);
+
+/**
+ * @brief Initializes the magnetometer sensor on an I2C bus
+ * 
+ * @param I2CBus The I2C bus to use. Either Wire, Wire1, Wire2
+ */
+void initMag(TwoWire* I2CBus);
 
 /**
  * @brief Initializes the RFM95 radio
