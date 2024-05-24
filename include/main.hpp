@@ -12,9 +12,8 @@
 #include <TinyGPS++.h>
 
 //Definitions
-#define RFM95_CS    4  // TODO CHANGE
-#define RFM95_INT   3  // TODO CHANGE
-#define RFM95_RST   2  // TODO CHANGE
+#define RFM95_CS    10 //
+#define RFM95_INT   9  //
 
 // Who am i? (server address)
 #define SELF_RADIO_ADDRESS  1
@@ -29,7 +28,7 @@ Adafruit_LIS3MDL lis_mag; // Magnetometer
 Adafruit_Sensor *lsm_accel, *lsm_gyro;
 sensors_event_t accelMainData, gyroData, magData;
 // radio
-RH_RF95 rf95_driver(RFM95_CS, RFM95_INT);
+RH_RF95 rf95_driver(RFM95_CS, RFM95_INT, hardware_spi);
 RHReliableDatagram manager(rf95_driver, SELF_RADIO_ADDRESS);
 
 // GPS
