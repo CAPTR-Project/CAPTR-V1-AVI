@@ -17,7 +17,11 @@ Desc: Main file for MCU
 
 #include "CAPTR_PIN_DRIVER.hpp"
 
-ControllerState MCU_state = ControllerState::LV_ON;
+ControllerState mcu_state = ControllerState::LV_ON;
+ErrorState error_state = ErrorState::NONE;
+
+bool new_state = true;
+unsigned int loop_start;
 
 void setup() {
   HwSetupPins();
@@ -29,23 +33,69 @@ void setup() {
 }
 
 void loop() {
+  loop_start = micros();
+
   double altitude = bmp.readAltitude(1013.25);
   
   lsm_accel->getEvent(&accelMain);
   lsm_gyro->getEvent(&gyro);
   
 
-  switch(MCU_state)
+  switch(mcu_state)
   {
     case ControllerState::LV_ON:
 
-    case ControllerState::TVC_UP:
+      if(new_state)
+      {
+        Serial.println("FSM: LV_ON");
+        new_state = false;
+      }
 
-    case ControllerState::TVC_DOWN:
+      // TODO: LV_ON Code
+
+      if (error_state == ErrorState::NONE) {
+        mcu_state = ControllerState::TVC_UP;
+        new_state = true;
+      }
+
+      break;
+
+    case ControllerState::TVC_UP:
+      
+      if(new_state)
+      {
+        Serial.println("FSM: TVC_UP");
+        new_state = false;
+      }
+
+      // TODO: TVC_UP Code
+
+      if (error_state == ErrorState::NONE) {
+        mcu_state = ControllerState::TVC_UP;
+      }
+
+    case ControllerState::RECOVERY:
+      
+      if(new_state)
+      {
+        Serial.println("FSM: RECOVERY");
+        new_state = false;
+      }
+
+      // TODO: Recovery Code
+
+      if (error_state == ErrorState::NONE) {
+        mcu_state = ControllerState::TVC_UP;
+      }
   }
 }
 
-// put function definitions here:
+/*
+=============================================
+============ Function Definitions ===========
+=============================================
+*/
+
 void initBMP(uint8_t i2cAddr, TwoWire* I2CBus){
   if (!bmp.begin_I2C(i2cAddr, &Wire)) {
     Serial.println("Could not find a valid BMP3 sensor, check wiring!");
