@@ -14,6 +14,20 @@ void loop() {
   
   lsm_accel->getEvent(&accelMain);
   lsm_gyro->getEvent(&gyro);
+
+  Serial.println("Altitude:");
+  Serial.println(altitude);
+
+  Serial.println("Accel:");
+  Serial.println(accelMain.acceleration.x);
+  Serial.println(accelMain.acceleration.y);
+  Serial.println(accelMain.acceleration.z);
+
+  Serial.println("Gyro:");
+  Serial.println(gyro.gyro.heading);
+  Serial.println(gyro.gyro.pitch);
+  Serial.println(gyro.gyro.roll);
+
   
 }
 
@@ -53,4 +67,15 @@ void initIMU(uint8_t i2cAddr, TwoWire* I2CBus) {
 
   lsm_gyro = lsm.getGyroSensor();
   lsm_gyro->printSensorDetails();
+}
+
+void initRadio() {
+  if (!rf95_driver.init()) {
+    Serial.println("LoRa radio init failed");
+    while (1);
+  }
+  Serial.println("LoRa radio init OK!");
+  rf95_driver.setFrequency(915.0);
+  rf95_driver.setTxPower(15, false);
+
 }
