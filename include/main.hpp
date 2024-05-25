@@ -16,10 +16,10 @@
 #define RFM95_INT   9  //
 
 // Who am i? (server address)
-#define SELF_RADIO_ADDRESS  1
+#define SELF_RADIO_ADDRESS  723164
 
-// Where to send packets to! MY_ADDRESS in client (RX) should match this.
-#define DEST_RADIO_ADDRESS  2
+// Where to send packets to! SELF_RADIO_ADDRESS in client (RX) should match this.
+#define DEST_RADIO_ADDRESS  723165
 
 // Variables
 Adafruit_BMP3XX bmp; // barometer
