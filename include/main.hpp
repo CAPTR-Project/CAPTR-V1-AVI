@@ -52,13 +52,17 @@ void initBMP(TwoWire* I2CBus);
  */
 void initIMU(TwoWire* I2CBus);
 
+
+// STATE MACHINE
 enum class ControllerState
 {
     LV_ON,
-    TVC_UP,
+    LAUNCH_DETECT,
+    POWERED_ASCENT,
+    COAST,
     RECOVERY,
-    TVC_DOWN,
-    LAND,
+    POWERED_DESCENT,
+    LANDED,
 };
 
 enum class ErrorState
