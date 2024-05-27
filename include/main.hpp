@@ -7,7 +7,6 @@
 #include <Adafruit_BMP3XX.h>
 #include <Adafruit_LSM6DS3TRC.h>
 #include <Adafruit_LIS3MDL.h>
-#include <RadioHead.h>
 #include <RH_RF95.h>
 #include <RHReliableDatagram.h>
 #include <TinyGPS++.h>
