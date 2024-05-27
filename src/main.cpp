@@ -41,7 +41,6 @@ void loop() {
 void initBMP(uint8_t i2cAddr, TwoWire* I2CBus){
   if (!bmp.begin_I2C(i2cAddr, &Wire)) {
     Serial.println("ERROR: Failed to find BMP390 sensor");
-    while (1);
   }
   Serial.println("BMP3 sensor found");
   bmp.setTemperatureOversampling(BMP3_OVERSAMPLING_4X);
@@ -53,9 +52,6 @@ void initBMP(uint8_t i2cAddr, TwoWire* I2CBus){
 void initIMU(uint8_t i2cAddr, TwoWire* I2CBus) {
   if (!imu.begin_I2C(i2cAddr, I2CBus)) {
     Serial.println("ERROR: Failed to find LSM6DS chip");
-    while (1) {
-      delay(10);
-    }
   }
 
   Serial.println("LSM6DS Found!");
@@ -76,9 +72,6 @@ void initIMU(uint8_t i2cAddr, TwoWire* I2CBus) {
 void initMag(uint8_t i2cAddr, TwoWire* I2CBus) {
   if (!lis_mag.begin_I2C(i2cAddr, I2CBus)) {
     Serial.println("ERROR: Failed to find LIS3MDL chip");
-    while (1) {
-      delay(10);
-    }
   }
 
   Serial.println("LIS3MDL Found!");
@@ -92,7 +85,6 @@ void initMag(uint8_t i2cAddr, TwoWire* I2CBus) {
 void initRadio() {
   if (!rf95_driver.init()) {
     Serial.println("ERROR: LoRa radio init failed");
-    while (1);
   }
   Serial.println("LoRa radio init OK!");
   rf95_driver.setFrequency(915.0);

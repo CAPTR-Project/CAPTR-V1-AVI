@@ -7,6 +7,7 @@
 #include <Adafruit_BMP3XX.h>
 #include <Adafruit_LSM6DS3TRC.h>
 #include <Adafruit_LIS3MDL.h>
+#include <RadioHead.h>
 #include <RH_RF95.h>
 #include <RHReliableDatagram.h>
 #include <TinyGPS++.h>
@@ -16,10 +17,10 @@
 #define RFM95_INT   9  //
 
 // Who am i? (server address)
-#define SELF_RADIO_ADDRESS  723164
+#define SELF_RADIO_ADDRESS  214
 
 // Where to send packets to! SELF_RADIO_ADDRESS in client (RX) should match this.
-#define DEST_RADIO_ADDRESS  723165
+#define DEST_RADIO_ADDRESS  215
 
 // Variables
 Adafruit_BMP3XX bmp; // barometer
