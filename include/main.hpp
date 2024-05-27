@@ -40,23 +40,26 @@ RHReliableDatagram manager(rf95_driver, SELF_RADIO_ADDRESS);
 /**
  * @brief Initializes the BMP sensor on an I2C bus
  * 
+ * @param i2cAddr The I2C address of the BMP sensor
  * @param I2CBus The I2C bus to use. Either Wire, Wire1, Wire2
  */
-void initBMP(TwoWire* I2CBus);
+void initBMP(uint8_t i2cAddr, TwoWire* I2CBus);
 
 /**
  * @brief Initializes the IMU sensor on an I2C bus
  * 
+ * @param i2cAddr The I2C address of the IMU sensor
  * @param I2CBus The I2C bus to use. Either Wire, Wire1, Wire2
  */
-void initIMU(TwoWire* I2CBus);
+void initIMU(uint8_t i2cAddr, TwoWire* I2CBus);
 
 /**
  * @brief Initializes the magnetometer sensor on an I2C bus
  * 
+ * @param i2cAddr The I2C address of the magnetometer sensor
  * @param I2CBus The I2C bus to use. Either Wire, Wire1, Wire2
  */
-void initMag(TwoWire* I2CBus);
+void initMag(uint8_t i2cAddr, TwoWire* I2CBus);
 
 /**
  * @brief Initializes the RFM95 radio
