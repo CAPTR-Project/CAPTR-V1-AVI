@@ -5,8 +5,6 @@
 
 enum ControllerPin{
     
-	HW_PIN_IMU,             // 7
-    HW_PIN_BARO,            // 8
     HW_PIN_SERVO_X,         // 28  
     HW_PIN_SERVO_Y,         // 29
 

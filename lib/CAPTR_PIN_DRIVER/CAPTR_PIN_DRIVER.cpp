@@ -2,18 +2,6 @@
 
 HwPin controller_pins[COUNT] = {
 
-  [HW_PIN_IMU] = {
-    .pin_number = 7,
-    .output = true,
-    .physical_state = false,
-  },
-	
-	[HW_PIN_BARO] = {
-    .pin_number = 7,
-    .output = true,
-    .physical_state = false,
-  },
-
   [HW_PIN_SERVO_X] = {
     .pin_number = 7,
     .output = true,
