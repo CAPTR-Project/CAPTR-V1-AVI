@@ -1,0 +1,38 @@
+language: cpp
+compiler: g++
+os:       linux
+sudo:     required
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+      - boost-latest
+    packages:
+      - gcc-4.8
+      - g++-4.8
+      - libboost-all-dev
+      - valgrind
+
+before_install:
+  # update apt
+  # - sudo apt-get update -y -qq
+
+  # install
+  # - sudo apt-get install -y -qq g++-4.8
+
+  # make sure we're using new gcc tools
+   - sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-4.8 90
+
+install:
+  - export CXX="g++-4.8"
+  - pip install --user travis requests[security] cpp-coveralls
+
+script:
+  - make -f Makefile.mk
+  - ./unit_tests
+  - valgrind --leak-check=full ./unit_tests
+
+after_success:
+  - coveralls -r . -b . -E Doxyfile --repo-token "${COVERALLS_TOKEN}" --gcov-options '\-lp'
+
