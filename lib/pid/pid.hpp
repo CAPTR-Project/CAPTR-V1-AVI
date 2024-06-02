@@ -1,24 +1,27 @@
-#include <stdio.h>
+#ifndef PID_HPP
+#define PID_HPP
 
-// pid controller
+#include <iostream>
 
 class PID
 {
-    public:
-        PID();
-        ~PID();
-        void setGains(float kp, float ki, float kd);
-        void setLimits(float min, float max);
-        void setDt(float dt);
-        void setSetpoint(float setpoint);
-        float update(float input);
-        void reset();
-    private:
-        float kp, ki, kd;
-        float min, max;
-        float dt;
-        float setpoint;
-        float integral;
-        float prevError;
+public:
+    PID(double dt, double max, double min, double Kp, double Kd, double Ki);        // has to be same name as class because it is a constructor like init in python
+    ~PID();
+
+    // PID functions
+    double update(double input);
+    void setDt(double dt);
+    void setSetpoint(double setpoint);
+    void reset();
+
+private:
+    double _Kp, _Ki, _Kd;
+    double _min, _max;
+    double _dt;
+    double _setpoint;
+    double _integral;
+    double _prevError;
 };
 
+#endif

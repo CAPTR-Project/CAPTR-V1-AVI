@@ -1,69 +1,56 @@
-#include "pid.hpp"
+#include "PID.hpp"
 
-// pid class
-using namespace std;
-class PID
+PID::PID(double dt, double max, double min, double Kp, double Kd, double Ki): 
+    _dt(dt),
+    _max(max), 
+    _min(min), 
+    _Kp(Kp), 
+    _Kd(Kd), 
+    _Ki(Ki), 
+    _integral(0.0), 
+    _prevError(0.0)
 {
-    public:
-        initPID(double dt, double max, double min, double Kp, double Kd, double Ki);
-        ~PID();
-        double update(double input);
-
-    private:
-        double _Kp, _Ki, _Kd;
-        double _min, _max;
-        double _dt;
-        double _setpoint;
-        double _integral;
-        double _prevError;
-};
-
-PID::initPID(double dt, double max, double min, double Kp, double Kd, double Ki) :
-{
-    _Kp(Kp);
-    _Kd(Kd);
-    _Ki(Ki);
-    _max(max);
-    _min(min);
-    _dt(dt);
-    return this;
 }
 
-
-void setDt(float dt)
+void PID::setDt(double dt)
 {
-    this->dt = dt;
+    _dt = dt;
 }
 
-void setSetpoint(float setpoint)
+void PID::setSetpoint(double setpoint)
 {
-    this->setpoint = setpoint;
+    _setpoint = setpoint;
 }
 
-double update(double input)       // main PID loop
+double PID::update(double input)
 {
+    double error = _setpoint - input;                                   // P
+    _integral += error * _dt;                                           // I
+    double derivative = (error - _prevError) / _dt;                     // D
 
-    float error = setpoint - input;                                 // proportional
-    integral += error * dt;                                         // integral 
-    float derivative = (error - prevError) / dt;                    // derivative
+    // sum
+    _prevError = error;
+    double output = _Kp * error + _Ki * _integral + _Kd * derivative;
 
-    prevError = error;                                              
-    float output = kp * error + ki * integral + kd * derivative;
-
-    // clamping to min max outputs (i assume this will be vectoring angles)
-    if (output < min)
+    // clamping to min and max
+    if (output < _min)
     {
-        output = min;
+        output = _min;
     }
-    else if (output > max)
+    else if (output > _max)
     {
-        output = max;
+        output = _max;
     }
     return output;
 }
 
-void reset()    // reset accumulated error and values for new setpoint 
+void PID::reset()
 {
-    integral = 0.0;
-    prevError = 0.0;
+    _integral = 0.0;
+    _prevError = 0.0;
+}
+
+
+PID::~PID()
+{
 }
