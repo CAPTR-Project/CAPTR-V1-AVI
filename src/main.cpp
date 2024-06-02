@@ -40,11 +40,8 @@ void loop() {
 // put function definitions here:
 void initBMP(uint8_t i2cAddr, TwoWire* I2CBus){
   if (!bmp.begin_I2C(i2cAddr, I2CBus)) {
-    while (true) {
-      Serial.println("ERROR: Failed to find BMP390 sensor");
-      delay(1000);
-    }
-    return;
+    Serial.println("ERROR: Failed to find BMP390 sensor");
+    delay(1000);
   }
   Serial.println("BMP3 sensor found");
   bmp.setTemperatureOversampling(BMP3_OVERSAMPLING_4X);
