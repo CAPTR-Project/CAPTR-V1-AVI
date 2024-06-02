@@ -5,35 +5,31 @@ void setup() {
   Serial.begin(115200);
   Serial.println("hi");
 
-  initIMU(LSM6DS_I2CADDR_DEFAULT, &Wire);
-  initMag(LIS3MDL_I2CADDR_DEFAULT, &Wire);
-  // initBMP(BMP390_CHIP_ID, &Wire1);
+  // initIMU(LSM6DS_I2CADDR_DEFAULT, &Wire);
+  // initMag(LIS3MDL_I2CADDR_DEFAULT, &Wire);
+  initBMP(BMP3_ADDR_I2C_SEC, &Wire2);
 }
 
 void loop() {
   // Serial.println("live");
   // put your main code here, to run repeatedly:
-  // double altitude = bmp.readAltitude(1013.25);
+  double altitude = bmp.readAltitude(1013.25);
   
   lsm_accel->getEvent(&accelMainData);
   lsm_gyro->getEvent(&gyroData);
   lis_mag.getEvent(&magData);
 
 
-  // Serial.println("Altitude:");
-  // Serial.println(altitude);
+  Serial.printf("Altitude: %09.3f\n", altitude);
 
-  // Serial.println("Accel:");
   Serial.printf("Accel: %05.2f ", accelMainData.acceleration.x);
   Serial.printf("%05.2f ", accelMainData.acceleration.y);
   Serial.printf("%05.2f\n", accelMainData.acceleration.z);
 
-  // Serial.println("Gyro:");
   Serial.printf("Gyro: %05.2f ", gyroData.gyro.heading);
   Serial.printf("%05.2f ", gyroData.gyro.pitch);
   Serial.printf("%05.2f\n", gyroData.gyro.roll);
 
-  // Serial.println("Mag:");
   Serial.printf("Mag: %05.2f ", magData.magnetic.x);
   Serial.printf("%05.2f ", magData.magnetic.y);
   Serial.printf("%05.2f\n\n", magData.magnetic.z);
@@ -43,8 +39,11 @@ void loop() {
 
 // put function definitions here:
 void initBMP(uint8_t i2cAddr, TwoWire* I2CBus){
-  if (!bmp.begin_I2C(i2cAddr, &Wire)) {
-    Serial.println("ERROR: Failed to find BMP390 sensor");
+  if (!bmp.begin_I2C(i2cAddr, I2CBus)) {
+    while (true) {
+      Serial.println("ERROR: Failed to find BMP390 sensor");
+      delay(1000);
+    }
     return;
   }
   Serial.println("BMP3 sensor found");
