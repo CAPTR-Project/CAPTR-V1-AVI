@@ -11,6 +11,8 @@
 #include <RHReliableDatagram.h>
 #include <TinyGPS++.h>
 
+#include <ArduinoEigenDense.h>
+
 //Definitions
 #define RFM95_CS    10 //
 #define RFM95_INT   9  //
