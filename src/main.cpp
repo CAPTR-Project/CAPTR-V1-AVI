@@ -54,25 +54,58 @@ void loop() {
       // TODO: LV_ON Code
 
       if (error_state == ErrorState::NONE) {
-        mcu_state = ControllerState::TVC_UP;
-        new_state = true;
+        mcu_state = ControllerState::LV_ON;
       }
 
       break;
 
-    case ControllerState::TVC_UP:
+    case ControllerState::LAUNCH_DETECT:
       
       if(new_state)
       {
-        Serial.println("FSM: TVC_UP");
+        Serial.println("FSM: LAUNCH_DETECT");
         new_state = false;
       }
 
       // TODO: TVC_UP Code
 
       if (error_state == ErrorState::NONE) {
-        mcu_state = ControllerState::TVC_UP;
+        mcu_state = ControllerState::LAUNCH_DETECT;
       }
+
+      break;
+
+    case ControllerState::POWERED_ASCENT:
+      
+      if(new_state)
+      {
+        Serial.println("FSM: POWERED_ASCENT");
+        new_state = false;
+      }
+
+      // TODO: TVC_UP Code
+
+      if (error_state == ErrorState::NONE) {
+        mcu_state = ControllerState::POWERED_ASCENT;
+      }
+
+      break;
+
+    case ControllerState::COAST:
+      
+      if(new_state)
+      {
+        Serial.println("FSM: COAST");
+        new_state = false;
+      }
+
+      // TODO: Recovery Code
+
+      if (error_state == ErrorState::NONE) {
+        mcu_state = ControllerState::COAST;
+      }
+
+      break;
 
     case ControllerState::RECOVERY:
       
@@ -85,8 +118,26 @@ void loop() {
       // TODO: Recovery Code
 
       if (error_state == ErrorState::NONE) {
-        mcu_state = ControllerState::TVC_UP;
+        mcu_state = ControllerState::RECOVERY;
       }
+
+      break;
+    
+    case ControllerState::LANDED:
+      
+      if(new_state)
+      {
+        Serial.println("FSM: LANDED");
+        new_state = false;
+      }
+
+      // TODO: Recovery Code
+
+      if (error_state == ErrorState::NONE) {
+        mcu_state = ControllerState::LANDED;
+      }
+
+      break;
   }
 }
 
