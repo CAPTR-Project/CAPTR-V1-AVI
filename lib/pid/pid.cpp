@@ -24,13 +24,13 @@ void PID::setSetpoint(double setpoint)
 
 double PID::update(double input)
 {
-    double error = _setpoint - input;                                   // P
-    _integral += error * _dt;                                           // I
-    double derivative = (error - _prevError) / _dt;                     // D
+    _error = _setpoint - input;                                   // P
+    _integral += _error * _dt;                                           // I
+    _derivative = (_error - _prevError) / _dt;                     // D
 
     // sum
     _prevError = error;
-    double output = _Kp * error + _Ki * _integral + _Kd * derivative;
+    double output = _Kp * _error + _Ki * _integral + _Kd * _derivative;
 
     // clamping to min and max
     if (output < _min)
@@ -53,4 +53,14 @@ void PID::reset()
 
 PID::~PID()
 {
+}
+
+// test pid
+
+int main(){
+    PID pid(0.1, 100, -100, 0.1, 0.01, 0.5);
+    pid.setSetpoint(10);
+    double output = pid.update(5);
+    std::cout << "Output: " << output << std::endl;     // Output: 0.5
+    return 0;
 }

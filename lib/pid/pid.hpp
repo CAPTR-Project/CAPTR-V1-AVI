@@ -20,6 +20,8 @@ private:
     double _min, _max;
     double _dt;
     double _setpoint;
+    double _error;
+    double _derivative;
     double _integral;
     double _prevError;
 };
