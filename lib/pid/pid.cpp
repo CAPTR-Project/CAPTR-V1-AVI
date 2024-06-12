@@ -25,9 +25,9 @@ void PID::setSetpoint(double setpoint)
 
 double PID::update(double input)
 {
-    _error = _setpoint - input;                                   // P
+    _error = _setpoint - input;                                         // P
     _integral += _error * _dt;                                           // I
-    _derivative = (_error - _prevError) / _dt;                     // D
+    _derivative = (_error - _prevError) / _dt;                          // D
 
     // integral windup prevention
     if ((_error / _prevError) < 0){             

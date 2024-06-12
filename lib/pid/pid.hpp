@@ -6,7 +6,7 @@
 class PID
 {
 public:
-    PID(double dt, double max, double min, double Kp, double Kd, double Ki, double intMax);        // has to be same name as class because it is a constructor like init in python
+    PID(double Kp, double Kd, double Ki, double dt, double max, double min, double intMax);        // has to be same name as class because it is a constructor like init in python
     ~PID();
 
     // PID functions
