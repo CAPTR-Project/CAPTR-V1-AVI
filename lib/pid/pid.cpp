@@ -1,6 +1,6 @@
 #include "PID.hpp"
 
-PID::PID(double dt, double max, double min, double Kp, double Kd, double Ki): 
+PID::PID(double dt, double max, double min, double Kp, double Kd, double Ki, double intMax): 
     _dt(dt),
     _max(max), 
     _min(min), 
@@ -8,7 +8,8 @@ PID::PID(double dt, double max, double min, double Kp, double Kd, double Ki):
     _Kd(Kd), 
     _Ki(Ki), 
     _integral(0.0), 
-    _prevError(0.0)
+    _prevError(0.0),
+    _integral_max(intMax)
 {
 }
 
@@ -28,8 +29,12 @@ double PID::update(double input)
     _integral += _error * _dt;                                           // I
     _derivative = (_error - _prevError) / _dt;                     // D
 
+    if ((_error / _prevError) < 0){             // integral windup prevention - if error has overshot, reset integral
+        reset(false);
+    }
+
     // sum
-    _prevError = error;
+    _prevError = _error;
     double output = _Kp * _error + _Ki * _integral + _Kd * _derivative;
 
     // clamping to min and max
@@ -44,23 +49,21 @@ double PID::update(double input)
     return output;
 }
 
-void PID::reset()
+void PID::reset(bool all)
 {
-    _integral = 0.0;
-    _prevError = 0.0;
+    if (all)
+    {
+        _integral = 0.0;
+        _prevError = 0.0;
+    }
+    else
+    {
+        _integral = 0.0;
+    }
+    
 }
 
 
 PID::~PID()
 {
-}
-
-// test pid
-
-int main(){
-    PID pid(0.1, 100, -100, 0.1, 0.01, 0.5);
-    pid.setSetpoint(10);
-    double output = pid.update(5);
-    std::cout << "Output: " << output << std::endl;     // Output: 0.5
-    return 0;
 }
