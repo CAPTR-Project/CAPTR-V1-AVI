@@ -29,8 +29,14 @@ double PID::update(double input)
     _integral += _error * _dt;                                           // I
     _derivative = (_error - _prevError) / _dt;                     // D
 
-    if ((_error / _prevError) < 0){             // integral windup prevention - if error has overshot, reset integral
-        reset(false);
+    // integral windup prevention
+    if ((_error / _prevError) < 0){             
+        _integral = 0.0;
+    }
+    if (_integral > _integral_max){
+        _integral = _integral_max;
+    } else if (_integral < -_integral_max){
+        _integral = -_integral_max;
     }
 
     // sum
@@ -51,16 +57,8 @@ double PID::update(double input)
 
 void PID::reset(bool all)
 {
-    if (all)
-    {
-        _integral = 0.0;
-        _prevError = 0.0;
-    }
-    else
-    {
-        _integral = 0.0;
-    }
-    
+    _integral = 0.0;
+    _prevError = 0.0;
 }
 
 
