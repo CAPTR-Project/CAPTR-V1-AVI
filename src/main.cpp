@@ -3,13 +3,15 @@
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
+  Serial.println("hi");
 
-  initIMU(LSM6DS_I2CADDR_DEFAULT, &Wire);
-  initMag(LIS3MDL_I2CADDR_DEFAULT, &Wire);
-  initBMP(BMP390_CHIP_ID, &Wire1);
+  // initIMU(LSM6DS_I2CADDR_DEFAULT, &Wire);
+  // initMag(LIS3MDL_I2CADDR_DEFAULT, &Wire);
+  initBMP(BMP3_ADDR_I2C_SEC, &Wire2);
 }
 
 void loop() {
+  // Serial.println("live");
   // put your main code here, to run repeatedly:
   double altitude = bmp.readAltitude(1013.25);
   
@@ -18,29 +20,28 @@ void loop() {
   lis_mag.getEvent(&magData);
 
 
-  Serial.println("Altitude:");
-  Serial.println(altitude);
+  Serial.printf("Altitude: %09.3f\n", altitude);
 
-  Serial.println("Accel:");
-  Serial.println(accelMainData.acceleration.x);
-  Serial.println(accelMainData.acceleration.y);
-  Serial.println(accelMainData.acceleration.z);
+  Serial.printf("Accel: %05.2f ", accelMainData.acceleration.x);
+  Serial.printf("%05.2f ", accelMainData.acceleration.y);
+  Serial.printf("%05.2f\n", accelMainData.acceleration.z);
 
-  Serial.println("Gyro:");
-  Serial.println(gyroData.gyro.heading);
-  Serial.println(gyroData.gyro.pitch);
-  Serial.println(gyroData.gyro.roll);
+  Serial.printf("Gyro: %05.2f ", gyroData.gyro.heading);
+  Serial.printf("%05.2f ", gyroData.gyro.pitch);
+  Serial.printf("%05.2f\n", gyroData.gyro.roll);
 
-  Serial.println("Mag:");
-  Serial.println(magData.magnetic.x);
-  Serial.println(magData.magnetic.y);
-  Serial.println(magData.magnetic.z);
+  Serial.printf("Mag: %05.2f ", magData.magnetic.x);
+  Serial.printf("%05.2f ", magData.magnetic.y);
+  Serial.printf("%05.2f\n\n", magData.magnetic.z);
+
+  delay(100);
 }
 
 // put function definitions here:
 void initBMP(uint8_t i2cAddr, TwoWire* I2CBus){
-  if (!bmp.begin_I2C(i2cAddr, &Wire)) {
+  if (!bmp.begin_I2C(i2cAddr, I2CBus)) {
     Serial.println("ERROR: Failed to find BMP390 sensor");
+    delay(1000);
   }
   Serial.println("BMP3 sensor found");
   bmp.setTemperatureOversampling(BMP3_OVERSAMPLING_4X);
@@ -52,6 +53,7 @@ void initBMP(uint8_t i2cAddr, TwoWire* I2CBus){
 void initIMU(uint8_t i2cAddr, TwoWire* I2CBus) {
   if (!imu.begin_I2C(i2cAddr, I2CBus)) {
     Serial.println("ERROR: Failed to find LSM6DS chip");
+    return;
   }
 
   Serial.println("LSM6DS Found!");
@@ -72,6 +74,7 @@ void initIMU(uint8_t i2cAddr, TwoWire* I2CBus) {
 void initMag(uint8_t i2cAddr, TwoWire* I2CBus) {
   if (!lis_mag.begin_I2C(i2cAddr, I2CBus)) {
     Serial.println("ERROR: Failed to find LIS3MDL chip");
+    return;
   }
 
   Serial.println("LIS3MDL Found!");
