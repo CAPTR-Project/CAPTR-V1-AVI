@@ -5,7 +5,9 @@
 ![](bodycs.gif?raw=true)
 
 ### Local frame
-Uses FLU (Front Left Up) coordinate frame. X is front, Y is Left, Z is up.
+Uses FRD (Front Right Down) coordinate frame, BUT modified to accomodate the orientation of the rocket. **"Front" is actually pointing UP**. 
+
+#### If the rocket is sitting on the pad, **X is Up, Y is Right, Z is Front.**
 
 ## Rotation
 
@@ -17,4 +19,4 @@ Quaternions are standard representation
 
 
 ### Global frame
-Uses East North Up coordinate frame. **Note that this will be perceived as "rotated" 90 degrees clockwise from the local frame, since us humans like to think north as forward.**
+Uses East North Up coordinate frame. X is East, Y is North, Z is up. **Note that this is very different from the local frame.**
