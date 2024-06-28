@@ -23,9 +23,23 @@ namespace UKF {
 
         void update(Eigen::VectorXd z_measurement);
 
+        /**
+         * @brief Dyanmic model that "rides the gyro" to predict the next state.
+         * 
+         * @param x The state vector. The first 4 elements are the quaternion, the next 3 are the bias.
+         * @param w_measured The angular velocities. Assumed to be in the 3-2-1, or Z-Y-X convention.
+         * @param dt The time step, in seconds.
+         * @return Eigen::VectorXd 
+         */
+        Eigen::VectorXd f_quaternion(Eigen::VectorXd x, Eigen::VectorXd w_measured, double dt);
 
-        Eigen::VectorXd f_quaternion(Eigen::VectorXd x, Eigen::VectorXd w_k_minus_1, double dt);
-	    Eigen::VectorXd h_quaternion(Eigen::VectorXd x);
+        /**
+         * @brief Measurement model. 
+         * 
+         * @param z 
+         * @return Eigen::VectorXd 
+         */
+	    Eigen::VectorXd h_quaternion(Eigen::VectorXd z);
     } ;
 }
 

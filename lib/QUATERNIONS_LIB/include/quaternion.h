@@ -40,6 +40,8 @@
 
 #include "quaternion_utils.h"
 
+#include "ArduinoEigenDense.h"
+
 namespace quaternion {
 
 /**
@@ -150,6 +152,10 @@ public:
    */
   std::array<T, 4> to_array() const {
     return {{_a, _b, _c, _d}};
+  }
+
+  Eigen::Vector4d to_eigen() const {
+    return Eigen::Vector4d(_a, _b, _c, _d);
   }
 
   /**
