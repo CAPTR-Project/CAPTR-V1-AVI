@@ -61,16 +61,15 @@ Eigen::VectorXd Attitude::f_quaternion(Eigen::VectorXd x, Eigen::VectorXd w_meas
 
     Eigen::Vector3d w_k = w_measured - bias;
 
-    Eigen::VectorXd dw = 0.5 * dt * w_k;
-    std::array<double, 3> dw_arr = {dw(0), dw(1), dw(2)};
+    std::array<double, 3> dw_arr = {w_measured(0) * dt, w_measured(1) * dt, w_measured(2) * dt};
 
     quaternion::Quaternion dq = quaternion::from_euler(dw_arr);
 
-    quaternion::Quaternion q_k_plus_1 = dq * q_k;
+    q_k = q_k * dq;
 
     Eigen::VectorXd x_k_plus_1(x_dim_);
 
-    x_k_plus_1.block<4, 1>(0, 0) = q_k_plus_1.to_eigen();
+    x_k_plus_1.block<4, 1>(0, 0) = q_k.to_eigen();
 
     x_k_plus_1.block<3, 1>(4, 0) = bias;
     
