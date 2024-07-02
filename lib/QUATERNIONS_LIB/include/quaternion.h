@@ -2,10 +2,10 @@
 #define QUATERNION_H
 
 #include "Arduino.h"
-#include "Eigen.h"
-#include <Eigen/Core>
-#include <Eigen/Dense>
-#include <Eigen/Cholesky>
+#include "ArduinoEigenDense.h"
+#include <ArduinoEigen/Eigen/Core>
+#include <ArduinoEigen/Eigen/Dense>
+#include <ArduinoEigen/Eigen/Cholesky>
 
 #include <vector> 
 #include <math.h>

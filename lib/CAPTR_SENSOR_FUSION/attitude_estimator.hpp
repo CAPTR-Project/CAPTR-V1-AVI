@@ -2,24 +2,33 @@
 #define ATT_HPP
 
 #include <ArduinoEigenDense.h>
-#include <quaternion.h>
+#include <ArduinoEigen/Eigen/Cholesky>
+#include <Quaternion.h>
 
 namespace UKF {
+    #define X_DIM 7
+    #define Z_DIM 3
+    #define P_DIM 3
+    #define BIAS {0, 0, 0}
     class Attitude {
-        int x_dim_;
         Eigen::VectorXd x_hat_;
         Eigen::VectorXd x_prior_;
         Eigen::MatrixXd P;
 
-        int z_dim_;
-        Eigen::VectorXd z;
-        Eigen::VectorXd z_prior_;
+        Eigen::Vector3d z;
+        Eigen::Vector3d z_prior_;
+        Eigen::MatrixXd Q;
 
-        Eigen::MatrixXd omega;
+
+        Eigen::Vector3d omega;
 
         Attitude();
 
-        void predict(double dt);
+        Attitude(Quaternion starting_orientation);
+
+        Attitude(Quaternion starting_orientation, Eigen::Vector3d starting_bias);
+
+        void predict(double dt, Eigen::Vector3d w_m);
 
         void update(Eigen::VectorXd z_measurement);
 
@@ -31,7 +40,7 @@ namespace UKF {
          * @param dt The time step, in seconds.
          * @return Eigen::VectorXd 
          */
-        Eigen::VectorXd f_quaternion(Eigen::VectorXd x, Eigen::VectorXd w_measured, double dt);
+        Eigen::VectorXd f_quaternion(Eigen::VectorXd x, Eigen::Vector3d w_m, double dt);
 
         /**
          * @brief Measurement model. 
