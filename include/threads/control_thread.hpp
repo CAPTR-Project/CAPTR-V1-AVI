@@ -8,25 +8,23 @@
 
 File: main.hpp
 Auth: Alex Wang, Yubo Wang
-Desc: Header file for MCU
+Desc: Header file for control thread
 
 */
 
+#ifndef CONTROL_THREAD_HPP
+#define CONTROL_THREAD_HPP
+
 // ================================== Includes ====================================
-// ================================================================================
 
-#include <Arduino.h>
-
-#include <Wire.h>
-#include <SPI.h>
-
+#include "rtos_includes.hpp"
 #include "globals.hpp"
 
-// CAPTR libs
-#include "CAPTR_PIN_DRIVER.hpp"
 
-// threads
-#include "threads/attitude_est_thread.hpp"
-#include "threads/daq_threads.hpp"
-#include "threads/control_thread.hpp"
-#include "threads/telem_logger_thread.hpp"
+// ================================= Constants ====================================
+
+// ============================ Function Prototypes ==============================
+
+void control_thread(void *params);
+
+#endif
