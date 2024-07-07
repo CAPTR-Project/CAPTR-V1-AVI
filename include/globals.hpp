@@ -5,7 +5,7 @@
 
 inline long long msElapsed = 0;
 
-// STATE MACHINE
+// ================================= State Machine ================================
 enum class ControllerState
 {
     LV_ON,
@@ -36,5 +36,10 @@ inline std::atomic<ControllerState> mcu_state;
 inline std::atomic<ErrorState> error_state;
 
 inline std::atomic<bool> new_state;
+
+// ============================ Shared Variables =================================
+
+// semaphores
+
 
 #endif
