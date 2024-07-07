@@ -11,6 +11,9 @@ namespace UKF {
     #define P_DIM 3
     #define BIAS {0, 0, 0}
     class Attitude {
+
+    public:
+    
         Eigen::VectorXd x_hat_;
         Eigen::VectorXd x_prior_;
         Eigen::MatrixXd P;

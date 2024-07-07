@@ -20,10 +20,15 @@ Desc: Header file for Attitude Estimation Thread
 #include "rtos_includes.hpp"
 #include "globals.hpp"
 
+#include "attitude_estimator.hpp"
 
 // ================================= Constants ====================================
 
-// ============================ Function Prototypes ==============================
+// =============================== Variables ======================================
+
+UKF::Attitude att_estimator;
+
+// ============================ Function Prototypes ===============================
 
 void att_est_predict_thread(void*);
 void att_est_update_thread(void*);
