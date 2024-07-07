@@ -26,11 +26,16 @@ void setup() {
   Serial.begin(115200);
   Serial.println("hi");
 
-  xTaskCreate(att_est_predict_thread , "Attitude Predictor"  , 500, nullptr, 3, &attEstPredictTaskHandle);
-  xTaskCreate(att_est_update_thread , "Attitude Updator"  , 500, nullptr, 3, &attEstUpdateTaskHandle);
+  att_est_mutex = xSemaphoreCreateMutex();
+
+  xTaskCreate(att_est_predict_thread, "Attitude Predictor"  , 500, nullptr, 3, &attEstPredictTaskHandle);
+  xTaskCreate(att_est_update_thread , "Attitude Updator"    , 500, nullptr, 3, &attEstUpdateTaskHandle);
 
   xTaskCreate(control_thread        , "Control"             , 500, nullptr, 2, &controlTaskHandle);
   xTaskCreate(telem_logger_thread   , "Telemetry Logger"    , 500, nullptr, 1, &telemLoggerTaskHandle);
+
+  // attach interrupts
+  
 
   // initBMP(BMP390_CHIP_ID, &Wire);
   // initIMU(106U, &Wire);
