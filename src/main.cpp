@@ -24,6 +24,7 @@ void setup() {
   HwSetupPins();
   
   Serial.begin(115200);
+  Serial.println("hi");
 
   xTaskCreate(att_est_predict_thread , "Attitude Predictor"  , 500, nullptr, 3, &attEstPredictTaskHandle);
   xTaskCreate(att_est_update_thread , "Attitude Updator"  , 500, nullptr, 3, &attEstUpdateTaskHandle);
