@@ -137,6 +137,7 @@ void loop() {
       {
         Serial.println("FSM: LANDED");
         new_state = false;
+        // command dump data to SD card
       }
 
       // TODO: Recovery Code
