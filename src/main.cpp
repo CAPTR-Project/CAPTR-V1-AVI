@@ -34,6 +34,9 @@ void setup() {
   xTaskCreate(control_thread        , "Control"             , 500, nullptr, 2, &controlTaskHandle);
   xTaskCreate(telem_logger_thread   , "Telemetry Logger"    , 500, nullptr, 1, &telemLoggerTaskHandle);
 
+  // attach interrupts
+  
+
   // initBMP(BMP390_CHIP_ID, &Wire);
   // initIMU(106U, &Wire);
 }

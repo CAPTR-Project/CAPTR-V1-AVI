@@ -26,7 +26,6 @@ void att_est_predict_thread(void*) {
             last_action_was_predict = true;
             xSemaphoreGive(att_est_mutex);
         }
-        // wait for mutex lock and run UKF predict
     }
 }
 
