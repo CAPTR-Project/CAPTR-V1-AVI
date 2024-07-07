@@ -14,11 +14,11 @@ Desc: Source file for data acquisition Interrupt Service Routines
 
 #include "daq_ISRs.hpp"
 
-void imuCB(void*) {
+void imuISR(void*) {
 
 }
 
-void gyroCB(void*) {
+void gyroISR(void*) {
     // update gyro data global variable
 
     // TODO: Implement gyro data update
@@ -30,11 +30,11 @@ void gyroCB(void*) {
     portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 }
 
-void baroCB(void*) {
+void baroISR(void*) {
     // Baro
 }
 
-void magCB(void*) {
+void magISR(void*) {
     // update mag data global variable
 
     // TODO: Implement mag data update
