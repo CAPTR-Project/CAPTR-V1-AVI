@@ -18,7 +18,9 @@ Desc: Global variables and constants header file to be included in all relevant 
 
 #include "rtos_includes.hpp"
 
-inline long long msElapsed = 0;
+inline std::atomic<long long> msElapsed = 0;
+
+// ================================= Constants ====================================
 
 // ================================= State Machine ================================
 enum class ControllerState
@@ -63,7 +65,45 @@ inline TaskHandle_t telemLoggerTaskHandle = NULL;
 // semaphores
 
 // Mutexes
-SemaphoreHandle_t att_est_mutex;
+inline SemaphoreHandle_t att_est_mutex = NULL;
+
+// State variables
+inline std::atomic<double> yaw = 0;
+inline std::atomic<double> pitch = 0;
+inline std::atomic<double> roll = 0;
+
+inline std::atomic<double> att_cmd_yaw = 0;
+inline std::atomic<double> att_cmd_pitch = 0;
+inline std::atomic<double> att_cmd_roll = 0;
+
+inline std::atomic<double> tvc_cmd_x = 0;
+inline std::atomic<double> tvc_cmd_y = 0;
+
+inline std::atomic<double> altitude_agl = 0;
+inline std::atomic<double> altitude_msl = 0;
+inline std::atomic<double> baro_Pa = 0;
+
+inline std::atomic<double> accel_x = 0;
+inline std::atomic<double> accel_y = 0;
+inline std::atomic<double> accel_z = 0;
+
+inline std::atomic<double> gyro_x = 0;
+inline std::atomic<double> gyro_y = 0;
+inline std::atomic<double> gyro_z = 0;
+
+inline std::atomic<double> mag_x = 0;
+inline std::atomic<double> mag_y = 0;
+inline std::atomic<double> mag_z = 0;
+
+inline std::atomic<double> lat = 0;
+inline std::atomic<double> lon = 0;
+inline std::atomic<double> gps_alt = 0;
+inline std::atomic<double> gps_speed = 0;
+
+
+inline std::atomic<int> pyro_1_cmd = 0;
+inline std::atomic<int> pyro_2_cmd = 0;
+
 
 
 #endif
