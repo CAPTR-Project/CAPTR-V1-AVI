@@ -62,5 +62,8 @@ inline TaskHandle_t telemLoggerTaskHandle = NULL;
 
 // semaphores
 
+// Mutexes
+SemaphoreHandle_t att_est_mutex;
+
 
 #endif
