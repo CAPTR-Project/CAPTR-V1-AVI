@@ -72,9 +72,37 @@ void Attitude::predict(double dt, Eigen::Vector3d w_m) {
     
     // predict mean and covariance
     UnitQuaternion est_mean = UnitQuaternion(x_hat_(0), x_hat_(1), x_hat_(2), x_hat_(3));
+
+    Eigen::Matrix3d avg_err = Eigen::Matrix3d::Zero();
+
     for (int i = 0; i < 1000; i++) {
-        
+        avg_err = Eigen::Matrix3d::Zero();
+        for (int j = 0; j < 2 * P_DIM + 1; j++) {
+            UnitQuaternion q_j(quat_sigma_points(0, j), quat_sigma_points(1, j), quat_sigma_points(2, j), quat_sigma_points(3, j));
+            q_j = (q_j * est_mean.inverse());
+            double theta = 2 * acos(q_j.s);
+            Eigen::Vector3d err = theta / sin(theta) * q_j.to_quaternion_vector().block<3, 1>(1, 0);
+            avg_err += err;
+        }
+        avg_err /= (2 * P_DIM + 1);
+
+        est_mean = UnitQuaternion::omega(avg_err(0), avg_err(1), avg_err(2)) * est_mean;
     }
+
+    x_hat_.block<4, 1>(0, 0) = est_mean.to_quaternion_vector();
+
+    Eigen::Matrix3d cov = Eigen::Matrix3d::Zero();
+
+    for (int i = 0; i < 2 * P_DIM + 1; i++) {
+        UnitQuaternion q_j(quat_sigma_points(0, i), quat_sigma_points(1, i), quat_sigma_points(2, i), quat_sigma_points(3, i));
+        q_j = (q_j * est_mean.inverse());
+        double theta = 2 * acos(q_j.s);
+        Eigen::Vector3d err = theta / sin(theta) * q_j.to_quaternion_vector().block<3, 1>(1, 0);
+        cov += err * err.transpose();
+    }
+    cov /= (2 * P_DIM + 1);
+
+    P = cov;
     
 }
 
