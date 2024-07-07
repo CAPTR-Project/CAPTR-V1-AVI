@@ -1,3 +1,18 @@
+/*
+
+ ██████  █████  ██████  ████████ ██████
+██      ██   ██ ██   ██    ██    ██   ██
+██      ███████ ██████     ██    ██████ 
+██      ██   ██ ██         ██    ██   ██  
+ ██████ ██   ██ ██         ██    ██   ██ 
+
+File: main.cpp
+Auth: Alex Wang, Yubo Wang
+Desc: Global variables and constants header file to be included in all relevant files. 
+      Variable definitions use 'inline' to avoid linker errors.
+
+*/
+
 #ifndef GLOBALS_HPP
 #define GLOBALS_HPP
 
@@ -38,6 +53,12 @@ inline std::atomic<ErrorState> error_state;
 inline std::atomic<bool> new_state;
 
 // ============================ Shared Variables =================================
+
+// Task handles
+inline TaskHandle_t controlTaskHandle = NULL;
+inline TaskHandle_t attEstPredictTaskHandle = NULL;
+inline TaskHandle_t attEstUpdateTaskHandle = NULL;
+inline TaskHandle_t telemLoggerTaskHandle = NULL;
 
 // semaphores
 

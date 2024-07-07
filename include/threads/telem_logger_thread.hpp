@@ -6,8 +6,8 @@
 ██     ██  ██ ██       ██   ██ ██  
 ██████ ██  ██ ██       ██   ██  ██ 
 
-File: main.hpp
-Auth: Alex Wang, Yubo Wang
+File: telem_logger_thread.hpp
+Auth: Yubo Wang
 Desc: Header file for telemtry and logging thread
 
 */
@@ -26,6 +26,6 @@ Desc: Header file for telemtry and logging thread
 
 // ============================ Function Prototypes ==============================
 
-void telem_logger_thread(void *params);
+void telem_logger_thread(void*);
 
 #endif

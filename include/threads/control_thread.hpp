@@ -6,8 +6,8 @@
 ██     ██  ██ ██       ██   ██ ██  
 ██████ ██  ██ ██       ██   ██  ██ 
 
-File: main.hpp
-Auth: Alex Wang, Yubo Wang
+File: control_thread.hpp
+Auth: Yubo Wang
 Desc: Header file for control thread
 
 */
@@ -25,6 +25,6 @@ Desc: Header file for control thread
 
 // ============================ Function Prototypes ==============================
 
-void control_thread(void *params);
+void control_thread(void*);
 
 #endif

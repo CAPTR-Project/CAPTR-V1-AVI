@@ -6,7 +6,7 @@
 ██     ██  ██ ██       ██   ██ ██  
 ██████ ██  ██ ██       ██   ██  ██ 
 
-File: main.hpp
+File: attitude_est_thread.hpp
 Auth: Yubo Wang
 Desc: Header file for Attitude Estimation Thread
 
@@ -25,6 +25,7 @@ Desc: Header file for Attitude Estimation Thread
 
 // ============================ Function Prototypes ==============================
 
-void attitude_est_thread(void *params);
+void att_est_predict_thread(void*);
+void att_est_update_thread(void*);
 
 #endif

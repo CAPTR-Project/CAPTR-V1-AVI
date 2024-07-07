@@ -8,7 +8,7 @@
 
 File: main.cpp
 Auth: Alex Wang, Yubo Wang
-Desc: Main file for MCU
+Desc: Source file for MCU
 
 */
 
@@ -25,6 +25,12 @@ void setup() {
   
   Serial.begin(115200);
 
+  xTaskCreate(att_est_predict_thread , "Attitude Predictor"  , 500, nullptr, 3, &attEstPredictTaskHandle);
+  xTaskCreate(att_est_update_thread , "Attitude Updator"  , 500, nullptr, 3, &attEstUpdateTaskHandle);
+
+  xTaskCreate(control_thread        , "Control"             , 500, nullptr, 2, &controlTaskHandle);
+  xTaskCreate(telem_logger_thread   , "Telemetry Logger"    , 500, nullptr, 1, &telemLoggerTaskHandle);
+
   // initBMP(BMP390_CHIP_ID, &Wire);
   // initIMU(106U, &Wire);
 }
@@ -36,7 +42,6 @@ void loop() {
   
   // lsm_accel->getEvent(&accelMain);
   // lsm_gyro->getEvent(&gyro);
-  
 
   switch(mcu_state)
   {
