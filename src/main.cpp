@@ -1,96 +1,156 @@
+/*
+
+ ██████  █████  ██████  ████████ ██████
+██      ██   ██ ██   ██    ██    ██   ██
+██      ███████ ██████     ██    ██████ 
+██      ██   ██ ██         ██    ██   ██  
+ ██████ ██   ██ ██         ██    ██   ██ 
+
+File: main.cpp
+Auth: Alex Wang, Yubo Wang
+Desc: Source file for MCU
+
+*/
+
 #include "main.hpp"
 
+unsigned int loop_start;
+
 void setup() {
-  // put your setup code here, to run once:
+  mcu_state = ControllerState::LV_ON;
+  error_state = ErrorState::NONE;
+  new_state = true;
+
+  HwSetupPins();
+  
   Serial.begin(115200);
   Serial.println("hi");
 
-  // initIMU(LSM6DS_I2CADDR_DEFAULT, &Wire);
-  // initMag(LIS3MDL_I2CADDR_DEFAULT, &Wire);
-  initBMP(BMP3_ADDR_I2C_SEC, &Wire2);
+  xTaskCreate(att_est_predict_thread , "Attitude Predictor"  , 500, nullptr, 3, &attEstPredictTaskHandle);
+  xTaskCreate(att_est_update_thread , "Attitude Updator"  , 500, nullptr, 3, &attEstUpdateTaskHandle);
+
+  xTaskCreate(control_thread        , "Control"             , 500, nullptr, 2, &controlTaskHandle);
+  xTaskCreate(telem_logger_thread   , "Telemetry Logger"    , 500, nullptr, 1, &telemLoggerTaskHandle);
+
+  // initBMP(BMP390_CHIP_ID, &Wire);
+  // initIMU(106U, &Wire);
 }
 
 void loop() {
-  // Serial.println("live");
-  // put your main code here, to run repeatedly:
-  double altitude = bmp.readAltitude(1013.25);
+  loop_start = micros();
+
+  // double altitude = bmp.readAltitude(1013.25);
   
-  lsm_accel->getEvent(&accelMainData);
-  lsm_gyro->getEvent(&gyroData);
-  lis_mag.getEvent(&magData);
+  // lsm_accel->getEvent(&accelMain);
+  // lsm_gyro->getEvent(&gyro);
 
+  switch(mcu_state)
+  {
+    case ControllerState::LV_ON:
 
-  Serial.printf("Altitude: %09.3f\n", altitude);
+      if(new_state)
+      {
+        Serial.println("FSM: LV_ON");
+        new_state = false;
+      }
 
-  Serial.printf("Accel: %05.2f ", accelMainData.acceleration.x);
-  Serial.printf("%05.2f ", accelMainData.acceleration.y);
-  Serial.printf("%05.2f\n", accelMainData.acceleration.z);
+      // TODO: LV_ON Code
 
-  Serial.printf("Gyro: %05.2f ", gyroData.gyro.heading);
-  Serial.printf("%05.2f ", gyroData.gyro.pitch);
-  Serial.printf("%05.2f\n", gyroData.gyro.roll);
+      if (error_state == ErrorState::NONE) {
+        mcu_state = ControllerState::LV_ON;
+      }
 
-  Serial.printf("Mag: %05.2f ", magData.magnetic.x);
-  Serial.printf("%05.2f ", magData.magnetic.y);
-  Serial.printf("%05.2f\n\n", magData.magnetic.z);
+      break;
 
-  delay(100);
-}
+    case ControllerState::LAUNCH_DETECT:
+      
+      if(new_state)
+      {
+        Serial.println("FSM: LAUNCH_DETECT");
+        new_state = false;
+      }
 
-// put function definitions here:
-void initBMP(uint8_t i2cAddr, TwoWire* I2CBus){
-  if (!bmp.begin_I2C(i2cAddr, I2CBus)) {
-    Serial.println("ERROR: Failed to find BMP390 sensor");
-    delay(1000);
+      // TODO: TVC_UP Code
+
+      if (error_state == ErrorState::NONE) {
+        mcu_state = ControllerState::LAUNCH_DETECT;
+      }
+
+      break;
+
+    case ControllerState::POWERED_ASCENT:
+      
+      if(new_state)
+      {
+        Serial.println("FSM: POWERED_ASCENT");
+        new_state = false;
+      }
+
+      // TODO: TVC_UP Code
+
+      if (error_state == ErrorState::NONE) {
+        mcu_state = ControllerState::POWERED_ASCENT;
+      }
+
+      break;
+
+    case ControllerState::COAST:
+      
+      if(new_state)
+      {
+        Serial.println("FSM: COAST");
+        new_state = false;
+      }
+
+      // TODO: Recovery Code
+
+      if (error_state == ErrorState::NONE) {
+        mcu_state = ControllerState::COAST;
+      }
+
+      break;
+
+    case ControllerState::RECOVERY:
+      
+      if(new_state)
+      {
+        Serial.println("FSM: RECOVERY");
+        new_state = false;
+      }
+
+      // TODO: Recovery Code
+
+      if (error_state == ErrorState::NONE) {
+        mcu_state = ControllerState::RECOVERY;
+      }
+
+      break;
+    
+    case ControllerState::LANDED:
+      
+      if(new_state)
+      {
+        Serial.println("FSM: LANDED");
+        new_state = false;
+      }
+
+      // TODO: Recovery Code
+
+      if (error_state == ErrorState::NONE) {
+        mcu_state = ControllerState::LANDED;
+      }
+
+      break;
+
+    default:
+      Serial.println("FSM: ERROR");
+      error_state = ErrorState::FSM;
+      break;
   }
-  Serial.println("BMP3 sensor found");
-  bmp.setTemperatureOversampling(BMP3_OVERSAMPLING_4X);
-  bmp.setPressureOversampling(BMP3_OVERSAMPLING_16X);
-  bmp.setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3);
-  bmp.setOutputDataRate(BMP3_ODR_200_HZ);
 }
 
-void initIMU(uint8_t i2cAddr, TwoWire* I2CBus) {
-  if (!imu.begin_I2C(i2cAddr, I2CBus)) {
-    Serial.println("ERROR: Failed to find LSM6DS chip");
-    return;
-  }
-
-  Serial.println("LSM6DS Found!");
-
-  // Set to 2G range and 26 Hz update rate
-  imu.setAccelRange(LSM6DS_ACCEL_RANGE_16_G);
-  imu.setGyroRange(LSM6DS_GYRO_RANGE_2000_DPS);
-  imu.setAccelDataRate(LSM6DS_RATE_1_66K_HZ);
-  imu.setGyroDataRate(LSM6DS_RATE_1_66K_HZ);
-
-  lsm_accel = imu.getAccelerometerSensor();
-  lsm_accel->printSensorDetails();
-
-  lsm_gyro = imu.getGyroSensor();
-  lsm_gyro->printSensorDetails();
-}
-
-void initMag(uint8_t i2cAddr, TwoWire* I2CBus) {
-  if (!lis_mag.begin_I2C(i2cAddr, I2CBus)) {
-    Serial.println("ERROR: Failed to find LIS3MDL chip");
-    return;
-  }
-
-  Serial.println("LIS3MDL Found!");
-
-  lis_mag.setRange(LIS3MDL_RANGE_16_GAUSS);
-  lis_mag.setDataRate(LIS3MDL_DATARATE_560_HZ);
-  lis_mag.setPerformanceMode(LIS3MDL_ULTRAHIGHMODE);
-  lis_mag.setOperationMode(LIS3MDL_CONTINUOUSMODE);
-}
-
-void initRadio() {
-  if (!rf95_driver.init()) {
-    Serial.println("ERROR: LoRa radio init failed");
-  }
-  Serial.println("LoRa radio init OK!");
-  rf95_driver.setFrequency(915.0);
-  rf95_driver.setTxPower(15, false);
-
-}
+/*
+=============================================
+============ Function Definitions ===========
+=============================================
+*/

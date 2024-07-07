@@ -6,28 +6,26 @@
 ██     ██  ██ ██       ██   ██ ██  
 ██████ ██  ██ ██       ██   ██  ██ 
 
-File: main.hpp
-Auth: Alex Wang, Yubo Wang
-Desc: Header file for MCU
+File: telem_logger_thread.hpp
+Auth: Yubo Wang
+Desc: Header file for telemtry and logging thread
 
 */
 
+#ifndef TELEM_LOGGER_THREAD_HPP
+#define TELEM_LOGGER_THREAD_HPP
+
 // ================================== Includes ====================================
-// ================================================================================
 
-#include <Arduino.h>
-
-#include <Wire.h>
-#include <SPI.h>
-
+#include "rtos_includes.hpp"
 #include "globals.hpp"
 
-// CAPTR libs
-#include "CAPTR_PIN_DRIVER.hpp"
+// Include libs
 
-#include "daq_ISRs.hpp"
+// ================================= Constants ====================================
 
-// threads
-#include "threads/attitude_est_thread.hpp"
-#include "threads/control_thread.hpp"
-#include "threads/telem_logger_thread.hpp"
+// ============================ Function Prototypes ==============================
+
+void telem_logger_thread(void*);
+
+#endif

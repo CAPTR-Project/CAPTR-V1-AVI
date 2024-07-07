@@ -6,28 +6,26 @@
 ██     ██  ██ ██       ██   ██ ██  
 ██████ ██  ██ ██       ██   ██  ██ 
 
-File: main.hpp
-Auth: Alex Wang, Yubo Wang
-Desc: Header file for MCU
+File: attitude_est_thread.hpp
+Auth: Yubo Wang
+Desc: Header file for Attitude Estimation Thread
 
 */
 
+#ifndef ATT_EST_THREAD_HPP
+#define ATT_EST_THREAD_HPP
+
 // ================================== Includes ====================================
-// ================================================================================
 
-#include <Arduino.h>
-
-#include <Wire.h>
-#include <SPI.h>
-
+#include "rtos_includes.hpp"
 #include "globals.hpp"
 
-// CAPTR libs
-#include "CAPTR_PIN_DRIVER.hpp"
 
-#include "daq_ISRs.hpp"
+// ================================= Constants ====================================
 
-// threads
-#include "threads/attitude_est_thread.hpp"
-#include "threads/control_thread.hpp"
-#include "threads/telem_logger_thread.hpp"
+// ============================ Function Prototypes ==============================
+
+void att_est_predict_thread(void*);
+void att_est_update_thread(void*);
+
+#endif
