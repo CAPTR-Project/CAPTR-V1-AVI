@@ -106,6 +106,10 @@ void Attitude::predict(double dt, Eigen::Vector3d w_m) {
     
 }
 
+void Attitude::update(Eigen::Vector3d measurement) {
+    
+}
+
 Eigen::VectorXd Attitude::f_quaternion(Eigen::VectorXd x, Eigen::Vector3d w_m, double dt) {
     UnitQuaternion q_k(x(0), x(1), x(2), x(3));
 

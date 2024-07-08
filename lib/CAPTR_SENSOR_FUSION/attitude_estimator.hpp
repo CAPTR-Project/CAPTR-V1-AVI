@@ -13,7 +13,7 @@ namespace UKF {
     class Attitude {
 
     public:
-    
+
         Eigen::VectorXd x_hat_;
         Eigen::VectorXd x_prior_;
         Eigen::MatrixXd P;
@@ -33,7 +33,7 @@ namespace UKF {
 
         void predict(double dt, Eigen::Vector3d w_m);
 
-        void update(Eigen::VectorXd z_measurement);
+        void update(Eigen::Vector3d z_measurement);
 
         /**
          * @brief Dyanmic model that "rides the gyro" to predict the next state.
