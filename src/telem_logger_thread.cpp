@@ -16,6 +16,7 @@ Desc: Source file for telemetry and logging thread
 
 void telem_logger_thread(void*) {
     // Telemetry and logging
+    
     TickType_t xLastWakeTime = xTaskGetTickCount();
     BaseType_t xWasDelayed;
     while (1) {
