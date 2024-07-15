@@ -68,9 +68,7 @@ inline TaskHandle_t telemLoggerTaskHandle = NULL;
 inline SemaphoreHandle_t att_est_mutex = NULL;
 
 // State variables
-inline std::atomic<double> yaw = 0;
-inline std::atomic<double> pitch = 0;
-inline std::atomic<double> roll = 0;
+inline UKF::Attitude att_estimator;
 
 inline std::atomic<double> att_cmd_yaw = 0;
 inline std::atomic<double> att_cmd_pitch = 0;

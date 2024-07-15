@@ -88,7 +88,7 @@ UnitQuaternion::UnitQuaternion(float s, float v_1, float v_2, float v_3)
 }
 
 
-UnitQuaternion UnitQuaternion::omega(float wx, float wy, float wz)
+UnitQuaternion UnitQuaternion::from_rotVec(float wx, float wy, float wz)
 {
 	/***
 	Unit Quaternion Constructor from angle times rotation vector.
@@ -109,6 +109,36 @@ UnitQuaternion UnitQuaternion::omega(float wx, float wy, float wz)
 	uq.v_1 = sin(theta/2.0) * (wx / theta);
 	uq.v_2 = sin(theta/2.0) * (wy / theta);
 	uq.v_3 = sin(theta/2.0) * (wz / theta);
+
+	return uq;
+}
+
+UnitQuaternion UnitQuaternion::from_euler(float yaw, float pitch, float roll)
+{
+	/***
+	Unit Quaternion Constructor from Euler angles
+
+	Constructs a UnitQuaternion from Euler angles.
+	EQN reference: https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+
+	Inputs:
+	roll: roll angle (rads)
+	pitch: pitch angle (rads)
+	yaw: yaw angle (rads)
+	***/
+	UnitQuaternion uq;
+
+	float cr = cos(roll * 0.5);
+	float sr = sin(roll * 0.5);
+	float cp = cos(pitch * 0.5);
+	float sp = sin(pitch * 0.5);
+	float cy = cos(yaw * 0.5);
+	float sy = sin(yaw * 0.5);
+
+	uq.s = cr * cp * cy + sr * sp * sy;
+	uq.v_1 = sr * cp * cy - cr * sp * sy;
+	uq.v_2 = cr * sp * cy + sr * cp * sy;
+	uq.v_3 = cr * cp * sy - sr * sp * cy;
 
 	return uq;
 }
@@ -347,4 +377,43 @@ Eigen::Vector4d Quaternion::to_quaternion_vector()
 	***/	
 	Eigen::Vector4d quat_vect(this->s, this->v_1, this->v_2, this->v_3);
 	return quat_vect;
+}
+
+Eigen::Vector4d UnitQuaternion::average_quaternions(std::vector<UnitQuaternion> quaternions, std::vector<double> weights) {
+	Eigen::Matrix4d A = Eigen::Matrix4d::Zero();
+	int sz = quaternions.size();
+	double wSum = 0;
+
+	for (int i = 0; i < sz; i++) {
+		Eigen::Vector4d q = quaternions[i].to_quaternion_vector();
+		double w_i = weights[i];
+		A = w_i * (q * q.transpose()) + A;
+		wSum += weights[i];
+	}
+
+	A = (1 / wSum) * A;
+
+	Eigen::EigenSolver<Eigen::Matrix4d> es(A);
+	Eigen::Vector4cd eig = es.eigenvalues();
+	Eigen::Matrix4cd eigVec = es.eigenvectors();
+
+	int maxIdx = 0;
+	double maxVal = eig[0].real();
+	for (int i = 1; i < 4; i++) {
+		if (eig[i].real() > maxVal) {
+			maxVal = eig[i].real();
+			maxIdx = i;
+		}
+	}
+
+	Eigen::Vector4d avgQuat = eigVec.col(maxIdx).real();
+	return avgQuat;
+}
+
+Eigen::Vector3d UnitQuaternion::to_rotVec() {
+	Eigen::Vector3d rotVec;
+	rotVec << v_1, v_2, v_3;
+	double theta = 2 * acos(s);
+	rotVec = theta / sin(theta / 2) * rotVec;
+	return rotVec;
 }
