@@ -16,6 +16,8 @@ Desc: Source file for MCU
 
 unsigned int loop_start;
 
+unsigned int event_last_timer = 0;
+
 void setup() {
   mcu_state = ControllerState::LV_ON;
   error_state = ErrorState::NONE;
@@ -39,6 +41,7 @@ void setup() {
 
   // initBMP(BMP390_CHIP_ID, &Wire);
   // initIMU(106U, &Wire);
+  event_last_timer = millis();
 }
 
 void loop() {
@@ -57,9 +60,15 @@ void loop() {
       {
         Serial.println("FSM: LV_ON");
         new_state = false;
+
+        event_last_timer = millis();
       }
 
       // TODO: LV_ON Code
+      if (millis() - event_last_timer > 5000) {
+          mcu_state = ControllerState::LAUNCH_DETECT;
+          new_state = true;
+      }
 
       if (error_state == ErrorState::NONE) {
         mcu_state = ControllerState::LV_ON;
@@ -73,7 +82,9 @@ void loop() {
         {
           Serial.println("FSM: CALIBRATING");
           new_state = false;
+          event_last_timer = millis();
         }
+
 
         break;
 
