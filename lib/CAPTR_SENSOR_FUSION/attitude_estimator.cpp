@@ -114,12 +114,7 @@ void Attitude::update_mag(Eigen::Vector3d measurement) {
 
     Eigen::MatrixXd covSqrt = Q_.ldlt().matrixU();
 
-    Eigen::MatrixXd z_sigma_points(Q_DIM, 2 * Q_DIM + 1);
-    z_sigma_points.block<Q_DIM, 1>(0, 0) = z_;
-    for (int i = 1; i <= Q_DIM; i++) {
-        z_sigma_points.block<Q_DIM, 1>(0, i) = sqrt(2 * Q_DIM) * covSqrt.col(i);
-        z_sigma_points.block<Q_DIM, 1>(0, i + Q_DIM) = -sqrt(2 * Q_DIM) * covSqrt.col(i);
-    }
+    Eigen::MatrixXd z_sigma_points = sigma_points;
 
     // calculate cross covariance matrix
 
@@ -133,7 +128,7 @@ void Attitude::update_mag(Eigen::Vector3d measurement) {
 
     // calculate kalman gain
 
-    Eigen::MatrixXd K = P_xz * Q_.inverse();
+    Eigen::MatrixXd K = P_xz * (P + Q);
 
     // calculate weighted average of xhat and z to get new xhat. 
     Eigen::Vector3d innovation = z_rotVec - x_hat_.block<3, 1>(0, 0);
