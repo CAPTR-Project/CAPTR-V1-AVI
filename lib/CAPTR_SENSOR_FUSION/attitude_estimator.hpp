@@ -15,6 +15,7 @@ namespace UKF {
     #define Z_DIM 3
     #define P_DIM 3
     #define Q_DIM 3
+    #define R_DIM 3
     #define BIAS {0, 0, 0}
     class Attitude {
 
@@ -28,20 +29,32 @@ namespace UKF {
         Eigen::Vector3d z_prior_;
         Eigen::MatrixXd Q_;
 
+        Eigen::MatrixXd R_;
+
         Eigen::MatrixXd sigma_points;
 
         Eigen::Vector3d ang_vec; // [rad/s] angular velocity in [x, y, z] form. roll, pitch, yaw.
 
         Eigen::Vector3d mag_vec_up; // [uT] magnetic field vector in [x, y, z] form.
 
+        std::atomic_bool initialized = false;
+
         std::atomic<double> quat_w;
         std::atomic<double> quat_x;
         std::atomic<double> quat_y;
         std::atomic<double> quat_z;
 
+        /**
+         * @brief Construct a new Attitude object. Initializes everything.
+         * 
+         */
         Attitude();
 
-        Attitude(Quaternion starting_orientation, Eigen::Vector3d starting_bias, Eigen::Vector3d mag_vec, Eigen::Matrix<double, Q_DIM, Q_DIM> Q);
+        Attitude    (Quaternion starting_orientation,
+                    Eigen::Vector3d starting_bias, 
+                    Eigen::Vector3d mag_vec, 
+                    Eigen::Matrix<double, Q_DIM, Q_DIM> Q,
+                    Eigen::Matrix<double, Z_DIM, Z_DIM> R);
 
         /**
          * @brief Predict the next state of the system. Uses the dynamic model to predict the next state.
@@ -80,7 +93,6 @@ namespace UKF {
         
         void set_gyroBiases(Eigen::Vector3d new_biases);
         void set_magVec(Eigen::Vector3d new_magVec);
-        void set_Q(Eigen::Matrix<double, Q_DIM, Q_DIM> new_Q);
     } ;
 }
 

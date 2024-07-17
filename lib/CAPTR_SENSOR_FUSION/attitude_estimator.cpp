@@ -3,13 +3,18 @@
 namespace UKF {
 
 Attitude::Attitude(){
-    Attitude(UnitQuaternion(1, 0, 0, 0), Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(0, 0, 0), Eigen::Matrix<double, Q_DIM, Q_DIM>::Identity());
+    Attitude(UnitQuaternion(1, 0, 0, 0),
+    Eigen::Vector3d(0, 0, 0),
+    Eigen::Vector3d(0, 0, 0),
+    Eigen::Matrix<double, Q_DIM, Q_DIM>::Identity(),
+    Eigen::Matrix<double, Z_DIM, Z_DIM>::Identity());
 }
 
 Attitude::Attitude(Quaternion starting_orientation, 
                     Eigen::Vector3d starting_bias, 
                     Eigen::Vector3d mag_vec, 
-                    Eigen::Matrix<double, Q_DIM, Q_DIM> Q) 
+                    Eigen::Matrix<double, Q_DIM, Q_DIM> Q,
+                    Eigen::Matrix<double, Z_DIM, Z_DIM> R) 
 {
     x_hat_ = Eigen::VectorXd(X_DIM);
     x_hat_.block<4, 1>(0, 0) = starting_orientation.to_quaternion_vector();
@@ -25,11 +30,15 @@ Attitude::Attitude(Quaternion starting_orientation,
     z_vec_ = Eigen::VectorXd(Z_DIM);
     z_prior_ = Eigen::VectorXd(Z_DIM);
 
-    Q_ = Eigen::MatrixXd(Z_DIM, Z_DIM);
+    Q_ = Q;
+
+    R_ = R;
 
     sigma_points = Eigen::MatrixXd::Zero(P_DIM, 2 * P_DIM + 1);
 
     ang_vec = Eigen::Vector3d(0, 0, 0);
+
+    initialized = true;
 }
 
 void Attitude::predict(double dt, Eigen::Vector3d w_m) {
@@ -37,7 +46,7 @@ void Attitude::predict(double dt, Eigen::Vector3d w_m) {
     // generate sigma points
     // sigma_points = Eigen::MatrixXd::Zero(P_DIM, 2 * P_DIM + 1);
 
-    Eigen::MatrixXd covSqrt = P_.ldlt().matrixU();
+    Eigen::MatrixXd covSqrt = (P_ + Q_).ldlt().matrixU();
 
     sigma_points.block<P_DIM, 1>(0, 0) = CENTER_WEIGHT * x_hat_.block<P_DIM, 1>(0, 0);
     for (int i = 1; i <= P_DIM; i++) {
@@ -110,20 +119,16 @@ void Attitude::update_mag(Eigen::Vector3d measurement) {
     z_vec_ = z_quat.to_quaternion_vector();
     Eigen::Vector3d z_rotVec = z_quat.to_rotVec();
 
-    Eigen::Matrix(Q_DIM, 2 * Q_DIM + 1);
-
-    Eigen::MatrixXd covSqrt = Q_.ldlt().matrixU();
+    Eigen::Matrix(R_DIM, 2 * R_DIM + 1);
 
     Eigen::MatrixXd z_sigma_points = sigma_points;
 
     // calculate cross covariance matrix
-
-    Eigen::MatrixXd P_xz = Eigen::MatrixXd::Zero(P_DIM, Q_DIM);
+    Eigen::MatrixXd P_xz = Eigen::MatrixXd::Zero(P_DIM, R_DIM);
 
     for (int i = 0; i < 2 * P_DIM + 1; i++) {
-        P_xz += sigma_points.block<P_DIM, 1>(0, i) * (z_sigma_points.block<Q_DIM, 1>(0, i) - z_rotVec).transpose();
+        P_xz += sigma_points.block<P_DIM, 1>(0, i) * (z_sigma_points.block<R_DIM, 1>(0, i) - z_rotVec).transpose();
     }
-
     P_xz /= (2 * P_DIM + 1);
 
     // calculate kalman gain
@@ -188,10 +193,6 @@ void Attitude::set_gyroBiases(Eigen::Vector3d new_biases) {
 
 void Attitude::set_magVec(Eigen::Vector3d new_mag) {
     mag_vec_up = new_mag;
-}
-
-void Attitude::set_Q(Eigen::Matrix<double, Q_DIM, Q_DIM> new_Q) {
-    Q_ = new_Q;
 }
 
 } // namespace UKF

@@ -67,6 +67,16 @@ void loop() {
 
       break;
 
+    case ControllerState::CALIBRATING:
+        
+        if(new_state)
+        {
+          Serial.println("FSM: CALIBRATING");
+          new_state = false;
+        }
+
+        break;
+
     case ControllerState::LAUNCH_DETECT:
       
       if(new_state)

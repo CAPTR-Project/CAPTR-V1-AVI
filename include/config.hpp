@@ -8,7 +8,8 @@
 
 // ====================== State estimation configuration ======================
 
-
+#define Q_MATRIX (Eigen::Matrix<double, Q_DIM, Q_DIM>::Identity() * 0.1) // The process noise matrix.
+#define R_MATRIX (Eigen::Matrix<double, Z_DIM, Z_DIM>::Identity() * 0.1) // The measurement noise matrix.
 
 // ============================ Sensor configuration ==========================
 

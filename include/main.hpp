@@ -21,6 +21,7 @@ Desc: Header file for MCU
 #include <SPI.h>
 
 #include "globals.hpp"
+#include "config.hpp"
 
 // CAPTR libs
 #include "CAPTR_PIN_DRIVER.hpp"

@@ -26,6 +26,7 @@ inline std::atomic<long long> msElapsed = 0;
 enum class ControllerState
 {
     LV_ON,
+    CALIBRATING,
     LAUNCH_DETECT,
     POWERED_ASCENT,
     COAST,
