@@ -14,15 +14,15 @@ class Quaternion
 {
 public:
 	// Scalar part of Quaternion
-	float s;
+	float s = 1;
 
 	// Orthogonal complex number (vector part of Quaternion) 
-	float v_1, v_2, v_3;
+	float v_1 = 0, v_2 = 0, v_3 = 0;
 
 	Quaternion();
 	Quaternion(float s, float v_1, float v_2, float v_3);
 	Quaternion(float roll, float pitch, float yaw);
-	~Quaternion();
+	// ~Quaternion();
 
 
 	/*** Quaternion Operators ***/

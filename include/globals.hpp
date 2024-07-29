@@ -16,9 +16,15 @@ Desc: Global variables and constants header file to be included in all relevant 
 #ifndef GLOBALS_HPP
 #define GLOBALS_HPP
 
+#include <Wire.h>
 #include "rtos_includes.hpp"
 #include "attitude_estimator.hpp"
 #include "captr_sensor_msgs.hpp"
+#include <Adafruit_LSM6DS3TRC.h>
+#include <Adafruit_LSM6DSOX.h>
+#include <Adafruit_LIS3MDL.h>
+#include <Adafruit_BMP3XX.h>
+#include <TinyGPS++.h>
 
 inline std::atomic<long long> msElapsed = 0;
 
@@ -45,7 +51,13 @@ enum class ErrorState
 
     FSM,               
 
-    IMU, 
+    CONTROL,
+
+    ATT_EST,
+
+    LOGGING,
+
+    ACCEL, 
     GYRO,
     BARO,
     MAG,
@@ -64,11 +76,18 @@ inline TaskHandle_t controlTaskHandle = NULL;
 inline TaskHandle_t attEstPredictTaskHandle = NULL;
 inline TaskHandle_t attEstUpdateTaskHandle = NULL;
 inline TaskHandle_t telemLoggerTaskHandle = NULL;
+inline TaskHandle_t gyroCalibTaskHandle = NULL;
 
 // semaphores
 
 // Mutexes
 inline SemaphoreHandle_t att_est_mutex = NULL;
+
+// Sensors
+inline Adafruit_LSM6DS3TRC imu;
+// Adafruit_LSM6DSOX imu;
+inline Adafruit_LIS3MDL mag;
+inline Adafruit_BMP3XX bmp;
 
 // State variables
 inline UKF::Attitude att_estimator;
@@ -80,13 +99,10 @@ inline std::atomic<double> att_cmd_roll = 0;
 inline std::atomic<double> tvc_cmd_x = 0;
 inline std::atomic<double> tvc_cmd_y = 0;
 
-inline std::atomic<sensor_msgs::BaroMsg> baro_data;
-
-inline std::atomic<sensor_msgs::AccelMsg> accel_data;
-
-inline std::atomic<sensor_msgs::GyroMsg> gyro_data;
-
-inline std::atomic<sensor_msgs::MagMsg> mag_data;
+inline sensor_msgs::BaroMsg baro_data;
+inline sensor_msgs::AccelMsg accel_data;
+inline sensor_msgs::GyroMsg gyro_data;
+inline sensor_msgs::MagMsg mag_data;
 
 inline std::atomic<double> lat = 0;
 inline std::atomic<double> lon = 0;

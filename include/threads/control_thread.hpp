@@ -20,6 +20,7 @@ Desc: Header file for control thread
 #include "rtos_includes.hpp"
 #include "config.hpp"
 #include "globals.hpp"
+#include "attitude_estimator.hpp"
 
 // ================================= Constants ====================================
 

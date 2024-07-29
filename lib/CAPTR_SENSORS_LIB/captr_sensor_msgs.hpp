@@ -1,40 +1,61 @@
 #ifndef SENSOR_MSGS_HPP
 #define SENSOR_MSGS_HPP
 
+#include <ArduinoEigenDense.h>
+
 namespace sensor_msgs {
     class GyroMsg {
     
     public:
-        double x; // [rad/s]
-        double y; // [rad/s]
-        double z; // [rad/s]
+        GyroMsg();
+
+        Eigen::Vector3d toVector();
+
+        SemaphoreHandle_t ready;
+
+        float x = 0; // [rad/s]
+        float y = 0; // [rad/s]
+        float z = 0; // [rad/s]
     };
 
     class AccelMsg {
     
     public:
-        double x; // [m/s^2]
-        double y; // [m/s^2]
-        double z; // [m/s^2]
+        AccelMsg();
+        Eigen::Vector3d toVector();
+
+        SemaphoreHandle_t ready;
+
+        float x = 0; // [m/s^2]
+        float y = 0; // [m/s^2]
+        float z = 0; // [m/s^2]
     };
 
     class MagMsg {
     
     public:
-        double x; // [uT]
-        double y; // [uT]
-        double z; // [uT]
+        MagMsg();
+        Eigen::Vector3d toVector();
+
+        SemaphoreHandle_t ready;
+        
+        float x = 0; // [uT]
+        float y = 0; // [uT]
+        float z = 0; // [uT]
     };
 
     class BaroMsg {
     
     public:
-        double pres_msl; // [Pa]
-        double pres_agl; // [Pa]
-        double pressure; // [Pa]
-        double alt_msl; // [m]
-        double alt_agl; // [m]
-        // double temperature; // [deg C]
+        BaroMsg();
+        SemaphoreHandle_t ready;
+
+        float pres_msl = 0; // [Pa]
+        float pres_agl = 0; // [Pa]
+        float pressure = 0; // [Pa]
+        float alt_msl = 0; // [m]
+        float alt_agl = 0; // [m]
+        // float temperature = 0; // [deg C]
     }; 
 
 }

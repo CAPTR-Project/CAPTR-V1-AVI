@@ -27,11 +27,11 @@ Desc: Header file for data acquisition Interrupt Service Routines
 
 // ============================ Function Prototypes ==============================
 
-void imuISR(void*);
-void gyroISR(void*);
-void baroISR(void*);
-void magISR(void*);
+void imuISR();
+void gyroISR();
+void baroISR();
+void magISR();
 
-void GPS_thread(void*);
+void GPS_thread();
 
 #endif

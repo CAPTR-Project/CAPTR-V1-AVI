@@ -4,8 +4,10 @@
 #include <ArduinoEigenDense.h>
 #include <ArduinoEigen/Eigen/Cholesky>
 #include <Quaternion.h>
-#include "config.hpp"
 #include <vector>
+#include <atomic>
+#include "arduino_freertos.h"
+#include <semphr.h>
 
 namespace UKF {
     #define CENTER_WEIGHT 1.0
@@ -39,7 +41,8 @@ namespace UKF {
 
         std::atomic_bool initialized = false;
 
-        std::atomic<UnitQuaternion> newest_attitude_quat;
+        SemaphoreHandle_t ready;
+        UnitQuaternion newest_attitude_quat;
 
         /**
          * @brief Construct a new Attitude object. Initializes everything.
@@ -88,7 +91,7 @@ namespace UKF {
 	    UnitQuaternion h_quaternion(Eigen::Vector3d z);
         
         
-        void set_gyroBiases(Eigen::Vector3d new_biases);
+        void set_gyroBiases(float x, float y, float z);
         void set_magVec(Eigen::Vector3d new_magVec);
     } ;
 }

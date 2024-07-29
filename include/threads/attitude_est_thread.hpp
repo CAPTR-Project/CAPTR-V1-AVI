@@ -19,12 +19,14 @@ Desc: Header file for Attitude Estimation Thread
 
 #include "rtos_includes.hpp"
 #include "globals.hpp"
+#include "config.hpp"
 
 #include "attitude_estimator.hpp"
 
 // ================================= Constants ====================================
 
 // =============================== Variables ======================================
+inline std::atomic<bool> last_action_was_predict;
 
 // ============================ Function Prototypes ===============================
 

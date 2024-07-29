@@ -23,6 +23,11 @@ void setup() {
   error_state = ErrorState::NONE;
   new_state = true;
 
+  baro_data = sensor_msgs::BaroMsg();
+  accel_data = sensor_msgs::AccelMsg();
+  gyro_data = sensor_msgs::GyroMsg();
+  mag_data = sensor_msgs::MagMsg();
+
   HwSetupPins();
   
   Serial.begin(115200);
@@ -30,17 +35,16 @@ void setup() {
 
   att_est_mutex = xSemaphoreCreateMutex();
 
-  xTaskCreate(att_est_predict_thread, "Attitude Predictor"  , 500, nullptr, 3, &attEstPredictTaskHandle);
-  xTaskCreate(att_est_update_thread , "Attitude Updator"    , 500, nullptr, 3, &attEstUpdateTaskHandle);
+  // init sensors
+  sensors_lib::initIMU(&imu, LSM6DS_I2CADDR_DEFAULT, &Wire, IMU_DATARATE, imuISR, ACCEL_INT_PIN, gyroISR, GYRO_INT_PIN);
+  sensors_lib::initBMP(&bmp, BMP3_ADDR_I2C_SEC, &Wire, baroISR, BARO_INT_PIN);
+  sensors_lib::initMag(&mag, LIS3MDL_I2CADDR_DEFAULT, &Wire, MAG_DATARATE, magISR, MAG_INT_PIN);
 
-  xTaskCreate(control_thread        , "Control"             , 500, nullptr, 2, &controlTaskHandle);
-  xTaskCreate(telem_logger_thread   , "Telemetry Logger"    , 500, nullptr, 1, &telemLoggerTaskHandle);
+  xTaskCreate(att_est_predict_thread, "Attitude Predictor"  , 1500, nullptr, 3, &attEstPredictTaskHandle);
+  xTaskCreate(att_est_update_thread , "Attitude Updator"    , 1500, nullptr, 3, &attEstUpdateTaskHandle);
+  xTaskCreate(control_thread        , "Control"             , 1000, nullptr, 2, &controlTaskHandle);
+  xTaskCreate(telem_logger_thread   , "Telemetry Logger"    , 1000, nullptr, 1, &telemLoggerTaskHandle);
 
-  // attach interrupts
-  
-
-  // initBMP(BMP390_CHIP_ID, &Wire);
-  // initIMU(106U, &Wire);
   event_last_timer = millis();
 }
 
@@ -66,8 +70,9 @@ void loop() {
 
       // TODO: LV_ON Code
       if (millis() - event_last_timer > 5000) {
-          mcu_state = ControllerState::LAUNCH_DETECT;
+          mcu_state = ControllerState::CALIBRATING;
           new_state = true;
+          break;
       }
 
       if (error_state == ErrorState::NONE) {
@@ -83,8 +88,18 @@ void loop() {
           Serial.println("FSM: CALIBRATING");
           new_state = false;
           event_last_timer = millis();
+          xTaskCreate(gyroBiasEstimation_task, "Gyro Calibration"  , 500, nullptr, 4, &gyroCalibTaskHandle);
         }
 
+        if (gyro_calib_done) {
+          mcu_state = ControllerState::LAUNCH_DETECT;
+          new_state = true;
+          break;
+        }
+
+        if (error_state == ErrorState::NONE) {
+          mcu_state = ControllerState::CALIBRATING;
+        }
 
         break;
 

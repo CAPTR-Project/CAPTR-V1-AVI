@@ -37,7 +37,10 @@ Attitude::Attitude(UnitQuaternion starting_orientation,
 
     ang_vec = Eigen::Vector3d(0, 0, 0);
 
-    newest_attitude_quat = starting_orientation;
+    if (xSemaphoreTake(ready, 2) == pdTRUE) {
+        newest_attitude_quat = starting_orientation;
+        xSemaphoreGive(ready);
+    }
 
     initialized = true;
 }
@@ -79,10 +82,10 @@ void Attitude::predict(double dt, Eigen::Vector3d w_m) {
     // predict mean and covariance
     UnitQuaternion est_mean = UnitQuaternion(x_hat_(0), x_hat_(1), x_hat_(2), x_hat_(3));
 
-    Eigen::Matrix3d avg_err = Eigen::Matrix3d::Zero();
+    Eigen::Vector3d avg_err;
 
     for (int i = 0; i < 1000; i++) {
-        avg_err = Eigen::Matrix3d::Zero();
+        avg_err = Eigen::Vector3d::Zero();
         for (int j = 0; j < 2 * P_DIM + 1; j++) {
             UnitQuaternion q_j(quat_sigma_points(0, j), quat_sigma_points(1, j), quat_sigma_points(2, j), quat_sigma_points(3, j));
             q_j = (q_j * est_mean.inverse());
@@ -92,6 +95,8 @@ void Attitude::predict(double dt, Eigen::Vector3d w_m) {
 
         est_mean = UnitQuaternion::from_rotVec(avg_err(0), avg_err(1), avg_err(2)) * est_mean;
     }
+
+    x_prior_ = x_hat_;
 
     x_hat_.block<4, 1>(0, 0) = est_mean.to_quaternion_vector();
 
@@ -109,7 +114,10 @@ void Attitude::predict(double dt, Eigen::Vector3d w_m) {
 
     P_ = cov;
 
-    newest_attitude_quat = est_mean;
+    if (xSemaphoreTake(ready, pdMS_TO_TICKS(3)) == pdTRUE) {
+        newest_attitude_quat = est_mean;
+        xSemaphoreGive(ready);
+    }
     
 }
 
@@ -151,9 +159,15 @@ void Attitude::update_mag(Eigen::Vector3d measurement) {
 
     UnitQuaternion new_orientation = h_quaternion(fused_measurement);
 
+    x_prior_ = x_hat_;
+
     x_hat_.block<4, 1>(0, 0) = new_orientation.to_quaternion_vector();
 
-    newest_attitude_quat = new_orientation;
+    if (xSemaphoreTake(ready, pdMS_TO_TICKS(3)) == pdTRUE) {
+        newest_attitude_quat = new_orientation;
+        xSemaphoreGive(ready);
+    }
+    
 }
 
 
@@ -187,8 +201,8 @@ UnitQuaternion Attitude::h_quaternion(Eigen::Vector3d z) {
     return UnitQuaternion::from_rotVec(angle * axis(0), angle * axis(1), angle * axis(2));
 }
 
-void Attitude::set_gyroBiases(Eigen::Vector3d new_biases) {
-    x_hat_.block<3, 1>(4, 0) = new_biases;
+void Attitude::set_gyroBiases(float x, float y, float z) {
+    x_hat_.block<3, 1>(4, 0) = Eigen::Vector3d(x, y, z);
 }
 
 void Attitude::set_magVec(Eigen::Vector3d new_mag) {

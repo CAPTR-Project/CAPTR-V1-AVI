@@ -19,12 +19,14 @@ Desc: Header file for gyroscope calibration asynchronous task. Not long-living, 
 
 #include "rtos_includes.hpp"
 #include "globals.hpp"
-
+#include "config.hpp"
 
 // ================================= Constants ====================================
 
+inline std::atomic<bool> gyro_calib_done = false;
+
 // ============================ Function Prototypes ==============================
 
-void gyro_calibration(void*);
+void gyroBiasEstimation_task(void*);
 
 #endif

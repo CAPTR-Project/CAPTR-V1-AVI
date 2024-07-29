@@ -144,10 +144,10 @@ UnitQuaternion UnitQuaternion::from_euler(float yaw, float pitch, float roll)
 }
 
 /*** Destructors ***/
-Quaternion::~Quaternion()
-{
-	// Destructor
-}
+// Quaternion::~Quaternion()
+// {
+// 	// Destructor
+// }
 
 
 /*** Quaternion Operators ***/
