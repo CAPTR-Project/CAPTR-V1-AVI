@@ -379,7 +379,7 @@ Eigen::Vector4d Quaternion::to_quaternion_vector()
 	return quat_vect;
 }
 
-Eigen::Vector4d UnitQuaternion::average_quaternions(std::vector<UnitQuaternion> quaternions, std::vector<double> weights) {
+UnitQuaternion UnitQuaternion::average_quaternions(std::vector<UnitQuaternion> quaternions, std::vector<double> weights) {
 	Eigen::Matrix4d A = Eigen::Matrix4d::Zero();
 	int sz = quaternions.size();
 	double wSum = 0;
@@ -407,7 +407,7 @@ Eigen::Vector4d UnitQuaternion::average_quaternions(std::vector<UnitQuaternion> 
 	}
 
 	Eigen::Vector4d avgQuat = eigVec.col(maxIdx).real();
-	return avgQuat;
+	return UnitQuaternion(avgQuat(0), avgQuat(1), avgQuat(2), avgQuat(3));
 }
 
 Eigen::Vector3d UnitQuaternion::to_rotVec() {

@@ -10,7 +10,7 @@ Attitude::Attitude(){
     Eigen::Matrix<double, Z_DIM, Z_DIM>::Identity());
 }
 
-Attitude::Attitude(Quaternion starting_orientation, 
+Attitude::Attitude(UnitQuaternion starting_orientation, 
                     Eigen::Vector3d starting_bias, 
                     Eigen::Vector3d mag_vec, 
                     Eigen::Matrix<double, Q_DIM, Q_DIM> Q,
@@ -18,7 +18,6 @@ Attitude::Attitude(Quaternion starting_orientation,
 {
     x_hat_ = Eigen::VectorXd(X_DIM);
     x_hat_.block<4, 1>(0, 0) = starting_orientation.to_quaternion_vector();
-
     x_hat_.block<3, 1>(4, 0) = starting_bias;
     mag_vec_up = mag_vec;
     Q_ = Q;
@@ -38,6 +37,8 @@ Attitude::Attitude(Quaternion starting_orientation,
 
     ang_vec = Eigen::Vector3d(0, 0, 0);
 
+    newest_attitude_quat = starting_orientation;
+
     initialized = true;
 }
 
@@ -48,7 +49,9 @@ void Attitude::predict(double dt, Eigen::Vector3d w_m) {
 
     Eigen::MatrixXd covSqrt = (P_ + Q_).ldlt().matrixU();
 
-    sigma_points.block<P_DIM, 1>(0, 0) = CENTER_WEIGHT * x_hat_.block<P_DIM, 1>(0, 0);
+    UnitQuaternion q_k(x_hat_(0), x_hat_(1), x_hat_(2), x_hat_(3));
+
+    sigma_points.block<P_DIM, 1>(0, 0) = CENTER_WEIGHT * q_k.to_rotVec();
     for (int i = 1; i <= P_DIM; i++) {
         sigma_points.block<P_DIM, 1>(0, i) = sqrt(2 * P_DIM) * covSqrt.col(i - 1);
         sigma_points.block<P_DIM, 1>(0, i + P_DIM) = -sqrt(2 * P_DIM) * covSqrt.col(i - 1);
@@ -56,7 +59,6 @@ void Attitude::predict(double dt, Eigen::Vector3d w_m) {
 
     Eigen::MatrixXd quat_sigma_points(X_DIM, 2 * P_DIM + 1);
 
-    UnitQuaternion q_k(x_hat_(0), x_hat_(1), x_hat_(2), x_hat_(3));
     UnitQuaternion q_noise;
     // Eigen::Vector3d w_noise;
     for (int i = 0; i < 2 * P_DIM + 1; i++) {
@@ -107,53 +109,51 @@ void Attitude::predict(double dt, Eigen::Vector3d w_m) {
 
     P_ = cov;
 
-    quat_w = x_hat_(0);
-    quat_x = x_hat_(1);
-    quat_y = x_hat_(2);
-    quat_z = x_hat_(3);
+    newest_attitude_quat = est_mean;
     
 }
 
 void Attitude::update_mag(Eigen::Vector3d measurement) {
-    Quaternion z_quat = h_quaternion(measurement);
-    z_vec_ = z_quat.to_quaternion_vector();
-    Eigen::Vector3d z_rotVec = z_quat.to_rotVec();
+    UnitQuaternion x_k_quat = UnitQuaternion(x_hat_(0), x_hat_(1), x_hat_(2), x_hat_(3));
 
-    Eigen::Matrix(R_DIM, 2 * R_DIM + 1);
+    Eigen::MatrixXd z_sigma_points(R_DIM, 2 * R_DIM + 1);
 
-    Eigen::MatrixXd z_sigma_points = sigma_points;
+    for (int i = 0; i < 2 * R_DIM + 1; i++) {
+        UnitQuaternion q_j(sigma_points(0, i), sigma_points(1, i), sigma_points(2, i), sigma_points(3, i));
+        z_sigma_points.block<R_DIM, 1>(0, i) = q_j.vector_rotation_by_quaternion(mag_vec_up);
+    }
+
+    // calculate uncertainty in measurement caused by uncertainty in state, P_zz
+    Eigen::Vector3d z_k_predicted = x_k_quat.vector_rotation_by_quaternion(mag_vec_up);
+
+    Eigen::Matrix3d P_zz = Eigen::Matrix3d::Zero();
+    for (int i = 0; i < 2 * R_DIM + 1; i++) {
+        P_zz += (z_sigma_points.block<R_DIM, 1>(0, i) - z_k_predicted) * (z_sigma_points.block<R_DIM, 1>(0, i) - z_k_predicted).transpose();
+    }
+    P_zz /= (2 * R_DIM + 1);
 
     // calculate cross covariance matrix
     Eigen::MatrixXd P_xz = Eigen::MatrixXd::Zero(P_DIM, R_DIM);
 
     for (int i = 0; i < 2 * P_DIM + 1; i++) {
-        P_xz += sigma_points.block<P_DIM, 1>(0, i) * (z_sigma_points.block<R_DIM, 1>(0, i) - z_rotVec).transpose();
+        P_xz += sigma_points.block<P_DIM, 1>(0, i) * (z_sigma_points.block<R_DIM, 1>(0, i) - z_k_predicted).transpose();
     }
     P_xz /= (2 * P_DIM + 1);
 
     // calculate kalman gain
 
-    Eigen::MatrixXd K = P_xz * (P + Q);
+    Eigen::MatrixXd K = P_xz * (P_zz + R_).inverse();
 
     // calculate weighted average of xhat and z to get new xhat. 
-    Eigen::Vector3d innovation = z_rotVec - x_hat_.block<3, 1>(0, 0);
+    Eigen::Vector3d innovation = measurement - z_k_predicted;
 
-    std::vector<UnitQuaternion> q_vec;
-    q_vec.push_back(UnitQuaternion(x_hat_(0), x_hat_(1), x_hat_(2), x_hat_(3)));
-    q_vec.push_back(UnitQuaternion::from_rotVec(K * innovation));
+    Eigen::Vector3d fused_measurement = z_k_predicted + K * innovation;
 
-    std::vector<double> weights;
-    weights.push_back(1.0);
-    weights.push_back(1.0);
-
-    UnitQuaternion new_orientation = UnitQuaternion::average_quaternions(q_vec, weights);
+    UnitQuaternion new_orientation = h_quaternion(fused_measurement);
 
     x_hat_.block<4, 1>(0, 0) = new_orientation.to_quaternion_vector();
 
-    quat_w = x_hat_(0);
-    quat_x = x_hat_(1);
-    quat_y = x_hat_(2);
-    quat_z = x_hat_(3);
+    newest_attitude_quat = new_orientation;
 }
 
 

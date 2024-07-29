@@ -60,7 +60,7 @@ public:
 	static UnitQuaternion from_rotVec(float wx, float wy, float wz);
 	static UnitQuaternion from_euler(float yaw, float pitch, float roll);
 
-	static Eigen::Vector4d average_quaternions(std::vector<UnitQuaternion> quaternions, std::vector<double> weights);
+	static UnitQuaternion average_quaternions(std::vector<UnitQuaternion> quaternions, std::vector<double> weights);
 
 	/*** UnitQuaternion operators ***/
 	UnitQuaternion operator+ (const UnitQuaternion q2); // q3 = q1+q2

@@ -12,9 +12,9 @@ Desc: Source file for MCU
 
 */
 
-#include "threads/control_thread.hpp"
+#include "tasks/gyro_calib.hpp"
 
-void control_thread(void*) {
+void gyro_calibration(void*) {
     // Control
     TickType_t xLastWakeTime = xTaskGetTickCount();
     BaseType_t xWasDelayed;
@@ -24,6 +24,6 @@ void control_thread(void*) {
         // Read setpoints
         // Calculate control outputs
         // Write control outputs
-        xWasDelayed = xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(1.0/CONTROL_FREQUENCY));
+        xWasDelayed = xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(5));
     }
 }

@@ -26,8 +26,6 @@ Desc: Header file for Attitude Estimation Thread
 
 // =============================== Variables ======================================
 
-UKF::Attitude att_estimator;
-
 // ============================ Function Prototypes ===============================
 
 void att_est_predict_thread(void*);

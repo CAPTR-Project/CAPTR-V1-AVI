@@ -39,10 +39,7 @@ namespace UKF {
 
         std::atomic_bool initialized = false;
 
-        std::atomic<double> quat_w;
-        std::atomic<double> quat_x;
-        std::atomic<double> quat_y;
-        std::atomic<double> quat_z;
+        std::atomic<UnitQuaternion> newest_attitude_quat;
 
         /**
          * @brief Construct a new Attitude object. Initializes everything.
@@ -50,7 +47,7 @@ namespace UKF {
          */
         Attitude();
 
-        Attitude    (Quaternion starting_orientation,
+        Attitude    (UnitQuaternion starting_orientation,
                     Eigen::Vector3d starting_bias, 
                     Eigen::Vector3d mag_vec, 
                     Eigen::Matrix<double, Q_DIM, Q_DIM> Q,
