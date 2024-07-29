@@ -17,6 +17,8 @@ Desc: Global variables and constants header file to be included in all relevant 
 #define GLOBALS_HPP
 
 #include "rtos_includes.hpp"
+#include "attitude_estimator.hpp"
+#include "captr_sensor_msgs.hpp"
 
 inline std::atomic<long long> msElapsed = 0;
 
@@ -78,21 +80,13 @@ inline std::atomic<double> att_cmd_roll = 0;
 inline std::atomic<double> tvc_cmd_x = 0;
 inline std::atomic<double> tvc_cmd_y = 0;
 
-inline std::atomic<double> altitude_agl = 0;
-inline std::atomic<double> altitude_msl = 0;
-inline std::atomic<double> baro_Pa = 0;
+inline std::atomic<sensor_msgs::BaroMsg> baro_data;
 
-inline std::atomic<double> accel_x = 0;
-inline std::atomic<double> accel_y = 0;
-inline std::atomic<double> accel_z = 0;
+inline std::atomic<sensor_msgs::AccelMsg> accel_data;
 
-inline std::atomic<double> gyro_x = 0;
-inline std::atomic<double> gyro_y = 0;
-inline std::atomic<double> gyro_z = 0;
+inline std::atomic<sensor_msgs::GyroMsg> gyro_data;
 
-inline std::atomic<double> mag_x = 0;
-inline std::atomic<double> mag_y = 0;
-inline std::atomic<double> mag_z = 0;
+inline std::atomic<sensor_msgs::MagMsg> mag_data;
 
 inline std::atomic<double> lat = 0;
 inline std::atomic<double> lon = 0;
