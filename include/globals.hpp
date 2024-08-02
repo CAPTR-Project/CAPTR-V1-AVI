@@ -64,29 +64,21 @@ enum class ErrorState
     RF
 };
 
-inline std::atomic<ControllerState> mcu_state;
-inline std::atomic<ErrorState> error_state;
+inline std::atomic<ControllerState> mcu_state_;
+inline std::atomic<ErrorState> error_state_;
 
-inline std::atomic<bool> new_state;
+inline std::atomic<bool> new_state_;
 
 // ============================ Shared Variables =================================
-
-// Task handles
-inline TaskHandle_t controlTaskHandle = NULL;
-inline TaskHandle_t attEstPredictTaskHandle = NULL;
-inline TaskHandle_t attEstUpdateTaskHandle = NULL;
-inline TaskHandle_t telemLoggerTaskHandle = NULL;
-inline TaskHandle_t gyroCalibTaskHandle = NULL;
 
 // semaphores
 
 // Mutexes
-inline SemaphoreHandle_t att_est_mutex = NULL;
 
 // Sensors
-inline Adafruit_LSM6DS3TRC imu;
-// Adafruit_LSM6DSOX imu;
-inline Adafruit_LIS3MDL mag;
+inline Adafruit_LSM6DS3TRC imu_;
+// Adafruit_LSM6DSOX imu_;
+inline Adafruit_LIS3MDL mag_;
 inline Adafruit_BMP3XX bmp;
 
 // State variables
@@ -99,16 +91,10 @@ inline std::atomic<double> att_cmd_roll = 0;
 inline std::atomic<double> tvc_cmd_x = 0;
 inline std::atomic<double> tvc_cmd_y = 0;
 
-inline sensor_msgs::BaroMsg baro_data;
-inline sensor_msgs::AccelMsg accel_data;
-inline sensor_msgs::GyroMsg gyro_data;
-inline sensor_msgs::MagMsg mag_data;
-
-inline std::atomic<double> lat = 0;
-inline std::atomic<double> lon = 0;
-inline std::atomic<double> gps_alt = 0;
-inline std::atomic<double> gps_speed = 0;
-
+inline sensor_msgs::BaroMsg baro_data_;
+inline sensor_msgs::AccelMsg accel_data_;
+inline sensor_msgs::GyroMsg gyro_data_;
+inline sensor_msgs::MagMsg mag_data_;
 
 inline std::atomic<int> pyro_1_cmd = 0;
 inline std::atomic<int> pyro_2_cmd = 0;

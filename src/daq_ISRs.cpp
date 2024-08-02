@@ -16,28 +16,37 @@ Desc: Source file for data acquisition Interrupt Service Routines
 
 void imuISR() {
     sensor_msgs::AccelMsg new_accel_data;
-    if (!imu.readAcceleration(new_accel_data.x, new_accel_data.y, new_accel_data.z)) {
-        error_state = ErrorState::ACCEL;
+    if (!imu_.readAcceleration(new_accel_data.x, new_accel_data.y, new_accel_data.z)) {
+        error_state_ = ErrorState::ACCEL;
     }
-    accel_data = new_accel_data;
+    accel_data_ = new_accel_data;
+    telem_logger_thread::accel_data_ready_ = true;
+
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    configASSERT( telem_logger_thread::daqTaskHandle != NULL );
+    vTaskNotifyGiveFromISR( telem_logger_thread::daqTaskHandle, &xHigherPriorityTaskWoken);
+    portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 }
 
 void gyroISR() {
     // update gyro data global variable
     
     sensor_msgs::GyroMsg new_gyro_data;
-    if (!imu.readGyroscope(new_gyro_data.x, new_gyro_data.y, new_gyro_data.z)) {
-        error_state = ErrorState::GYRO;
+    if (!imu_.readGyroscope(new_gyro_data.x, new_gyro_data.y, new_gyro_data.z)) {
+        error_state_ = ErrorState::GYRO;
     }
-    gyro_data = new_gyro_data;
+    gyro_data_ = new_gyro_data;
+    telem_logger_thread::gyro_data_ready_ = true;
 
     // Send notification to control task on INDEX 0, unblocking the predict(). 
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    configASSERT( attEstPredictTaskHandle != NULL );
-    vTaskNotifyGiveFromISR(attEstPredictTaskHandle, &xHigherPriorityTaskWoken);
-    if (gyroCalibTaskHandle != NULL) {
-        vTaskNotifyGiveFromISR(gyroCalibTaskHandle, &xHigherPriorityTaskWoken);
+    configASSERT( att_est_threads::predictTaskHandle_ != NULL );
+    vTaskNotifyGiveFromISR(att_est_threads::predictTaskHandle_, &xHigherPriorityTaskWoken);
+    if (gyro_calib_task::taskHandle != NULL) {
+        vTaskNotifyGiveFromISR(gyro_calib_task::taskHandle, &xHigherPriorityTaskWoken);
     }
+    configASSERT( telem_logger_thread::daqTaskHandle != NULL );
+    vTaskNotifyGiveFromISR( telem_logger_thread::daqTaskHandle, &xHigherPriorityTaskWoken);
     portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 }
 
@@ -46,18 +55,22 @@ void baroISR() {
 }
 
 void magISR() {
-    // update mag data global variable
+    // update mag_ data global variable
 
     sensor_msgs::MagMsg new_mag_data;
-    if (!mag.readMagneticField(new_mag_data.x, new_mag_data.y, new_mag_data.z)) {
-        error_state = ErrorState::MAG;
+    if (!mag_.readMagneticField(new_mag_data.x, new_mag_data.y, new_mag_data.z)) {
+        error_state_ = ErrorState::MAG;
     }
-    mag_data = new_mag_data;
+    mag_data_ = new_mag_data;
+    telem_logger_thread::mag_data_ready_ = true;
     
     // Send notification to control task on INDEX 0, unblocking the update(). 
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    configASSERT( attEstUpdateTaskHandle != NULL );
-    vTaskNotifyGiveFromISR(attEstUpdateTaskHandle, &xHigherPriorityTaskWoken);
+    configASSERT( att_est_threads::updateTaskHandle_ != NULL );
+    vTaskNotifyGiveFromISR(att_est_threads::updateTaskHandle_, &xHigherPriorityTaskWoken);
+
+    configASSERT( telem_logger_thread::daqTaskHandle != NULL );
+    vTaskNotifyGiveFromISR(telem_logger_thread::daqTaskHandle, &xHigherPriorityTaskWoken);
     portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 }
 

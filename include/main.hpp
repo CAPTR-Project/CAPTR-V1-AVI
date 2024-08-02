@@ -23,10 +23,12 @@ Desc: Header file for MCU
 #include "globals.hpp"
 #include "config.hpp"
 
+// functions
+#include "daq_ISRs.hpp"
+
 // CAPTR libs
 #include "CAPTR_PIN_DRIVER.hpp"
 #include "sensors_setup.hpp"
-#include "daq_ISRs.hpp"
 
 // threads
 #include "threads/attitude_est_thread.hpp"
@@ -35,3 +37,4 @@ Desc: Header file for MCU
 
 // tasks
 #include "tasks/gyro_calib.hpp"
+#include "tasks/mag_calib.hpp"

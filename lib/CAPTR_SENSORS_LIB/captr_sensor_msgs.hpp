@@ -2,6 +2,7 @@
 #define SENSOR_MSGS_HPP
 
 #include <ArduinoEigenDense.h>
+#include <arduino_freertos.h>
 
 namespace sensor_msgs {
     class GyroMsg {

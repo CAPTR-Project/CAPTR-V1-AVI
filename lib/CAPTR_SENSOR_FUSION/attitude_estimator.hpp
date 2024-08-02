@@ -8,6 +8,7 @@
 #include <atomic>
 #include "arduino_freertos.h"
 #include <semphr.h>
+#include "captr_sensor_msgs.hpp"
 
 namespace UKF {
     #define CENTER_WEIGHT 1.0
@@ -50,7 +51,7 @@ namespace UKF {
          */
         Attitude();
 
-        Attitude    (UnitQuaternion starting_orientation,
+        void init(UnitQuaternion starting_orientation,
                     Eigen::Vector3d starting_bias, 
                     Eigen::Vector3d mag_vec, 
                     Eigen::Matrix<double, Q_DIM, Q_DIM> Q,
@@ -92,7 +93,7 @@ namespace UKF {
         
         
         void set_gyroBiases(float x, float y, float z);
-        void set_magVec(Eigen::Vector3d new_magVec);
+        void set_magVec(float x, float y, float z);
     } ;
 }
 

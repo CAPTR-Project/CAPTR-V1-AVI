@@ -12,17 +12,17 @@ Desc: Source file for MCU
 
 */
 
-#include "tasks/gyro_calib.hpp"
+#include "tasks/mag_calib.hpp"
 
-namespace gyro_calib_task {
+namespace mag_calib_task {
 
-void gyroBiasEstimation_task(void*) {
+void magVectorEstimation_task(void*) {
     
     // Initialize variables
-    gyro_calib_done = false;
+    mag_calib_done = false;
 
     long cnt = 0;
-    sensor_msgs::GyroMsg local_gyro_data;
+    sensor_msgs::MagMsg local_mag_data;
     float x = 0;
     float y = 0;
     float z = 0;
@@ -33,19 +33,19 @@ void gyroBiasEstimation_task(void*) {
     while (xLastWakeTime < start_time + pdMS_TO_TICKS(GYRO_CALIBRATION_TIME)) {
         // Read gyro data
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        local_gyro_data = gyro_data_;
-        x += local_gyro_data.x;
-        y += local_gyro_data.y;
-        z += local_gyro_data.z;
+        local_mag_data = mag_data_;
+        x += local_mag_data.x;
+        y += local_mag_data.y;
+        z += local_mag_data.z;
         cnt++;
     }
     x = x / cnt;
     y = y / cnt;
     z = z / cnt;
 
-    att_estimator.set_gyroBiases(x, y, z);
+    att_estimator.set_magVec(x, y, z);
 
-    gyro_calib_done = true;
+    mag_calib_done = true;
 
     vTaskDelete(NULL);
 }

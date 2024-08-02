@@ -3,14 +3,16 @@
 namespace UKF {
 
 Attitude::Attitude(){
-    Attitude(UnitQuaternion(1, 0, 0, 0),
+    ready = xSemaphoreCreateMutex();
+    init(UnitQuaternion(1, 0, 0, 0),
     Eigen::Vector3d(0, 0, 0),
     Eigen::Vector3d(0, 0, 0),
     Eigen::Matrix<double, Q_DIM, Q_DIM>::Identity(),
     Eigen::Matrix<double, Z_DIM, Z_DIM>::Identity());
+    initialized = false;
 }
 
-Attitude::Attitude(UnitQuaternion starting_orientation, 
+void Attitude::init(UnitQuaternion starting_orientation, 
                     Eigen::Vector3d starting_bias, 
                     Eigen::Vector3d mag_vec, 
                     Eigen::Matrix<double, Q_DIM, Q_DIM> Q,
@@ -37,7 +39,7 @@ Attitude::Attitude(UnitQuaternion starting_orientation,
 
     ang_vec = Eigen::Vector3d(0, 0, 0);
 
-    if (xSemaphoreTake(ready, 2) == pdTRUE) {
+    if (xSemaphoreTake(ready, 0) == pdTRUE) {
         newest_attitude_quat = starting_orientation;
         xSemaphoreGive(ready);
     }
@@ -205,8 +207,8 @@ void Attitude::set_gyroBiases(float x, float y, float z) {
     x_hat_.block<3, 1>(4, 0) = Eigen::Vector3d(x, y, z);
 }
 
-void Attitude::set_magVec(Eigen::Vector3d new_mag) {
-    mag_vec_up = new_mag;
+void Attitude::set_magVec(float x, float y, float z) {
+    mag_vec_up = Eigen::Vector3d(x, y, z);
 }
 
 } // namespace UKF

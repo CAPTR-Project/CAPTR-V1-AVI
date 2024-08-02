@@ -22,10 +22,16 @@ Desc: Header file for control thread
 #include "globals.hpp"
 #include "attitude_estimator.hpp"
 
-// ================================= Constants ====================================
+namespace controls_thread {
+
+// ================================= vars ====================================
+
+inline TaskHandle_t taskHandle = NULL;
 
 // ============================ Function Prototypes ==============================
 
 void control_thread(void*);
+
+}
 
 #endif
