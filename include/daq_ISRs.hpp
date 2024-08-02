@@ -29,6 +29,7 @@ Desc: Header file for data acquisition Interrupt Service Routines
 
 // tasks
 #include "tasks/gyro_calib.hpp"
+#include "tasks/mag_calib.hpp"
 
 // ================================= Constants ====================================
 

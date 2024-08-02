@@ -23,8 +23,10 @@ void imuISR() {
     telem_logger_thread::accel_data_ready_ = true;
 
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
     configASSERT( telem_logger_thread::daqTaskHandle != NULL );
     vTaskNotifyGiveFromISR( telem_logger_thread::daqTaskHandle, &xHigherPriorityTaskWoken);
+    
     portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 }
 
@@ -40,6 +42,7 @@ void gyroISR() {
 
     // Send notification to control task on INDEX 0, unblocking the predict(). 
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
     configASSERT( att_est_threads::predictTaskHandle_ != NULL );
     vTaskNotifyGiveFromISR(att_est_threads::predictTaskHandle_, &xHigherPriorityTaskWoken);
     if (gyro_calib_task::taskHandle != NULL) {
@@ -47,6 +50,7 @@ void gyroISR() {
     }
     configASSERT( telem_logger_thread::daqTaskHandle != NULL );
     vTaskNotifyGiveFromISR( telem_logger_thread::daqTaskHandle, &xHigherPriorityTaskWoken);
+
     portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 }
 
@@ -66,8 +70,13 @@ void magISR() {
     
     // Send notification to control task on INDEX 0, unblocking the update(). 
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
     configASSERT( att_est_threads::updateTaskHandle_ != NULL );
     vTaskNotifyGiveFromISR(att_est_threads::updateTaskHandle_, &xHigherPriorityTaskWoken);
+
+    if (mag_calib_task::taskHandle != NULL) {
+        vTaskNotifyGiveFromISR(mag_calib_task::taskHandle, &xHigherPriorityTaskWoken);
+    }
 
     configASSERT( telem_logger_thread::daqTaskHandle != NULL );
     vTaskNotifyGiveFromISR(telem_logger_thread::daqTaskHandle, &xHigherPriorityTaskWoken);
