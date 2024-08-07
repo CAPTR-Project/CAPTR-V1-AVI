@@ -7,7 +7,6 @@
 #define CONTROL_FREQUENCY 200 // [Hz] The frequency at which to run the control loop.
 
 
-
 // ====================== State estimation configuration ======================
 
 #define Q_MATRIX (Eigen::Matrix<double, Q_DIM, Q_DIM>::Identity() * 0.1) // The process noise matrix.

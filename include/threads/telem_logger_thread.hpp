@@ -24,6 +24,8 @@ Desc: Header file for telemtry and logging thread
 
 // ================================= Constants ====================================
 
+// Include constants/variables
+
 // ============================ Function Prototypes ==============================
 
 void telem_logger_thread(void*);
