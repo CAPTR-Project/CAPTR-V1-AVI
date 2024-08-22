@@ -40,4 +40,10 @@ struct SensorLog {
 
 void datalogger_thread(void*);
 
+// Validation function declarations
+bool isValidAccelData(const sensor_msgs::AccelMsg& accel);
+bool isValidGyroData(const sensor_msgs::GyroMsg& gyro);
+bool isValidBaroData(const sensor_msgs::BaroMsg& baro);
+bool isValidMagData(const sensor_msgs::MagMsg& mag);
+
 #endif
