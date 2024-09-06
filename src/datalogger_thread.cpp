@@ -13,10 +13,8 @@ Desc: Source file datalogger thread of BaroMsg, AccelMsg, GyroMsg, and mag_data
 */
 
 #include "threads/datalogger_thread.hpp"
-#include <cmath>
-#include <SerialFlash.h>
 
-const int FlashChip = 1; // Chip select pin for flash memory CHANGE WHEN IMPLEMENTED!!!!!
+// const int FlashChip = 1; // Chip select pin for flash memory CHANGE WHEN IMPLEMENTED!!!!!
 
 // check if individual sensor data is valid
 bool isValidAccelData(const sensor_msgs::AccelMsg& accel) {
@@ -79,7 +77,7 @@ void logData(const SensorLog& data) {
 
 void datalogger_thread(void*) {
     // init flash 
-    if (!SerialFlash.begin(FlashChip)) {
+    if (!SerialFlash.begin(FLASH_CHIP)) {
         error_state = ErrorState::FLASH_INIT;
         return;
     }

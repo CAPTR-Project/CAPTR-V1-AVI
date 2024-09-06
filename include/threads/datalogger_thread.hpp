@@ -19,6 +19,9 @@ Desc: Header file for datalogger thread of BaroMsg, AccelMsg, GyroMsg, and mag_d
 
 #include "rtos_includes.hpp"
 #include "globals.hpp"
+#include "config.hpp"
+#include <cmath>
+#include <SerialFlash.h>
 
 // Include libs
 
