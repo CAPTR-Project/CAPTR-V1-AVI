@@ -57,6 +57,10 @@ enum class ErrorState
 
     LOGGING,
 
+    FLASH_INIT,
+    FLASH_CREATE,
+    FLASH_WRITE,
+
     ACCEL, 
     GYRO,
     BARO,

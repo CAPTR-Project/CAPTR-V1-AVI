@@ -41,6 +41,8 @@ inline sensor_msgs::BaroMsg baro_data_;
 inline std::atomic_bool baro_data_ready_ = false;
 inline UnitQuaternion attitude_;
 
+// Include constants/variables
+
 // ============================ Function Prototypes ==============================
 
 void telem_logger_thread(void*);

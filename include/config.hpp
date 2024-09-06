@@ -7,7 +7,6 @@
 #define CONTROL_FREQUENCY 200 // [Hz] The frequency at which to run the control loop.
 
 
-
 // ====================== State estimation configuration ======================
 
 #define Q_MATRIX (Eigen::Matrix<double, Q_DIM, Q_DIM>::Identity() * 0.1) // The process noise matrix.
@@ -35,5 +34,9 @@
 // Barometer
 #define BARO_INT_PIN 5 // The pin to which the barometer interrupt is connected.
 #define BARO_PRESSURE_ASL 1013.25 // [Pa] The pressure at sea level.
+
+
+// Flash configuration
+#define FLASH_CHIP 1 // Chip select pin for flash memory CHANGE WHEN IMPLEMENTED!!!!!
 
 #endif
