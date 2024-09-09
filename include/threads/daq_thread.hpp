@@ -6,7 +6,7 @@
 ██     ██  ██ ██       ██   ██ ██  
 ██████ ██  ██ ██       ██   ██  ██ 
 
-File: telem_logger_thread.hpp
+File: daq_thread.hpp
 Auth: Yubo Wang
 Desc: Header file for telemtry and logging thread
 
@@ -20,34 +20,34 @@ Desc: Header file for telemtry and logging thread
 #include "rtos_includes.hpp"
 #include "globals.hpp"
 #include "quaternion.h"
+#include "attitude_est_thread.hpp"
+#include "tasks/gyro_calib.hpp"
+#include "tasks/mag_calib.hpp"
 
-namespace telem_logger_thread {
+namespace daq_thread {
 
 // Include libs
 
 // ================================= Vars ====================================
-inline SemaphoreHandle_t reading_flag_ = NULL;
 
 inline TaskHandle_t taskHandle = NULL;
-inline TaskHandle_t daqTaskHandle = NULL;
 
-inline sensor_msgs::AccelMsg accel_data_;
+inline sensor_msgs::AccelMsg temp_accel_data_;
 inline std::atomic_bool accel_data_ready_ = false;
-inline sensor_msgs::GyroMsg gyro_data_;
+inline sensor_msgs::GyroMsg temp_gyro_data_;
 inline std::atomic_bool gyro_data_ready_ = false;
-inline sensor_msgs::MagMsg mag_data_;
+inline sensor_msgs::MagMsg temp_mag_data_;
 inline std::atomic_bool mag_data_ready_ = false;
-inline sensor_msgs::BaroMsg baro_data_;
+inline sensor_msgs::BaroMsg temp_baro_data_;
 inline std::atomic_bool baro_data_ready_ = false;
-inline UnitQuaternion attitude_;
 
 // Include constants/variables
 
 // ============================ Function Prototypes ==============================
 
-void telem_logger_thread(void*);
+void daq_thread(void*);
 void telem_logger_DAQ_thread(void*);
 
-} // namespace telem_logger_thread
+} // namespace daq_thread
 
 #endif

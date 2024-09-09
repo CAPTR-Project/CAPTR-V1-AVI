@@ -33,17 +33,21 @@ void magVectorEstimation_task(void*) {
     while (xLastWakeTime < start_time + pdMS_TO_TICKS(GYRO_CALIBRATION_TIME)) {
         // Read gyro data
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        local_mag_data = mag_data_;
-        x += local_mag_data.x;
-        y += local_mag_data.y;
-        z += local_mag_data.z;
-        cnt++;
+        if (xSemaphoreTake(mag_data__.ready, 1) == pdTRUE) {
+            local_mag_data = mag_data__;
+            xSemaphoreGive(mag_data__.ready);
+        
+            x += local_mag_data.x;
+            y += local_mag_data.y;
+            z += local_mag_data.z;
+            cnt++;
+        }
     }
     x = x / cnt;
     y = y / cnt;
     z = z / cnt;
 
-    att_estimator.set_magVec(x, y, z);
+    att_estimator__.set_magVec(x, y, z);
 
     mag_calib_done = true;
 

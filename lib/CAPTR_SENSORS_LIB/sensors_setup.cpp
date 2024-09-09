@@ -35,8 +35,8 @@ namespace sensors_lib {
         imu->configInt1(false, true, false); // enable interrupt on gyroscope data ready
         imu->configInt2(false, false, true); // enable interrupt on accelerometer data ready
 
-        attachInterrupt(accel_isr_pin, imu_isr, arduino::RISING);
-        attachInterrupt(gyro_isr_pin, gyro_isr, arduino::RISING);
+        attachInterrupt(digitalPinToInterrupt(accel_isr_pin), imu_isr, arduino::RISING);
+        attachInterrupt(digitalPinToInterrupt(gyro_isr_pin), gyro_isr, arduino::RISING);
 
         return true;
     }
@@ -71,4 +71,8 @@ namespace sensors_lib {
     //     rf95_driver.setTxPower(15, false);
 
     // }
+
+    void initGPS(TinyGPSPlus* gps, HardwareSerial* gpsSerial) {
+        gpsSerial->begin(9600);
+    }
 }

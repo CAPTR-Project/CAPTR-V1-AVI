@@ -30,20 +30,25 @@ void gyroBiasEstimation_task(void*) {
     TickType_t xLastWakeTime = xTaskGetTickCount();
     BaseType_t xWasDelayed;
     TickType_t start_time = xTaskGetTickCount();
+
     while (xLastWakeTime < start_time + pdMS_TO_TICKS(GYRO_CALIBRATION_TIME)) {
         // Read gyro data
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        local_gyro_data = gyro_data_;
-        x += local_gyro_data.x;
-        y += local_gyro_data.y;
-        z += local_gyro_data.z;
-        cnt++;
+        if (xSemaphoreTake(gyro_data__.ready, 1) == pdTRUE) {
+            local_gyro_data = gyro_data__;
+            xSemaphoreGive(gyro_data__.ready);
+        
+            x += local_gyro_data.x;
+            y += local_gyro_data.y;
+            z += local_gyro_data.z;
+            cnt++;
+        }
     }
     x = x / cnt;
     y = y / cnt;
     z = z / cnt;
 
-    att_estimator.set_gyroBiases(x, y, z);
+    att_estimator__.set_gyroBiases(x, y, z);
 
     gyro_calib_done = true;
 

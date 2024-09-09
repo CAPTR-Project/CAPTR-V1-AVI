@@ -23,9 +23,9 @@ void control_thread(void*) {
     UnitQuaternion current_attitude;
     while (1) {
         // Control loop
-        if (xSemaphoreTake(att_estimator.ready, 0) == pdTRUE) {
-            current_attitude = att_estimator.newest_attitude_quat;
-            xSemaphoreGive(att_estimator.ready);
+        if (xSemaphoreTake(att_estimator__.ready, 0) == pdTRUE) {
+            current_attitude = att_estimator__.newest_attitude_quat;
+            xSemaphoreGive(att_estimator__.ready);
         }
 
 

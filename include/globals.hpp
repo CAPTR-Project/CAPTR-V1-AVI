@@ -65,7 +65,8 @@ enum class ErrorState
     GYRO,
     BARO,
     MAG,
-    RF
+    RF,
+    GPS
 };
 
 inline std::atomic<ControllerState> mcu_state_;
@@ -80,13 +81,14 @@ inline std::atomic<bool> new_state_;
 // Mutexes
 
 // Sensors
-inline Adafruit_LSM6DS3TRC imu_;
-// Adafruit_LSM6DSOX imu_;
-inline Adafruit_LIS3MDL mag_;
-inline Adafruit_BMP3XX bmp;
+inline Adafruit_LSM6DS3TRC imu__;
+// Adafruit_LSM6DSOX imu__;
+inline Adafruit_LIS3MDL mag__;
+inline Adafruit_BMP3XX bmp__;
+inline TinyGPSPlus gps__;
 
 // State variables
-inline UKF::Attitude att_estimator;
+inline UKF::Attitude att_estimator__;
 
 inline std::atomic<double> att_cmd_yaw = 0;
 inline std::atomic<double> att_cmd_pitch = 0;
@@ -95,10 +97,10 @@ inline std::atomic<double> att_cmd_roll = 0;
 inline std::atomic<double> tvc_cmd_x = 0;
 inline std::atomic<double> tvc_cmd_y = 0;
 
-inline sensor_msgs::BaroMsg baro_data_;
-inline sensor_msgs::AccelMsg accel_data_;
-inline sensor_msgs::GyroMsg gyro_data_;
-inline sensor_msgs::MagMsg mag_data_;
+inline sensor_msgs::BaroMsg baro_data__;
+inline sensor_msgs::AccelMsg accel_data__;
+inline sensor_msgs::GyroMsg gyro_data__;
+inline sensor_msgs::MagMsg mag_data__;
 
 inline std::atomic<int> pyro_1_cmd = 0;
 inline std::atomic<int> pyro_2_cmd = 0;

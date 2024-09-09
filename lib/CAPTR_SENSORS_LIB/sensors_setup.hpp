@@ -22,6 +22,8 @@ namespace sensors_lib {
                  void (*mag_isr)(), uint8_t mag_isr_pin);
     
     void initRadio();
+
+    void initGPS(TinyGPSPlus* gps, HardwareSerial* serialPort, uint32_t baudrate);
     
 }
 

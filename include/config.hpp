@@ -35,6 +35,10 @@
 #define BARO_INT_PIN 5 // The pin to which the barometer interrupt is connected.
 #define BARO_PRESSURE_ASL 1013.25 // [Pa] The pressure at sea level.
 
+// GPS
+#define GPS_SERIAL_PORT Serial1 // The serial port to which the GPS is connected.
+#define GPS_BAUDRATE 9600 // The baudrate of the GPS.
+#define GPS_FREQUENCY 10 // [Hz] The frequency at which to read the GPS.
 
 // Flash configuration
 #define FLASH_CHIP 1 // Chip select pin for flash memory CHANGE WHEN IMPLEMENTED!!!!!
