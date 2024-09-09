@@ -37,7 +37,7 @@ void setup()
 
     // init sensors
     sensors_lib::initIMU(&imu__, LSM6DS_I2CADDR_DEFAULT, &Wire, IMU_DATARATE, imuISR, ACCEL_INT_PIN, gyroISR, GYRO_INT_PIN);
-    sensors_lib::initBMP(&bmp__, BMP3_ADDR_I2C_SEC, &Wire, baroISR, BARO_INT_PIN);
+    sensors_lib::initBMP(&bmp__, BMP3_ADDR_I2C_SEC, &Wire1, baroISR, BARO_INT_PIN);
     sensors_lib::initMag(&mag__, LIS3MDL_I2CADDR_DEFAULT, &Wire, MAG_DATARATE, magISR, MAG_INT_PIN);
     sensors_lib::initGPS(&gps__, &GPS_SERIAL_PORT, GPS_BAUDRATE);
 

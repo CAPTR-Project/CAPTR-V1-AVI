@@ -51,7 +51,7 @@ void logData(const SensorLog& data) {
 
     if (!SerialFlash.exists(filename)) {
         if (!SerialFlash.create(filename, sizeof(SensorLog) * 10000)) { // Space for 10 000 logs
-            error_state = ErrorState::FLASH_CREATE;
+            error_state_ = ErrorState::FLASH_CREATE;
             return;
         }
     }
@@ -59,7 +59,7 @@ void logData(const SensorLog& data) {
     SerialFlashFile flashFile = SerialFlash.open(filename);
 
     if (!flashFile) {
-        error_state = ErrorState::FLASH_CREATE;
+        error_state_ = ErrorState::FLASH_CREATE;
         return;
     } else {
         // find end of file
@@ -67,7 +67,7 @@ void logData(const SensorLog& data) {
         
         // write data to flash
         if (flashFile.write(&data, sizeof(SensorLog)) != sizeof(SensorLog)) {
-            error_state = ErrorState::FLASH_WRITE;
+            error_state_ = ErrorState::FLASH_WRITE;
         }
 
         flashFile.close();
@@ -77,8 +77,8 @@ void logData(const SensorLog& data) {
 
 void datalogger_thread(void*) {
     // init flash 
-    if (!SerialFlash.begin(FLASH_CHIP)) {
-        error_state = ErrorState::FLASH_INIT;
+    if (!SerialFlash.begin(SPI, FLASH_CHIP)) {
+        error_state_ = ErrorState::FLASH_INIT;
         return;
     }
 
@@ -91,16 +91,28 @@ void datalogger_thread(void*) {
     //handle file open error
 
     while (1) {
-        xWasDelayed = xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(1000));
         
         // Read sensor data
         long long currentTimestamp = msElapsed.load();
 
         SensorLog currentLog;
-        currentLog.baro = baro_data;
-        currentLog.accel = accel_data;
-        currentLog.gyro = gyro_data;
-        currentLog.mag = mag_data;
+        if (xSemaphoreTake(baro_data__.ready, 0) == pdTRUE) {
+            currentLog.baro = baro_data__;
+            xSemaphoreGive(baro_data__.ready);
+        }
+        if (xSemaphoreTake(accel_data__.ready, 0) == pdTRUE) {
+            currentLog.accel = accel_data__;
+            xSemaphoreGive(accel_data__.ready);
+        }
+        if (xSemaphoreTake(gyro_data__.ready, 0) == pdTRUE) {
+            currentLog.gyro = gyro_data__;
+            xSemaphoreGive(gyro_data__.ready);
+        }
+        if (xSemaphoreTake(mag_data__.ready, 0) == pdTRUE) {
+            currentLog.mag = mag_data__;
+            xSemaphoreGive(mag_data__.ready);
+        }
+        
         currentLog.timestamp = currentTimestamp;
 
         // OR individually
@@ -112,18 +124,19 @@ void datalogger_thread(void*) {
         // log data to flash
         logData(currentLog);
 
+        xWasDelayed = xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(int(1000/LOGGING_FREQUENCY)));
         if (xWasDelayed) {
             // Log error
-            error_state = ErrorState::LOGGING;
+            error_state_ = ErrorState::LOGGING;
 
             if (!isValidAccelData(currentLog.accel)) {
-                error_state = ErrorState::ACCEL;
+                error_state_ = ErrorState::ACCEL;
             } else if (!isValidGyroData(currentLog.gyro)) {
-                error_state = ErrorState::GYRO;
+                error_state_ = ErrorState::GYRO;
             } else if (!isValidBaroData(currentLog.baro)) {
-                error_state = ErrorState::BARO;
+                error_state_ = ErrorState::BARO;
             } else if (!isValidMagData(currentLog.mag)) {
-                error_state = ErrorState::MAG;
+                error_state_ = ErrorState::MAG;
             }
         }
     }

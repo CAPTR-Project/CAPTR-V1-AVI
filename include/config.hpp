@@ -41,6 +41,6 @@
 #define GPS_FREQUENCY 10 // [Hz] The frequency at which to read the GPS.
 
 // Flash configuration
-#define FLASH_CHIP 1 // Chip select pin for flash memory CHANGE WHEN IMPLEMENTED!!!!!
+#define FLASH_CHIP 10 // Chip select pin for flash memory
 
 #endif
