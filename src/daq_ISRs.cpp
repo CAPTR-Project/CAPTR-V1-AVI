@@ -60,6 +60,9 @@ void magISR() {
     if (!mag__.readMagneticField(new_mag_data.x, new_mag_data.y, new_mag_data.z)) {
         error_state_ = ErrorState::MAG;
     }
+    new_mag_data.x = MAG_X_OFFSET;
+    new_mag_data.y += MAG_Y_OFFSET;
+    new_mag_data.z += MAG_Z_OFFSET;
     daq_thread::temp_mag_data_ = new_mag_data;
     daq_thread::mag_data_ready_ = true;
     
