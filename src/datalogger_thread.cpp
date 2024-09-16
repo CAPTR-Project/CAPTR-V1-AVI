@@ -14,6 +14,8 @@ Desc: Source file datalogger thread of BaroMsg, AccelMsg, GyroMsg, and mag_data
 
 #include "threads/datalogger_thread.hpp"
 
+namespace datalogger_thread {
+
 // const int FlashChip = 1; // Chip select pin for flash memory CHANGE WHEN IMPLEMENTED!!!!!
 
 // check if individual sensor data is valid
@@ -45,12 +47,12 @@ bool isValidMagData(const sensor_msgs::MagMsg& mag) {
 }
 
 // Log data to SerialFlash
-void logData(const SensorLog& data) {
+void logData(const datalogger_thread::SensorLog& data) {
     // Write data to flash memory
     const char *filename = "datalog.bin";
 
     if (!SerialFlash.exists(filename)) {
-        if (!SerialFlash.create(filename, sizeof(SensorLog) * 10000)) { // Space for 10 000 logs
+        if (!SerialFlash.create(filename, sizeof(datalogger_thread::SensorLog) * 10000)) { // Space for 10 000 logs
             error_state_ = ErrorState::FLASH_CREATE;
             return;
         }
@@ -66,7 +68,7 @@ void logData(const SensorLog& data) {
         flashFile.seek(flashFile.size());
         
         // write data to flash
-        if (flashFile.write(&data, sizeof(SensorLog)) != sizeof(SensorLog)) {
+        if (flashFile.write(&data, sizeof(datalogger_thread::SensorLog)) != sizeof(datalogger_thread::SensorLog)) {
             error_state_ = ErrorState::FLASH_WRITE;
         }
 
@@ -93,9 +95,9 @@ void datalogger_thread(void*) {
     while (1) {
         
         // Read sensor data
-        long long currentTimestamp = msElapsed.load();
+        uint32_t currentTimestamp = msElapsed.load();
 
-        SensorLog currentLog;
+        datalogger_thread::SensorLog currentLog;
         if (xSemaphoreTake(baro_data__.ready, 0) == pdTRUE) {
             currentLog.baro = baro_data__;
             xSemaphoreGive(baro_data__.ready);
@@ -141,3 +143,5 @@ void datalogger_thread(void*) {
         }
     }
 }
+
+} // namespace datalogger_thread

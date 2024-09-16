@@ -49,11 +49,11 @@ void setup()
     xTaskCreate(controls_thread::control_thread, 
                 "Control", 2000, nullptr, 10, &controls_thread::taskHandle);
     xTaskCreate(daq_thread::daq_thread, 
-                "Telemetry Logger", 1000, nullptr, 1, &daq_thread::taskHandle);
-    xTaskCreate(daq_thread::telem_logger_DAQ_thread, 
-                "Sensor DAQ", 1000, nullptr, 50, &daq_thread::taskHandle);
-    xTaskCreate(controls_thread::control_thread, 
-                "Control", 2000, nullptr, 8, &controls_thread::taskHandle);
+                "Sensor DAQ", 1000, nullptr, 1, &daq_thread::taskHandle);
+    xTaskCreate(datalogger_thread::datalogger_thread, 
+                "Telemetry Logger", 1000, nullptr, 50, &datalogger_thread::taskHandle);
+    // xTaskCreate(controls_thread::control_thread, 
+    //             "Control", 2000, nullptr, 8, &controls_thread::taskHandle);
     taskEXIT_CRITICAL();
 
     last_state_change_ms = millis();

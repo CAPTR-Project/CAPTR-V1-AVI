@@ -19,20 +19,20 @@
 // Gyroscope
 #define IMU_DATARATE LSM6DS_RATE_52_HZ
 #define GYRO_CALIBRATION_TIME 10000 // [ms] The time to calibrate the gyroscope offsets.
-#define GYRO_INT_PIN 2 // The pin to which the gyroscope interrupt is connected.
+#define GYRO_INT_PIN 40 // The pin to which the gyroscope interrupt is connected.
 
 // Accelerometer
-#define ACCEL_INT_PIN 3 // The pin to which the accelerometer interrupt is connected.
+#define ACCEL_INT_PIN 9 // The pin to which the accelerometer interrupt is connected.
 
 // Magnetometer
 #define MAG_X_OFFSET 0.0 // [uT]
 #define MAG_Y_OFFSET 0.0 // [uT]
 #define MAG_Z_OFFSET 0.0 // [uT]
 #define MAG_DATARATE LIS3MDL_DATARATE_20_HZ
-#define MAG_INT_PIN 4 // The pin to which the magnetometer interrupt is connected.
+#define MAG_INT_PIN 38 // The pin to which the magnetometer interrupt is connected.
 
 // Barometer
-#define BARO_INT_PIN 5 // The pin to which the barometer interrupt is connected.
+#define BARO_INT_PIN 41 // The pin to which the barometer interrupt is connected.
 #define BARO_PRESSURE_ASL 1013.25 // [Pa] The pressure at sea level.
 
 // GPS

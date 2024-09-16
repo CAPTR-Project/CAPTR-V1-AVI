@@ -23,11 +23,14 @@ Desc: Header file for datalogger thread of BaroMsg, AccelMsg, GyroMsg, and mag_d
 #include <cmath>
 #include <SerialFlash.h>
 
+namespace datalogger_thread {
+
 // Include libs
 
-// ================================= Constants ====================================
+// ============================== Constants/Vars ==================================
 
 // Include constants/variables
+inline TaskHandle_t taskHandle = NULL;
 
 // ============================ Structs/Enums/Unions ==============================
 
@@ -36,10 +39,11 @@ struct SensorLog {
     sensor_msgs::AccelMsg accel;
     sensor_msgs::GyroMsg gyro;
     sensor_msgs::MagMsg mag;
-    long long timestamp;
+    uint32_t timestamp;
 };
 
 // ============================ Function Prototypes ==============================
+
 
 void datalogger_thread(void*);
 
@@ -48,5 +52,7 @@ bool isValidAccelData(const sensor_msgs::AccelMsg& accel);
 bool isValidGyroData(const sensor_msgs::GyroMsg& gyro);
 bool isValidBaroData(const sensor_msgs::BaroMsg& baro);
 bool isValidMagData(const sensor_msgs::MagMsg& mag);
+
+}
 
 #endif

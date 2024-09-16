@@ -26,7 +26,7 @@ Desc: Global variables and constants header file to be included in all relevant 
 #include <Adafruit_BMP3XX.h>
 #include <TinyGPS++.h>
 
-inline std::atomic<long long> msElapsed = 0;
+inline std::atomic<uint32_t> msElapsed = 0;
 
 // ================================= Constants ====================================
 

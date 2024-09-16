@@ -417,3 +417,10 @@ Eigen::Vector3d UnitQuaternion::to_rotVec() {
 	rotVec = theta / sin(theta / 2) * rotVec;
 	return rotVec;
 }
+
+Eigen::Vector3d UnitQuaternion::to_euler() {
+	double roll = atan2(2 * (s * v_1 + v_2 * v_3), 1 - 2 * (v_1 * v_1 + v_2 * v_2));
+	double pitch = asin(2 * (s * v_2 - v_3 * v_1));
+	double yaw = atan2(2 * (s * v_3 + v_1 * v_2), 1 - 2 * (v_2 * v_2 + v_3 * v_3));
+	return Eigen::Vector3d(roll, pitch, yaw);
+}

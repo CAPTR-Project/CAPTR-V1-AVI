@@ -55,24 +55,22 @@ namespace sensors_lib {
         lis_mag->setPerformanceMode(LIS3MDL_ULTRAHIGHMODE);
         lis_mag->setOperationMode(LIS3MDL_CONTINUOUSMODE);
 
-        lis_mag->setIntThreshold(0);
-        lis_mag->configInterrupt(true, true, true, true, false, true);
         attachInterrupt(mag_isr_pin, mag_isr, arduino::RISING);
 
         return true;
     }
 
-    // void initRadio() {
-    //     if (!rf95_driver.init()) {
-    //         Serial.println("ERROR: LoRa radio init failed");
-    //     }
-    //     Serial.println("LoRa radio init OK!");
-    //     rf95_driver.setFrequency(915.0);
-    //     rf95_driver.setTxPower(15, false);
+    void initRadio() {
+        // if (!rf95_driver.init()) {
+        //     Serial.println("ERROR: LoRa radio init failed");
+        // }
+        // Serial.println("LoRa radio init OK!");
+        // rf95_driver.setFrequency(915.0);
+        // rf95_driver.setTxPower(15, false);
 
-    // }
+    }
 
-    void initGPS(TinyGPSPlus* gps, HardwareSerial* gpsSerial) {
-        gpsSerial->begin(9600);
+    void initGPS(TinyGPSPlus* gps, HardwareSerial* gpsSerial, uint32_t baudrate) {
+        gpsSerial->begin(baudrate);
     }
 }

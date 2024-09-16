@@ -72,6 +72,11 @@ public:
 	UnitQuaternion conjugate();
 	UnitQuaternion inverse();
 
+	/**
+	 * @brief Convert quaternion to euler angles. 
+	 * 
+	 * @return Eigen::Vector3d the euler angles, in Body 3-2-1: Yaw, Pitch, Roll
+	 */
 	Eigen::Vector3d to_euler();
 	Eigen::Vector3d to_rotVec();
 
