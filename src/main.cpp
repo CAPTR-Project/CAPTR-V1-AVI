@@ -5,9 +5,9 @@ void setup() {
   Serial.begin(115200);
   Serial.println("hi");
 
-  // initIMU(LSM6DS_I2CADDR_DEFAULT, &Wire);
-  // initMag(LIS3MDL_I2CADDR_DEFAULT, &Wire);
-  initBMP(BMP3_ADDR_I2C_SEC, &Wire2);
+  initIMU(LSM6DS_I2CADDR_DEFAULT, &Wire);
+  initMag(LIS3MDL_I2CADDR_DEFAULT, &Wire);
+  initBMP(BMP3_ADDR_I2C_SEC, &Wire1);
 }
 
 void loop() {
@@ -34,7 +34,7 @@ void loop() {
   Serial.printf("%05.2f ", magData.magnetic.y);
   Serial.printf("%05.2f\n\n", magData.magnetic.z);
 
-  delay(100);
+  delay(10);
 }
 
 // put function definitions here:
