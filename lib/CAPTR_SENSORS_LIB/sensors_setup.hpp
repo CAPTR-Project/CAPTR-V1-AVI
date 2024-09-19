@@ -19,7 +19,7 @@ namespace sensors_lib {
                  void (*gyro_isr)(), uint8_t gyro_isr_pin);
 
     bool initMag(Adafruit_LIS3MDL* lis_mag, uint8_t i2cAddr, TwoWire* I2CBus, lis3mdl_dataRate_t datarate, 
-                 void (*mag_isr)(), uint8_t mag_isr_pin);
+                 void (*mag_isr)(), uint8_t mag_isr_pin, bool skip_init = false);
     
     void initRadio();
 

@@ -23,6 +23,8 @@ Desc: Header file for telemtry and logging thread
 #include "attitude_est_thread.hpp"
 #include "tasks/gyro_calib.hpp"
 #include "tasks/mag_calib.hpp"
+#include "sensors_setup.hpp"
+#include "daq_ISRs.hpp"
 
 namespace daq_thread {
 

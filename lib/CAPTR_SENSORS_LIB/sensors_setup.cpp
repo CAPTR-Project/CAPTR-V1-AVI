@@ -31,21 +31,24 @@ namespace sensors_lib {
         imu->setAccelDataRate(dataRate);
         imu->setGyroDataRate(dataRate);
 
-        imu->configIntOutputs(true, false); // set to active high and push-pull
         imu->configInt1(false, true, false); // enable interrupt on gyroscope data ready
         imu->configInt2(false, false, true); // enable interrupt on accelerometer data ready
+        imu->configIntOutputs(true, false); // set to active high and push-pull
 
         attachInterrupt(digitalPinToInterrupt(accel_isr_pin), imu_isr, arduino::RISING);
         attachInterrupt(digitalPinToInterrupt(gyro_isr_pin), gyro_isr, arduino::RISING);
+
+        (*imu_isr)(); // read once to clear interrupt
+        (*gyro_isr)(); // read once to clear interrupt
 
         return true;
     }
 
     bool initMag(Adafruit_LIS3MDL* lis_mag, uint8_t i2cAddr, TwoWire* I2CBus, lis3mdl_dataRate_t datarate, 
-                 void (*mag_isr)(), uint8_t mag_isr_pin) {
+                 void (*mag_isr)(), uint8_t mag_isr_pin, bool skip_init) {
         if (!lis_mag->begin_I2C(i2cAddr, I2CBus)) {
             Serial.println("ERROR: Failed to find LIS3MDL chip");
-            return false;
+            if (!skip_init) return false;
         }
 
         Serial.println("LIS3MDL Found!");
@@ -53,9 +56,11 @@ namespace sensors_lib {
         lis_mag->setRange(LIS3MDL_RANGE_16_GAUSS);
         lis_mag->setDataRate(datarate);
         lis_mag->setPerformanceMode(LIS3MDL_ULTRAHIGHMODE);
-        lis_mag->setOperationMode(LIS3MDL_CONTINUOUSMODE);
+        lis_mag->setOperationMode(LIS3MDL_SINGLEMODE);
 
-        attachInterrupt(mag_isr_pin, mag_isr, arduino::RISING);
+        attachInterrupt(digitalPinToInterrupt(mag_isr_pin), mag_isr, arduino::RISING);
+
+        lis_mag->read(); // read once to clear interrupt
 
         return true;
     }

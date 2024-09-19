@@ -3,6 +3,9 @@
 namespace gps_thread {
 
     void gps_thread(void*) {
+
+        sensors_lib::initGPS(&gps__, &GPS_SERIAL_PORT, GPS_BAUDRATE);
+
         TickType_t xLastWakeTime = xTaskGetTickCount();
         BaseType_t xWasDelayed;
         while (1) {

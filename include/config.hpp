@@ -3,9 +3,9 @@
 
 // ========================== General configuration ===========================
 
-#define LOGGING_FREQUENCY 50 // [Hz] The frequency at which to log data.
-#define CONTROL_FREQUENCY 200 // [Hz] The frequency at which to run the control loop.
-
+#define LOGGING_FREQUENCY 10 // [Hz] The frequency at which to log data.
+#define CONTROL_FREQUENCY 30 // [Hz] The frequency at which to run the control loop.
+#define FSM_FREQUENCY 10 // [Hz] The frequency at which to run the finite state machine.
 
 // ====================== State estimation configuration ======================
 
@@ -22,13 +22,13 @@
 #define GYRO_INT_PIN 40 // The pin to which the gyroscope interrupt is connected.
 
 // Accelerometer
-#define ACCEL_INT_PIN 9 // The pin to which the accelerometer interrupt is connected.
+#define ACCEL_INT_PIN 39 // The pin to which the accelerometer interrupt is connected.
 
 // Magnetometer
 #define MAG_X_OFFSET 0.0 // [uT]
 #define MAG_Y_OFFSET 0.0 // [uT]
 #define MAG_Z_OFFSET 0.0 // [uT]
-#define MAG_DATARATE LIS3MDL_DATARATE_20_HZ
+#define MAG_DATARATE LIS3MDL_DATARATE_0_625_HZ
 #define MAG_INT_PIN 38 // The pin to which the magnetometer interrupt is connected.
 
 // Barometer

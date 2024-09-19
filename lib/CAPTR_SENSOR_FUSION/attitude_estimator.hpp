@@ -24,6 +24,11 @@ namespace UKF {
 
     public:
 
+        /**
+         * @brief Construct a new Attitude object. Initializes everything.
+         * 
+         */
+        Attitude();
         Eigen::VectorXd x_hat_;
         Eigen::VectorXd x_prior_;
         Eigen::MatrixXd P_;
@@ -45,11 +50,6 @@ namespace UKF {
         SemaphoreHandle_t ready;
         UnitQuaternion newest_attitude_quat;
 
-        /**
-         * @brief Construct a new Attitude object. Initializes everything.
-         * 
-         */
-        Attitude();
 
         void init(UnitQuaternion starting_orientation,
                     Eigen::Vector3d starting_bias, 

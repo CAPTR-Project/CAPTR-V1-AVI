@@ -17,8 +17,22 @@ Desc: Source file for telemetry and logging thread
 namespace daq_thread {
 
 void daq_thread(void*) {
-     while (1) {
+
+    // init sensors
+    if (!sensors_lib::initIMU(&imu__, LSM6DS_I2CADDR_DEFAULT, &Wire, IMU_DATARATE, imuISR, ACCEL_INT_PIN, gyroISR, GYRO_INT_PIN)) {
+        error_state_.store(ErrorState::IMU);
+    }
+    if (!sensors_lib::initMag(&mag__, 0x1E, &Wire, MAG_DATARATE, magISR, MAG_INT_PIN, true)) {
+        error_state_.store(ErrorState::MAG);
+    }
+    if (!sensors_lib::initBMP(&bmp__, BMP3_ADDR_I2C_SEC, &Wire1, baroISR, BARO_INT_PIN)) {
+        error_state_.store(ErrorState::BARO);
+    }
+
+     while (true) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+
+        Serial.println("Data received");
         
         // Read data
         if (accel_data_ready_ && xSemaphoreTake(accel_data__.ready, 1)) {

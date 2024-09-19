@@ -25,8 +25,9 @@ Desc: Global variables and constants header file to be included in all relevant 
 #include <Adafruit_LIS3MDL.h>
 #include <Adafruit_BMP3XX.h>
 #include <TinyGPS++.h>
+#include "CAPTR_PIN_DRIVER.hpp"
 
-inline std::atomic<uint32_t> msElapsed = 0;
+inline uint32_t msElapsed = 0;
 
 // ================================= Constants ====================================
 
@@ -63,6 +64,7 @@ enum class ErrorState
 
     ACCEL, 
     GYRO,
+    IMU,
     BARO,
     MAG,
     RF,

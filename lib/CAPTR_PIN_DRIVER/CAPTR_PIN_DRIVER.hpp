@@ -8,6 +8,11 @@ enum ControllerPin{
     HW_PIN_SERVO_X,         // 28  
     HW_PIN_SERVO_Y,         // 29
 
+    HW_PIN_GYRO_INT,        // 40
+    HW_PIN_ACCEL_INT,       // 39
+    HW_PIN_MAG_INT,         // 38
+    HW_PIN_BARO_INT,        // 41
+
     COUNT
 };
 

@@ -13,15 +13,28 @@ Desc: Source file for MCU
 */
 
 #include "main.hpp"
+// #include "Arduino.h"
 
 unsigned int loop_start;
 
-unsigned int last_state_change_ms = 0;
+static void task2(void*) {
+    Serial.begin(0);
+    while (true) {
+        Serial.println("TICK");
+        vTaskDelay(pdMS_TO_TICKS(1'000));
 
-void setup()
+        Serial.println("TOCK");
+        vTaskDelay(pdMS_TO_TICKS(1'000));
+    }
+}
+
+FLASHMEM __attribute__((noinline)) void setup()
 {
-    mcu_state_ = ControllerState::LV_ON;
-    error_state_ = ErrorState::NONE;
+
+    Serial.begin(0);
+    
+    mcu_state_.store(ControllerState::LV_ON);
+    error_state_.store(ErrorState::NONE);
     new_state_ = true;
 
     baro_data__ = sensor_msgs::BaroMsg();
@@ -29,205 +42,202 @@ void setup()
     gyro_data__ = sensor_msgs::GyroMsg();
     mag_data__ = sensor_msgs::MagMsg();
 
+    att_estimator__.init(UnitQuaternion(1, 0, 0, 0),
+                        Eigen::Vector3d(0, 0, 0),
+                        Eigen::Vector3d(0, 0, 0),
+                        Eigen::Matrix<double, Q_DIM, Q_DIM>::Identity(),
+                        Eigen::Matrix<double, Z_DIM, Z_DIM>::Identity());
+
     att_est_threads::att_est_mutex_ = xSemaphoreCreateMutex();
 
     HwSetupPins();
 
-    Serial.println("Serial print working!");
-
-    // init sensors
-    sensors_lib::initIMU(&imu__, LSM6DS_I2CADDR_DEFAULT, &Wire, IMU_DATARATE, imuISR, ACCEL_INT_PIN, gyroISR, GYRO_INT_PIN);
-    sensors_lib::initBMP(&bmp__, BMP3_ADDR_I2C_SEC, &Wire1, baroISR, BARO_INT_PIN);
-    sensors_lib::initMag(&mag__, LIS3MDL_I2CADDR_DEFAULT, &Wire, MAG_DATARATE, magISR, MAG_INT_PIN);
-    sensors_lib::initGPS(&gps__, &GPS_SERIAL_PORT, GPS_BAUDRATE);
-
-    taskENTER_CRITICAL();
-    xTaskCreate(att_est_threads::att_est_predict_thread, 
-                "Attitude Predictor", 2000, nullptr, 8, &att_est_threads::predictTaskHandle_);
-    xTaskCreate(att_est_threads::att_est_update_thread,
-                "Attitude Updator", 2000, nullptr, 8, &att_est_threads::updateTaskHandle_);
+    // xTaskCreate(att_est_threads::att_est_predict_thread, 
+    //             "Attitude Predictor", 2000, nullptr, 8, &att_est_threads::predictTaskHandle_);
+    // xTaskCreate(att_est_threads::att_est_update_thread,
+    //             "Attitude Updator", 2000, nullptr, 8, &att_est_threads::updateTaskHandle_);
     xTaskCreate(controls_thread::control_thread, 
-                "Control", 2000, nullptr, 10, &controls_thread::taskHandle);
+                "Control", 2000, nullptr, 8, &controls_thread::taskHandle);
     xTaskCreate(daq_thread::daq_thread, 
-                "Sensor DAQ", 1000, nullptr, 1, &daq_thread::taskHandle);
-    xTaskCreate(datalogger_thread::datalogger_thread, 
-                "Telemetry Logger", 1000, nullptr, 50, &datalogger_thread::taskHandle);
-    // xTaskCreate(controls_thread::control_thread, 
-    //             "Control", 2000, nullptr, 8, &controls_thread::taskHandle);
-    taskEXIT_CRITICAL();
+                "Sensor DAQ", 1000, nullptr, 9, &daq_thread::taskHandle);
+    // xTaskCreate(datalogger_thread::datalogger_thread, 
+    //             "Telemetry Logger", 1000, nullptr, 7, &datalogger_thread::taskHandle);
+    xTaskCreate(state_mgmt_thread::state_mgmt_thread, 
+                "FSM", 1000, nullptr, 0, &state_mgmt_thread::taskHandle);
 
-    last_state_change_ms = millis();
+    xTaskCreate(task2, "task2", 128, nullptr, 2, nullptr);
+
+
+    Serial.println("setup(): starting scheduler...");
+    Serial.flush();
+
+    vTaskStartScheduler();
 }
 
 void loop()
 {
-    loop_start = micros();
+    // loop_start = micros();
+    
+    // Serial.println("Altitude: " + String(baro_data__.alt_agl) + "m");
+    // Serial.println("Acceleration: " + String(accel_data__.x) + " " + String(accel_data__.y) + " " + String(accel_data__.z));
+    // Serial.println("Gyroscope: " + String(gyro_data__.x) + " " + String(gyro_data__.y) + " " + String(gyro_data__.z));
+    // Serial.println("Magnetometer: " + String(mag_data__.x) + " " + String(mag_data__.y) + " " + String(mag_data__.z));
+    // Eigen::Vector3d euler = att_estimator__.newest_attitude_quat.to_euler();
+    // Serial.println("Orientation: x: " + String(euler[0]) + " y: " + String(euler[1]) + " z: " + String(euler[2]));
 
-    // double altitude = bmp__.readAltitude(1013.25);
+    // switch (mcu_state_)
+    // {
+    // case ControllerState::LV_ON:
 
-    // lsm_accel->getEvent(&accelMain);
-    // lsm_gyro->getEvent(&gyro);
-    Serial.println("Altitude: " + String(baro_data__.alt_agl) + "m");
-    Serial.println("Acceleration: " + String(accel_data__.x) + " " + String(accel_data__.y) + " " + String(accel_data__.z));
-    Serial.println("Gyroscope: " + String(gyro_data__.x) + " " + String(gyro_data__.y) + " " + String(gyro_data__.z));
-    Serial.println("Magnetometer: " + String(mag_data__.x) + " " + String(mag_data__.y) + " " + String(mag_data__.z));
-    Eigen::Vector3d euler = att_estimator__.newest_attitude_quat.to_euler();
-    Serial.println("Orientation: x: " + String(euler[0]) + " y: " + String(euler[1]) + " z: " + String(euler[2]));
+    //     if (new_state_)
+    //     {
+    //         Serial.println("FSM: LV_ON");
+    //         new_state_ = false;
 
-    switch (mcu_state_)
-    {
-    case ControllerState::LV_ON:
+    //         last_state_change_ms = millis();
+    //     }
 
-        if (new_state_)
-        {
-            Serial.println("FSM: LV_ON");
-            new_state_ = false;
+    //     // TODO: LV_ON Code
+    //     if (millis() - last_state_change_ms > 5000)
+    //     {
+    //         mcu_state_ = ControllerState::CALIBRATING;
+    //         new_state_ = true;
+    //         break;
+    //     }
 
-            last_state_change_ms = millis();
-        }
+    //     if (error_state_ == ErrorState::NONE)
+    //     {
+    //         mcu_state_ = ControllerState::LV_ON;
+    //     }
 
-        // TODO: LV_ON Code
-        if (millis() - last_state_change_ms > 5000)
-        {
-            mcu_state_ = ControllerState::CALIBRATING;
-            new_state_ = true;
-            break;
-        }
+    //     break;
 
-        if (error_state_ == ErrorState::NONE)
-        {
-            mcu_state_ = ControllerState::LV_ON;
-        }
+    // case ControllerState::CALIBRATING:
 
-        break;
+    //     if (new_state_)
+    //     {
+    //         Serial.println("FSM: CALIBRATING");
+    //         new_state_ = false;
+    //         last_state_change_ms = millis();
+    //         xTaskCreate(gyro_calib_task::gyroBiasEstimation_task, "Gyro Calibration", 2000, nullptr, 4, &gyro_calib_task::taskHandle);
+    //     }
 
-    case ControllerState::CALIBRATING:
+    //     if (!mag_calib_task::mag_calib_done && gyro_calib_task::gyro_calib_done)
+    //     {
+    //         xTaskCreate(mag_calib_task::magVectorEstimation_task, "Magnetometer Calibration", 2000, nullptr, 4, &mag_calib_task::taskHandle);
+    //     }
 
-        if (new_state_)
-        {
-            Serial.println("FSM: CALIBRATING");
-            new_state_ = false;
-            last_state_change_ms = millis();
-            xTaskCreate(gyro_calib_task::gyroBiasEstimation_task, "Gyro Calibration", 2000, nullptr, 4, &gyro_calib_task::taskHandle);
-        }
+    //     if (mag_calib_task::mag_calib_done && gyro_calib_task::gyro_calib_done)
+    //     {
+    //         att_estimator__.initialized = true;
+    //         mcu_state_ = ControllerState::LAUNCH_DETECT;
+    //         new_state_ = true;
+    //         break;
+    //     }
 
-        if (!mag_calib_task::mag_calib_done && gyro_calib_task::gyro_calib_done)
-        {
-            xTaskCreate(mag_calib_task::magVectorEstimation_task, "Magnetometer Calibration", 2000, nullptr, 4, &mag_calib_task::taskHandle);
-        }
+    //     if (error_state_ == ErrorState::NONE)
+    //     {
+    //         mcu_state_ = ControllerState::CALIBRATING;
+    //     }
 
-        if (mag_calib_task::mag_calib_done && gyro_calib_task::gyro_calib_done)
-        {
-            att_estimator__.initialized = true;
-            mcu_state_ = ControllerState::LAUNCH_DETECT;
-            new_state_ = true;
-            break;
-        }
+    //     break;
 
-        if (error_state_ == ErrorState::NONE)
-        {
-            mcu_state_ = ControllerState::CALIBRATING;
-        }
+    // case ControllerState::LAUNCH_DETECT:
 
-        break;
+    //     if (new_state_)
+    //     {
+    //         Serial.println("FSM: LAUNCH_DETECT");
+    //         new_state_ = false;
+    //     }
 
-    case ControllerState::LAUNCH_DETECT:
+    //     if (accel_data__.z > 0.5)
+    //     {
+    //         mcu_state_ = ControllerState::POWERED_ASCENT;
+    //         new_state_ = true;
+    //         break;
+    //     }
 
-        if (new_state_)
-        {
-            Serial.println("FSM: LAUNCH_DETECT");
-            new_state_ = false;
-        }
+    //     if (error_state_ == ErrorState::NONE)
+    //     {
+    //         mcu_state_ = ControllerState::LAUNCH_DETECT;
+    //     }
 
-        if (accel_data__.z > 0.5)
-        {
-            mcu_state_ = ControllerState::POWERED_ASCENT;
-            new_state_ = true;
-            break;
-        }
+    //     break;
 
-        if (error_state_ == ErrorState::NONE)
-        {
-            mcu_state_ = ControllerState::LAUNCH_DETECT;
-        }
+    // case ControllerState::POWERED_ASCENT:
 
-        break;
+    //     if (new_state_)
+    //     {
+    //         Serial.println("FSM: POWERED_ASCENT");
+    //         new_state_ = false;
+    //     }
 
-    case ControllerState::POWERED_ASCENT:
+    //     // TODO: TVC_UP Code
 
-        if (new_state_)
-        {
-            Serial.println("FSM: POWERED_ASCENT");
-            new_state_ = false;
-        }
+    //     if (error_state_ == ErrorState::NONE)
+    //     {
+    //         mcu_state_ = ControllerState::POWERED_ASCENT;
+    //     }
 
-        // TODO: TVC_UP Code
+    //     break;
 
-        if (error_state_ == ErrorState::NONE)
-        {
-            mcu_state_ = ControllerState::POWERED_ASCENT;
-        }
+    // case ControllerState::COAST:
 
-        break;
+    //     if (new_state_)
+    //     {
+    //         Serial.println("FSM: COAST");
+    //         new_state_ = false;
+    //     }
 
-    case ControllerState::COAST:
+    //     // TODO: Recovery Code
 
-        if (new_state_)
-        {
-            Serial.println("FSM: COAST");
-            new_state_ = false;
-        }
+    //     if (error_state_ == ErrorState::NONE)
+    //     {
+    //         mcu_state_ = ControllerState::COAST;
+    //     }
 
-        // TODO: Recovery Code
+    //     break;
 
-        if (error_state_ == ErrorState::NONE)
-        {
-            mcu_state_ = ControllerState::COAST;
-        }
+    // case ControllerState::RECOVERY:
 
-        break;
+    //     if (new_state_)
+    //     {
+    //         Serial.println("FSM: RECOVERY");
+    //         new_state_ = false;
+    //     }
 
-    case ControllerState::RECOVERY:
+    //     // TODO: Recovery Code
 
-        if (new_state_)
-        {
-            Serial.println("FSM: RECOVERY");
-            new_state_ = false;
-        }
+    //     if (error_state_ == ErrorState::NONE)
+    //     {
+    //         mcu_state_ = ControllerState::RECOVERY;
+    //     }
 
-        // TODO: Recovery Code
+    //     break;
 
-        if (error_state_ == ErrorState::NONE)
-        {
-            mcu_state_ = ControllerState::RECOVERY;
-        }
+    // case ControllerState::LANDED:
 
-        break;
+    //     if (new_state_)
+    //     {
+    //         Serial.println("FSM: LANDED");
+    //         new_state_ = false;
+    //         // command dump data to SD card
+    //     }
 
-    case ControllerState::LANDED:
+    //     // TODO: Recovery Code
 
-        if (new_state_)
-        {
-            Serial.println("FSM: LANDED");
-            new_state_ = false;
-            // command dump data to SD card
-        }
+    //     if (error_state_ == ErrorState::NONE)
+    //     {
+    //         mcu_state_ = ControllerState::LANDED;
+    //     }
 
-        // TODO: Recovery Code
+    //     break;
 
-        if (error_state_ == ErrorState::NONE)
-        {
-            mcu_state_ = ControllerState::LANDED;
-        }
-
-        break;
-
-    default:
-        Serial.println("FSM: ERROR");
-        error_state_ = ErrorState::FSM;
-        break;
-    }
-
+    // default:
+    //     Serial.println("FSM: ERROR");
+    //     error_state_ = ErrorState::FSM;
+    //     break;
+    // }
 
 }
 

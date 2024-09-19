@@ -19,6 +19,7 @@ Desc: Header file for telemtry and logging thread
 #include "rtos_includes.hpp"
 #include "globals.hpp"
 #include "config.hpp"
+#include "sensors_setup.hpp"
 
 // vars
 namespace gps_thread {

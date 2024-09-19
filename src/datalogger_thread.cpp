@@ -81,7 +81,6 @@ void datalogger_thread(void*) {
     // init flash 
     if (!SerialFlash.begin(SPI, FLASH_CHIP)) {
         error_state_ = ErrorState::FLASH_INIT;
-        return;
     }
 
     // Data logger
@@ -92,10 +91,10 @@ void datalogger_thread(void*) {
 
     //handle file open error
 
-    while (1) {
+    while (true) {
         
         // Read sensor data
-        uint32_t currentTimestamp = msElapsed.load();
+        uint32_t currentTimestamp = msElapsed;
 
         datalogger_thread::SensorLog currentLog;
         if (xSemaphoreTake(baro_data__.ready, 0) == pdTRUE) {
@@ -126,20 +125,20 @@ void datalogger_thread(void*) {
         // log data to flash
         logData(currentLog);
 
-        xWasDelayed = xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(int(1000/LOGGING_FREQUENCY)));
+        if (!isValidAccelData(currentLog.accel)) {
+            error_state_ = ErrorState::ACCEL;
+        } else if (!isValidGyroData(currentLog.gyro)) {
+            error_state_ = ErrorState::GYRO;
+        } else if (!isValidBaroData(currentLog.baro)) {
+            error_state_ = ErrorState::BARO;
+        } else if (!isValidMagData(currentLog.mag)) {
+            error_state_ = ErrorState::MAG;
+        }
+
+        xWasDelayed = xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(int(round(1000/LOGGING_FREQUENCY))));
         if (xWasDelayed) {
             // Log error
-            error_state_ = ErrorState::LOGGING;
-
-            if (!isValidAccelData(currentLog.accel)) {
-                error_state_ = ErrorState::ACCEL;
-            } else if (!isValidGyroData(currentLog.gyro)) {
-                error_state_ = ErrorState::GYRO;
-            } else if (!isValidBaroData(currentLog.baro)) {
-                error_state_ = ErrorState::BARO;
-            } else if (!isValidMagData(currentLog.mag)) {
-                error_state_ = ErrorState::MAG;
-            }
+            // error_state_ = ErrorState::LOGGING;
         }
     }
 }
