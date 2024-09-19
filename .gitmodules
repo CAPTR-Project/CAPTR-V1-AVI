@@ -1,3 +1,6 @@
 [submodule "lib/freertos-teensy"]
 	path = lib/freertos-teensy
 	url = https://github.com/tsandmann/freertos-teensy.git
+[submodule "lib/bmp390"]
+	path = lib/bmp390
+	url = https://github.com/libdriver/bmp390.git
