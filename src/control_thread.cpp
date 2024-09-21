@@ -28,16 +28,13 @@ void control_thread(void*) {
         //     xSemaphoreGive(att_estimator__.ready);
         // }
 
-        // Serial.println("Gyro int pin: " + String(HwAnalogRead(HW_PIN_GYRO_INT)));
-
-
-        // Serial.println("Altitude: " + String(baro_data__.alt_agl) + "m");
-        // Serial.println("Acceleration: " + String(accel_data__.x) + " " + String(accel_data__.y) + " " + String(accel_data__.z));
-        // Serial.println("Gyroscope: " + String(gyro_data__.x) + " " + String(gyro_data__.y) + " " + String(gyro_data__.z));
+        Serial.println("Altitude: " + String(baro_data__.alt_agl) + "m");
+        Serial.println("Acceleration: " + String(accel_data__.x) + " " + String(accel_data__.y) + " " + String(accel_data__.z));
+        Serial.println("Gyroscope: " + String(gyro_data__.x) + " " + String(gyro_data__.y) + " " + String(gyro_data__.z));
         Serial.println("Magnetometer: " + String(mag_data__.x) + " " + String(mag_data__.y) + " " + String(mag_data__.z));
-        // Eigen::Vector3d euler = att_estimator__.newest_attitude_quat.to_euler();
-        // Serial.println("Orientation: x: " + String(euler[0]) + " y: " + String(euler[1]) + " z: " + String(euler[2]));
-        // Serial.println();
+        Eigen::Vector3d euler = att_estimator__.newest_attitude_quat.to_euler();
+        Serial.println("Orientation: x: " + String(euler[0]) + " y: " + String(euler[1]) + " z: " + String(euler[2]));
+        Serial.println();
 
         // Serial.println("Control loop");
 

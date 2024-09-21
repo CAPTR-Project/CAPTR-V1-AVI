@@ -37,7 +37,7 @@ Desc: Header file for data acquisition Interrupt Service Routines
 
 void imuISR();
 void gyroISR();
-void baroISR();
+void baroISR(u_int8_t type);
 void magISR();
 
 void GPS_thread();

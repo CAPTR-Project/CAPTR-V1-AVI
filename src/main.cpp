@@ -65,7 +65,7 @@ FLASHMEM __attribute__((noinline)) void setup()
     xTaskCreate(state_mgmt_thread::state_mgmt_thread, 
                 "FSM", 1000, nullptr, 0, &state_mgmt_thread::taskHandle);
 
-    xTaskCreate(task2, "task2", 128, nullptr, 2, nullptr);
+    // xTaskCreate(task2, "task2", 128, nullptr, 2, nullptr);
 
 
     Serial.println("setup(): starting scheduler...");

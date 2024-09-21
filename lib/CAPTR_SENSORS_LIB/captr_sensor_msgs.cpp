@@ -3,7 +3,7 @@
 namespace sensor_msgs {
     // GyroMsg
     GyroMsg::GyroMsg() {
-        ready = xSemaphoreCreateBinary();
+        ready = xSemaphoreCreateMutex();
     }
     Eigen::Vector3d GyroMsg::toVector() {
         return Eigen::Vector3d(x, y, z);
@@ -11,7 +11,7 @@ namespace sensor_msgs {
 
     // AccelMsg
     AccelMsg::AccelMsg() {
-        ready = xSemaphoreCreateBinary();
+        ready = xSemaphoreCreateMutex();
     }
     Eigen::Vector3d AccelMsg::toVector() {
         return Eigen::Vector3d(x, y, z);
@@ -19,13 +19,13 @@ namespace sensor_msgs {
 
     // MagMsg
     MagMsg::MagMsg() {
-        ready = xSemaphoreCreateBinary();
+        ready = xSemaphoreCreateMutex();
     }
     Eigen::Vector3d MagMsg::toVector() {
         return Eigen::Vector3d(x, y, z);
     }
     // BaroMsg
     BaroMsg::BaroMsg() {
-        ready = xSemaphoreCreateBinary();
+        ready = xSemaphoreCreateMutex();
     }
 }

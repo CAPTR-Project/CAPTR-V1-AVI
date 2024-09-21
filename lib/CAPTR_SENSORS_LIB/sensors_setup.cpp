@@ -12,6 +12,8 @@ namespace sensors_lib {
         bmp->setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3);
         bmp->setOutputDataRate(BMP3_ODR_200_HZ);
 
+        // attachInterrupt(digitalPinToInterrupt(isr_pin), alt_isr, arduino::RISING);
+
         return true;
     }
 
@@ -33,7 +35,9 @@ namespace sensors_lib {
 
         imu->configInt1(false, true, false); // enable interrupt on gyroscope data ready
         imu->configInt2(false, false, true); // enable interrupt on accelerometer data ready
-        imu->configIntOutputs(true, false); // set to active high and push-pull
+        imu->configIntOutputs(false, false); // set to active high and push-pull
+
+        vPortEnterCritical();
 
         attachInterrupt(digitalPinToInterrupt(accel_isr_pin), imu_isr, arduino::RISING);
         attachInterrupt(digitalPinToInterrupt(gyro_isr_pin), gyro_isr, arduino::RISING);
@@ -41,26 +45,32 @@ namespace sensors_lib {
         (*imu_isr)(); // read once to clear interrupt
         (*gyro_isr)(); // read once to clear interrupt
 
+        vPortExitCritical();
+
         return true;
     }
 
     bool initMag(Adafruit_LIS3MDL* lis_mag, uint8_t i2cAddr, TwoWire* I2CBus, lis3mdl_dataRate_t datarate, 
-                 void (*mag_isr)(), uint8_t mag_isr_pin, bool skip_init) {
+                 void (*mag_isr)(), uint8_t mag_isr_pin) {
         if (!lis_mag->begin_I2C(i2cAddr, I2CBus)) {
             Serial.println("ERROR: Failed to find LIS3MDL chip");
-            if (!skip_init) return false;
         }
 
         Serial.println("LIS3MDL Found!");
 
+        lis_mag->reset();
         lis_mag->setRange(LIS3MDL_RANGE_16_GAUSS);
         lis_mag->setDataRate(datarate);
         lis_mag->setPerformanceMode(LIS3MDL_ULTRAHIGHMODE);
-        lis_mag->setOperationMode(LIS3MDL_SINGLEMODE);
+        lis_mag->setOperationMode(LIS3MDL_CONTINUOUSMODE);
+
+        vPortEnterCritical();
 
         attachInterrupt(digitalPinToInterrupt(mag_isr_pin), mag_isr, arduino::RISING);
 
         lis_mag->read(); // read once to clear interrupt
+
+        vPortExitCritical();
 
         return true;
     }

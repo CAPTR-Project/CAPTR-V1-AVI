@@ -26,6 +26,8 @@ Desc: Global variables and constants header file to be included in all relevant 
 #include <Adafruit_BMP3XX.h>
 #include <TinyGPS++.h>
 #include "CAPTR_PIN_DRIVER.hpp"
+#include <driver_bmp390.h>
+#include <driver_bmp390_interrupt.h>
 
 inline uint32_t msElapsed = 0;
 
@@ -86,7 +88,8 @@ inline std::atomic<bool> new_state_;
 inline Adafruit_LSM6DS3TRC imu__;
 // Adafruit_LSM6DSOX imu__;
 inline Adafruit_LIS3MDL mag__;
-inline Adafruit_BMP3XX bmp__;
+// inline Adafruit_BMP3XX bmp__;
+inline bmp390_handle_s bmp__;
 inline TinyGPSPlus gps__;
 
 // State variables

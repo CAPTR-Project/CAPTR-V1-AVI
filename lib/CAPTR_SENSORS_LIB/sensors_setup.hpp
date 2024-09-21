@@ -4,6 +4,8 @@
 #include <Wire.h>
 #include <Arduino.h>
 #include "arduino_freertos.h"
+#include "avr/io.h"
+#include "avr/interrupt.h"
 
 #include <Adafruit_LSM6DS3TRC.h>
 #include <Adafruit_LSM6DSOX.h>
@@ -19,7 +21,7 @@ namespace sensors_lib {
                  void (*gyro_isr)(), uint8_t gyro_isr_pin);
 
     bool initMag(Adafruit_LIS3MDL* lis_mag, uint8_t i2cAddr, TwoWire* I2CBus, lis3mdl_dataRate_t datarate, 
-                 void (*mag_isr)(), uint8_t mag_isr_pin, bool skip_init = false);
+                 void (*mag_isr)(), uint8_t mag_isr_pin);
     
     void initRadio();
 
