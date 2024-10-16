@@ -37,10 +37,26 @@ void control_thread(void*) {
         Serial.println();
 
         // Serial.println("Control loop");
+        // current state
+        _cur_attitude = att_estimator__.newest_attitude_quat;
 
-        // Read setpoints
-        // Calculate control outputs
+        // calc error (calc is short for calculate btw chat)     
+        _error_attitude = _target_attitude * _cur_attitude.inverse();
         // Write control outputs
+        // get the vector components of the quaternion
+        error_vector[0] = error_euler[1];   // pitch
+        error_vector[1] = error_euler[2];   // roll
+        error_vector[2] = error_euler[3];   // yaw
+
+        // control law
+        _u_pitch = _Kp[0] * error_vector[0] + _Kd[0] * gyro_data__.x;
+        _u_roll = _Kp[1] * error_vector[1] + _Kd[1] * gyro_data__.y;
+        // _u_yaw = _Kp[2] * error_vector[2] + _Kd[2] * gyro_data__.z;
+
+        att_cmd_pitch = _u_pitch;
+        att_cmd_roll = _u_roll;
+        //att_cmd_yaw = _u_yaw;
+
         xWasDelayed = xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(int(round(1000/CONTROL_FREQUENCY))));
         if (!xWasDelayed) {
             // error_state_ = ErrorState::CONTROL;
