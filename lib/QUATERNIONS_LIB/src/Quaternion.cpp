@@ -104,11 +104,21 @@ UnitQuaternion UnitQuaternion::from_rotVec(float wx, float wy, float wz)
 	***/
 	UnitQuaternion uq;
 
-	float theta = sqrt(wx*wx + wy*wy + wz*wz) + 1.0e-12;	// Add a little bit of eps to avoid blowing up
+	float theta = sqrt(wx*wx + wy*wy + wz*wz);	// Add a little bit of eps to avoid blowing up
+
+	if (abs(theta) < 1e-12) {
+		uq.s = 1;
+		uq.v_1 = 0;
+		uq.v_2 = 0;
+		uq.v_3 = 0;
+	} else {
+
 	uq.s = cos(theta/2.0);
 	uq.v_1 = sin(theta/2.0) * (wx / theta);
 	uq.v_2 = sin(theta/2.0) * (wy / theta);
 	uq.v_3 = sin(theta/2.0) * (wz / theta);
+
+	}
 
 	return uq;
 }
@@ -413,14 +423,39 @@ UnitQuaternion UnitQuaternion::average_quaternions(std::vector<UnitQuaternion> q
 Eigen::Vector3d UnitQuaternion::to_rotVec() {
 	Eigen::Vector3d rotVec;
 	rotVec << v_1, v_2, v_3;
-	double theta = 2 * acos(s);
-	rotVec = theta / sin(theta / 2) * rotVec;
+	double theta = 2 * atan2(rotVec.norm(), s);
+	if (theta == 0) rotVec = Eigen::Vector3d::Zero();
+	else rotVec = theta / sin(theta / 2) * rotVec;
 	return rotVec;
 }
 
 Eigen::Vector3d UnitQuaternion::to_euler() {
-	double roll = atan2(2 * (s * v_1 + v_2 * v_3), 1 - 2 * (v_1 * v_1 + v_2 * v_2));
-	double pitch = asin(2 * (s * v_2 - v_3 * v_1));
-	double yaw = atan2(2 * (s * v_3 + v_1 * v_2), 1 - 2 * (v_2 * v_2 + v_3 * v_3));
-	return Eigen::Vector3d(roll, pitch, yaw);
+	// double roll = atan2(2 * (s * v_1 + v_2 * v_3), 1 - 2 * (v_1 * v_1 + v_2 * v_2));
+	// double pitch = asin(2 * (s * v_2 - v_3 * v_1));
+	// double yaw = atan2(2 * (s * v_3 + v_1 * v_2), 1 - 2 * (v_2 * v_2 + v_3 * v_3));
+	// return Eigen::Vector3d(roll, pitch, yaw);
+
+	Eigen::Vector3d angles;    //yaw pitch roll
+    float x = v_1;
+    float y = v_2;
+    float z = v_3;
+    float w = s;
+
+    // roll (x-axis rotation)
+    double sinr_cosp = 2 * (w * x + y * z);
+    double cosr_cosp = 1 - 2 * (x * x + y * y);
+    angles[0] = std::atan2(sinr_cosp, cosr_cosp);
+
+    // pitch (y-axis rotation)
+    double sinp = 2 * (w * y - z * x);
+    if (std::abs(sinp) >= 1)
+        angles[1] = copysign(M_PI / 2, sinp); // use 90 degrees if out of range
+    else
+        angles[1] = asin(sinp);
+
+    // yaw (z-axis rotation)
+    double siny_cosp = 2 * (w * z + x * y);
+    double cosy_cosp = 1 - 2 * (y * y + z * z);
+    angles[2] = atan2(siny_cosp, cosy_cosp);
+    return angles;
 }

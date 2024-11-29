@@ -9,7 +9,7 @@
 
 // ====================== State estimation configuration ======================
 
-#define Q_MATRIX (Eigen::Matrix<double, Q_DIM, Q_DIM>::Identity() * 0.1) // The process noise matrix.
+#define Q_MATRIX (Eigen::Matrix<double, Q_DIM, Q_DIM>::Identity() * 0) // The process noise matrix.
 #define R_MATRIX (Eigen::Matrix<double, Z_DIM, Z_DIM>::Identity() * 0.1) // The measurement noise matrix.
 
 
@@ -17,8 +17,8 @@
 // ============================ Sensor configuration ==========================
 
 // Gyroscope
-#define IMU_DATARATE LSM6DS_RATE_26_HZ
-#define GYRO_CALIBRATION_TIME 10000 // [ms] The time to calibrate the gyroscope offsets.
+#define IMU_DATARATE LSM6DS_RATE_208_HZ
+#define GYRO_CALIBRATION_TIME 5000 // [ms] The time to calibrate the gyroscope offsets.
 #define GYRO_INT_PIN 40 // The pin to which the gyroscope interrupt is connected.
 
 // Accelerometer
@@ -33,8 +33,8 @@
 
 // Barometer
 #define BARO_INT_PIN 41 // The pin to which the barometer interrupt is connected.
-#define BARO_PRESSURE_ASL 1013.25 // [Pa] The pressure at sea level.
-#define BARO_DATARATE bmp390_odr_t::BMP390_ODR_0P2_HZ
+#define BARO_PRESSURE_ASL 101325 // [Pa] The pressure at sea level.
+#define BARO_DATARATE BMP3_ODR_200_HZ
 
 // GPS
 #define GPS_SERIAL_PORT Serial2 // The serial port to which the GPS is connected.
@@ -43,5 +43,8 @@
 
 // Flash configuration
 #define FLASH_CHIP 10 // Chip select pin for flash memory
+
+// TVC mount configuration
+#define 
 
 #endif

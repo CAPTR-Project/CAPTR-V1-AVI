@@ -12,9 +12,13 @@
 #include <Adafruit_LIS3MDL.h>
 #include <Adafruit_BMP3XX.h>
 #include <TinyGPS++.h>
+// #include <driver_bmp390.h>
+// #include <driver_bmp390_interface.h>
 
 namespace sensors_lib {
-    bool initBMP(Adafruit_BMP3XX* bmp, uint8_t i2cAddr, TwoWire* I2CBus, void (*alt_isr)(), uint8_t isr_pin);
+    // bool initBMP(bmp390_handle_s* bmp, bmp390_address_t i2cAddr, TwoWire* I2CBus, bmp390_odr_t datarate, void (*alt_isr)(), uint8_t isr_pin);
+    bool initBMP(Adafruit_BMP3XX* bmp, uint8_t i2cAddr, TwoWire* I2CBus, uint8_t dataRate,
+                 void (*baro_isr)(), uint8_t baro_isr_pin);
 
     bool initIMU(Adafruit_LSM6DS* imu, uint8_t i2cAddr, TwoWire* I2CBus, lsm6ds_data_rate_t dataRate, 
                  void (*imu_isr)(), uint8_t accel_isr_pin, 

@@ -31,13 +31,13 @@ namespace UKF {
         Attitude();
         Eigen::VectorXd x_hat_;
         Eigen::VectorXd x_prior_;
-        Eigen::MatrixXd P_;
+        Eigen::Matrix3d P_;
 
         Eigen::Vector3d z_vec_;
         Eigen::Vector3d z_prior_;
-        Eigen::MatrixXd Q_;
+        Eigen::Matrix3d Q_;
 
-        Eigen::MatrixXd R_;
+        Eigen::Matrix3d R_;
 
         Eigen::MatrixXd sigma_points;
 
@@ -94,6 +94,13 @@ namespace UKF {
         
         void set_gyroBiases(float x, float y, float z);
         void set_magVec(float x, float y, float z);
+
+    private:
+        Eigen::Matrix3d covSqrt;
+        UnitQuaternion q_k;
+        Eigen::MatrixXd quat_sigma_points;
+        Eigen::Vector3d bias;
+
     } ;
 }
 

@@ -4,12 +4,17 @@ namespace state_mgmt_thread {
 
 void state_mgmt_thread(void*) {
 
-    Serial.println(PSTR("\r\nBooted FreeRTOS kernel " tskKERNEL_VERSION_NUMBER ". Built by gcc " __VERSION__ " (newlib " _NEWLIB_VERSION ") on " __DATE__ ". ***\r\n"));
+
+    mcu_state_.store(ControllerState::LV_ON);
+    error_state_.store(ErrorState::NONE);
+    new_state_ = true;
 
     TickType_t xLastWakeTime = xTaskGetTickCount();
     BaseType_t xWasDelayed;
 
     last_state_change_ms = millis();
+
+    new_state_ = true;
 
     // error_state_ = ErrorState::NONE;
 
@@ -27,13 +32,15 @@ void state_mgmt_thread(void*) {
                 last_state_change_ms = millis();
             }
 
+            // Serial.println("FSM: LV_ON");
+
             // TODO: LV_ON Code
-            // if (millis() - last_state_change_ms > 5000)
-            // {
-            //     mcu_state_ = ControllerState::CALIBRATING;
-            //     new_state_ = true;
-            //     break;
-            // }
+            if (millis() - last_state_change_ms > 2000)
+            {
+                mcu_state_ = ControllerState::CALIBRATING;
+                new_state_ = true;
+                break;
+            }
 
             if (error_state_ == ErrorState::NONE)
             {
@@ -50,11 +57,8 @@ void state_mgmt_thread(void*) {
                 new_state_ = false;
                 last_state_change_ms = millis();
                 xTaskCreate(gyro_calib_task::gyroBiasEstimation_task, "Gyro Calibration", 2000, nullptr, 4, &gyro_calib_task::taskHandle);
-            }
-
-            if (!mag_calib_task::mag_calib_done && gyro_calib_task::gyro_calib_done)
-            {
                 xTaskCreate(mag_calib_task::magVectorEstimation_task, "Magnetometer Calibration", 2000, nullptr, 4, &mag_calib_task::taskHandle);
+
             }
 
             if (mag_calib_task::mag_calib_done && gyro_calib_task::gyro_calib_done)
@@ -79,6 +83,8 @@ void state_mgmt_thread(void*) {
                 Serial.println("FSM: LAUNCH_DETECT");
                 new_state_ = false;
             }
+
+            // Serial.println("FSM: LAUNCH_DETECT");
 
             if (accel_data__.z > 0.5)
             {

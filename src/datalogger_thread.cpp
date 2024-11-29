@@ -19,15 +19,15 @@ namespace datalogger_thread {
 // const int FlashChip = 1; // Chip select pin for flash memory CHANGE WHEN IMPLEMENTED!!!!!
 
 // check if individual sensor data is valid
+const float MAX_ACCEL = 100.0f; // m/s^2 change to accelerometer max value
 bool isValidAccelData(const sensor_msgs::AccelMsg& accel) {
-    const float MAX_ACCEL = 100.0f; // m/s^2 change to accelerometer max value
     return (std::abs(accel.x) <= MAX_ACCEL &&
             std::abs(accel.y) <= MAX_ACCEL &&
             std::abs(accel.z) <= MAX_ACCEL);
 }
 
+const float MAX_GYRO = 1000.0f; // deg/s change to gyroscope max value
 bool isValidGyroData(const sensor_msgs::GyroMsg& gyro) {
-    const float MAX_GYRO = 1000.0f; // deg/s change to gyroscope max value
     return (std::abs(gyro.x) <= MAX_GYRO &&
             std::abs(gyro.y) <= MAX_GYRO &&
             std::abs(gyro.z) <= MAX_GYRO);
@@ -39,8 +39,8 @@ bool isValidBaroData(const sensor_msgs::BaroMsg& baro) {
     return (baro.pressure >= MIN_PRESSURE && baro.pressure <= MAX_PRESSURE);
 }
 
+const float MAX_MAG = 1000.0f; // µT change to magnetometer max value
 bool isValidMagData(const sensor_msgs::MagMsg& mag) {
-    const float MAX_MAG = 1000.0f; // µT change to magnetometer max value
     return (std::abs(mag.x) <= MAX_MAG &&
             std::abs(mag.y) <= MAX_MAG &&
             std::abs(mag.z) <= MAX_MAG);

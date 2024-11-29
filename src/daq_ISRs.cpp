@@ -47,37 +47,29 @@ void gyroISR() {
     }
 }
 
-void baroISR(uint8_t type) {
-    switch (type)
-    {
-        case BMP390_INTERRUPT_STATUS_FIFO_WATERMARK :
-        {
-            break;
-        }
-        case BMP390_INTERRUPT_STATUS_FIFO_FULL :
-        {
-            break;
-        }
-        case BMP390_INTERRUPT_STATUS_DATA_READY :
-        {
-            Serial.println("Read temp and press");
-            /* read temperature pressure */
-            if (bmp390_interrupt_read((float *)nullptr, (float *)&daq_thread::temp_baro_data_.pressure) != 0)
-            {
-                Serial.println("bmp390: read temperature and pressure failed.");
-           
-                return;
-            }
-            daq_thread::baro_data_ready_ = true;
+void baroISR() {
+    // Serial.println("Baro read");
+    /* read temperature pressure */
+    // if (bmp390_read_pressure(&bmp__, nullptr, (float *)&daq_thread::temp_baro_data_.pressure) != 0)
+    // {
+    //     Serial.println("bmp390: read temperature and pressure failed.");
+    
+    //     return;
+    // }
+    daq_thread::temp_baro_data_.alt_msl = bmp__.readAltitude(BARO_PRESSURE_ASL * 0.01);
 
-            
-            break;
-        }
-        default :
-        {
-            break;
-        }
-    }
+    daq_thread::temp_baro_data_.alt_agl = daq_thread::temp_baro_data_.alt_msl - ground_altitude_offset_msl__;
+
+    daq_thread::temp_baro_data_.pressure = bmp__.pressure;
+
+    daq_thread::baro_data_ready_ = true;
+
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+    configASSERT( daq_thread::taskHandle != NULL );
+    vTaskNotifyGiveFromISR( daq_thread::taskHandle, &xHigherPriorityTaskWoken);
+    
+    portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 }
 
 void magISR() {

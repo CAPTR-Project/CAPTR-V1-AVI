@@ -17,12 +17,21 @@ Desc: Source file for attitude estimation thread
 namespace att_est_threads {
 
 void att_est_predict_thread(void*) {
+
+    att_estimator__.init(UnitQuaternion(1, 0, 0, 0),
+                    Eigen::Vector3d(0, 0, 0),
+                    Eigen::Vector3d(0, 0, 0),
+                    Q_MATRIX,
+                    R_MATRIX);
+
     TickType_t xLastWakeTime = xTaskGetTickCount();
     BaseType_t xWasDelayed;
     long long last_time_us = pdTICKS_TO_US(xLastWakeTime);
 
     sensor_msgs::GyroMsg local_gyro_data;
     ControllerState local_mcu_state;
+
+    att_est_mutex_ = xSemaphoreCreateMutex();
 
     while (1) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
@@ -41,6 +50,7 @@ void att_est_predict_thread(void*) {
                                     local_gyro_data.toVector());
                 
                 last_action_was_predict = true;
+                last_time_us = pdTICKS_TO_US(xTaskGetTickCount());
                 xSemaphoreGive(att_est_mutex_);
             }
         }
