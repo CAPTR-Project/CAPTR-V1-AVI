@@ -21,6 +21,7 @@ Desc: Header file for control thread
 #include "config.hpp"
 #include "globals.hpp"
 #include "attitude_estimator.hpp"
+#include "ArduinoEigenDense.h"
 
 namespace controls_thread {
 
