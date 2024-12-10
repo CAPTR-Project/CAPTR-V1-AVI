@@ -5,9 +5,6 @@
 
 enum ControllerPin{
     
-    HW_PIN_SERVO_X,         // 28  
-    HW_PIN_SERVO_Y,         // 29
-
     HW_PIN_GYRO_INT,        // 40
     HW_PIN_ACCEL_INT,       // 39
     HW_PIN_MAG_INT,         // 38
@@ -22,7 +19,33 @@ struct HwPin{
     bool physical_state;
 };
 
-extern HwPin controller_pins[COUNT];
+
+HwPin controller_pins[COUNT] = {
+
+  [HW_PIN_GYRO_INT] = {
+    .pin_number = 40,
+    .output = false,
+    .physical_state = false,
+  },
+
+  [HW_PIN_ACCEL_INT] = {
+    .pin_number = 39,
+    .output = false,
+    .physical_state = false,
+  },
+
+  [HW_PIN_MAG_INT] = {
+    .pin_number = 38,
+    .output = false,
+    .physical_state = false,
+  },
+
+  [HW_PIN_BARO_INT] = {
+    .pin_number = 41,
+    .output = false,
+    .physical_state = false,
+  },
+};
 
 void HwSetupPins(void);
 bool HwDigitalRead(ControllerPin x);

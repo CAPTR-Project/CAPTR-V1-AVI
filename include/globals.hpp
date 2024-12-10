@@ -18,14 +18,16 @@ Desc: Global variables and constants header file to be included in all relevant 
 
 #include <Wire.h>
 #include "rtos_includes.hpp"
-#include "attitude_estimator.hpp"
-#include "captr_sensor_msgs.hpp"
 #include <Adafruit_LSM6DS3TRC.h>
 #include <Adafruit_LSM6DSOX.h>
 #include <Adafruit_LIS3MDL.h>
 #include <Adafruit_BMP3XX.h>
 #include <TinyGPS++.h>
+
+#include "attitude_estimator.hpp"
+#include "captr_sensor_msgs.hpp"
 #include "CAPTR_PIN_DRIVER.hpp"
+#include "mount_lib.hpp"
 // #include <driver_bmp390.h>
 
 inline uint32_t msElapsed = 0;
@@ -96,6 +98,8 @@ inline float ground_altitude_offset_msl__ = 0.0;
 // State variables
 inline UKF::Attitude att_estimator__;
 
+inline tvc_mount_lib::TVC_mount tvc_mount__(SERVO_PITCH_PIN, 1.0, 0.0, SERVO_YAW_PIN, 1.0, 0.0);
+
 inline std::atomic<double> att_cmd_yaw = 0;
 inline std::atomic<double> att_cmd_pitch = 0;
 inline std::atomic<double> att_cmd_roll = 0;
@@ -110,7 +114,5 @@ inline sensor_msgs::MagMsg mag_data__;
 
 inline std::atomic<int> pyro_1_cmd = 0;
 inline std::atomic<int> pyro_2_cmd = 0;
-
-
 
 #endif
