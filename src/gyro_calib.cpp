@@ -33,7 +33,7 @@ void gyroBiasEstimation_task(void*) {
 
     while (xLastWakeTime < start_time + pdMS_TO_TICKS(GYRO_CALIBRATION_TIME)) {
         // Read gyro data
-        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(50));
         if (xSemaphoreTake(gyro_data__.ready, 1) == pdTRUE) {
             local_gyro_data = gyro_data__;
             xSemaphoreGive(gyro_data__.ready);
@@ -43,6 +43,7 @@ void gyroBiasEstimation_task(void*) {
             z += local_gyro_data.z;
             cnt++;
         }
+        xLastWakeTime = xTaskGetTickCount();
     }
     x = x / cnt;
     y = y / cnt;
@@ -51,8 +52,10 @@ void gyroBiasEstimation_task(void*) {
     att_estimator__.set_gyroBiases(x, y, z);
 
     gyro_calib_done = true;
+    Serial.println("Gyro calibration done");
 
     vTaskDelete(NULL);
+    return;
 }
 
 } // namespace gyro_calib_task

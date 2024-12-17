@@ -425,7 +425,7 @@ Eigen::Vector3d UnitQuaternion::to_rotVec() {
 	rotVec << v_1, v_2, v_3;
 	double theta = 2 * atan2(rotVec.norm(), s);
 	if (theta == 0) rotVec = Eigen::Vector3d::Zero();
-	else rotVec = theta / sin(theta / 2) * rotVec;
+	else rotVec = theta * rotVec / rotVec.norm();
 	return rotVec;
 }
 

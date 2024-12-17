@@ -4,13 +4,13 @@
 // ========================== General configuration ===========================
 
 #define LOGGING_FREQUENCY 10 // [Hz] The frequency at which to log data.
-#define CONTROL_FREQUENCY 30 // [Hz] The frequency at which to run the control loop.
+#define CONTROL_FREQUENCY 100 // [Hz] The frequency at which to run the control loop.
 #define FSM_FREQUENCY 10 // [Hz] The frequency at which to run the finite state machine.
 
 // ====================== State estimation configuration ======================
 
 #define Q_MATRIX (Eigen::Matrix<double, Q_DIM, Q_DIM>::Identity() * 0) // The process noise matrix.
-#define R_MATRIX (Eigen::Matrix<double, Z_DIM, Z_DIM>::Identity() * 0.1) // The measurement noise matrix.
+#define R_MATRIX (Eigen::Matrix<double, Z_DIM, Z_DIM>::Identity() * 0.01) // The measurement noise matrix.
 
 
 

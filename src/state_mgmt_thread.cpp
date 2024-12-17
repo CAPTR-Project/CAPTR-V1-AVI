@@ -9,6 +9,19 @@ void state_mgmt_thread(void*) {
     error_state_.store(ErrorState::NONE);
     new_state_ = true;
 
+    xTaskCreate(att_est_threads::att_est_predict_thread, 
+                "Attitude Predictor", 4000, nullptr, 8, &att_est_threads::predictTaskHandle_);
+    vTaskDelay(pdMS_TO_TICKS(10));
+    // xTaskCreate(att_est_threads::att_est_update_thread,
+    //             "Attitude Updator", 2000, nullptr, 8, &att_est_threads::updateTaskHandle_);
+    vTaskDelay(pdMS_TO_TICKS(10));
+    xTaskCreate(controls_thread::control_thread, 
+                "Control", 2000, nullptr, 8, &controls_thread::taskHandle);
+    xTaskCreate(daq_thread::daq_thread, 
+                "Sensor DAQ", 1000, nullptr, 9, &daq_thread::taskHandle);
+    // xTaskCreate(datalogger_thread::datalogger_thread, 
+    //             "Telemetry Logger", 1000, nullptr, 7, &datalogger_thread::taskHandle);
+
     TickType_t xLastWakeTime = xTaskGetTickCount();
     BaseType_t xWasDelayed;
 
@@ -56,8 +69,8 @@ void state_mgmt_thread(void*) {
                 Serial.println("FSM: CALIBRATING");
                 new_state_ = false;
                 last_state_change_ms = millis();
-                xTaskCreate(gyro_calib_task::gyroBiasEstimation_task, "Gyro Calibration", 2000, nullptr, 4, &gyro_calib_task::taskHandle);
-                xTaskCreate(mag_calib_task::magVectorEstimation_task, "Magnetometer Calibration", 2000, nullptr, 4, &mag_calib_task::taskHandle);
+                xTaskCreate(gyro_calib_task::gyroBiasEstimation_task, "Gyro Calibration", 2000, nullptr, 8, &gyro_calib_task::taskHandle);
+                xTaskCreate(mag_calib_task::magVectorEstimation_task, "Magnetometer Calibration", 2000, nullptr, 8, &mag_calib_task::taskHandle);
 
             }
 
@@ -65,6 +78,7 @@ void state_mgmt_thread(void*) {
             {
                 att_estimator__.initialized = true;
                 mcu_state_ = ControllerState::LAUNCH_DETECT;
+                Serial.println("FSM: LAUNCH_DETECT");
                 new_state_ = true;
                 break;
             }

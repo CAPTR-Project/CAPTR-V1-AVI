@@ -16,6 +16,8 @@ Desc: Global variables and constants header file to be included in all relevant 
 #ifndef GLOBALS_HPP
 #define GLOBALS_HPP
 
+#include "config.hpp"
+
 #include <Wire.h>
 #include "rtos_includes.hpp"
 #include <Adafruit_LSM6DS3TRC.h>

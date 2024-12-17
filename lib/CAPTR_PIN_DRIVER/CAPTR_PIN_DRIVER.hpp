@@ -20,7 +20,7 @@ struct HwPin{
 };
 
 
-HwPin controller_pins[COUNT] = {
+inline HwPin controller_pins[COUNT] = {
 
   [HW_PIN_GYRO_INT] = {
     .pin_number = 40,

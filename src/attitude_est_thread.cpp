@@ -50,7 +50,7 @@ void att_est_predict_thread(void*) {
                                     local_gyro_data.toVector());
                 
                 last_action_was_predict = true;
-                last_time_us = pdTICKS_TO_US(xTaskGetTickCount());
+                last_time_us = current_time_us;
                 xSemaphoreGive(att_est_mutex_);
             }
         }

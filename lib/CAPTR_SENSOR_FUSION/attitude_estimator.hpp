@@ -49,6 +49,7 @@ namespace UKF {
 
         SemaphoreHandle_t ready;
         UnitQuaternion newest_attitude_quat;
+        UnitQuaternion integrated_quat;
 
 
         void init(UnitQuaternion starting_orientation,

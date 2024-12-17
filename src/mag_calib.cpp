@@ -32,7 +32,7 @@ void magVectorEstimation_task(void*) {
     TickType_t start_time = xTaskGetTickCount();
     while (xLastWakeTime < start_time + pdMS_TO_TICKS(GYRO_CALIBRATION_TIME)) {
         // Read gyro data
-        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(50));
         if (xSemaphoreTake(mag_data__.ready, 1) == pdTRUE) {
             local_mag_data = mag_data__;
             xSemaphoreGive(mag_data__.ready);
@@ -42,6 +42,7 @@ void magVectorEstimation_task(void*) {
             z += local_mag_data.z;
             cnt++;
         }
+        xLastWakeTime = xTaskGetTickCount();
     }
     x = x / cnt;
     y = y / cnt;
@@ -50,8 +51,10 @@ void magVectorEstimation_task(void*) {
     att_estimator__.set_magVec(x, y, z);
 
     mag_calib_done = true;
+    Serial.println("Mag calibration done");
 
     vTaskDelete(NULL);
+    return;
 }
 
 } // namespace gyro_calib_task

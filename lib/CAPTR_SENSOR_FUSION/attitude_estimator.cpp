@@ -44,6 +44,7 @@ void Attitude::init(UnitQuaternion starting_orientation,
 
     if (xSemaphoreTake(ready, 1) == pdTRUE) {
         newest_attitude_quat = starting_orientation;
+        integrated_quat = starting_orientation;
         xSemaphoreGive(ready);
         initialized = true;
     }
@@ -99,7 +100,7 @@ void Attitude::predict(double dt, Eigen::Vector3d w_m) {
 
     Eigen::Vector3d avg_err;
 
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 50; i++) {
         avg_err = Eigen::Vector3d::Zero();
         for (int j = 0; j < 2 * P_DIM + 1; j++) {
             UnitQuaternion q_j(quat_sigma_points(0, j), quat_sigma_points(1, j), quat_sigma_points(2, j), quat_sigma_points(3, j));
@@ -107,7 +108,7 @@ void Attitude::predict(double dt, Eigen::Vector3d w_m) {
             if (j == 0) avg_err += CENTER_WEIGHT * q_j.to_rotVec();
             else avg_err += q_j.to_rotVec();
         }
-        avg_err /= (2 * P_DIM + 1);
+        avg_err /= (2 * P_DIM + CENTER_WEIGHT);
 
         est_mean = UnitQuaternion::from_rotVec(avg_err(0), avg_err(1), avg_err(2)) * est_mean;
     }
@@ -134,6 +135,12 @@ void Attitude::predict(double dt, Eigen::Vector3d w_m) {
     cov /= (2 * P_DIM + 1);
 
     P_ = cov;
+
+    ang_vec = w_m - bias;
+
+    UnitQuaternion dq = UnitQuaternion::from_euler(dt * ang_vec(0), dt * ang_vec(1), dt * ang_vec(2));
+
+    integrated_quat = dq * integrated_quat;
 
     if (xSemaphoreTake(ready, pdMS_TO_TICKS(3)) == pdTRUE) {
         newest_attitude_quat = q_k;

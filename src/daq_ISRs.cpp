@@ -31,9 +31,8 @@ void imuISR() {
 
 void gyroISR() {
     // update gyro data global variable
-    
     if (!imu__.readGyroscope(daq_thread::temp_gyro_data_.x, daq_thread::temp_gyro_data_.y, daq_thread::temp_gyro_data_.z)) {
-        // error_state_ = ErrorState::GYRO;
+        error_state_ = ErrorState::GYRO;
     } else {
         daq_thread::gyro_data_ready_ = true;
 

@@ -31,11 +31,6 @@ void daq_thread(void*) {
         error_state_.store(ErrorState::MAG);
     }
     // mag_data__.ready = xSemaphoreCreateMutex();
-    
-
-    // if (!sensors_lib::initBMP(&bmp__, BMP390_ADDRESS_ADO_HIGH, &Wire1, BARO_DATARATE, baroISR, BARO_INT_PIN)) {
-    //     error_state_.store(ErrorState::BARO);
-    // }
 
     if (!sensors_lib::initBMP(&bmp__, BMP3XX_DEFAULT_ADDRESS, &Wire1, BARO_DATARATE, baroISR, BARO_INT_PIN)) {
         error_state_.store(ErrorState::BARO);
@@ -56,9 +51,12 @@ void daq_thread(void*) {
         }
         if (gyro_data_ready_) {
             if (xSemaphoreTake(gyro_data__.ready, 1) == pdTRUE) {
-                gyro_data__.x = temp_gyro_data_.x / 180.0 * M_PI;
-                gyro_data__.y = temp_gyro_data_.y / 180.0 * M_PI;
-                gyro_data__.z = temp_gyro_data_.z / 180.0 * M_PI;
+                // gyro_data__.x = temp_gyro_data_.x / 180.0 * M_PI;
+                // gyro_data__.y = temp_gyro_data_.y / 180.0 * M_PI;
+                // gyro_data__.z = temp_gyro_data_.z / 180.0 * M_PI;
+                gyro_data__.x = temp_gyro_data_.x;
+                gyro_data__.y = temp_gyro_data_.y;
+                gyro_data__.z = temp_gyro_data_.z;
                 gyro_data_ready_ = false;
                 xSemaphoreGive(gyro_data__.ready);
 

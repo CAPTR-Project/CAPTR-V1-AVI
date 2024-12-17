@@ -886,10 +886,38 @@ int Adafruit_LSM6DS::readGyroscope(float &x, float &y, float &z) {
     return 0;
   }
 
+  getGyroRange();
+
+  float gyro_scale = 1; // range is in milli-dps per bit!
+  switch (gyroRangeBuffered) {
+  case ISM330DHCX_GYRO_RANGE_4000_DPS:
+    gyro_scale = 140.0;
+    break;
+  case LSM6DS_GYRO_RANGE_2000_DPS:
+    gyro_scale = 70.0;
+    break;
+  case LSM6DS_GYRO_RANGE_1000_DPS:
+    gyro_scale = 35.0;
+    break;
+  case LSM6DS_GYRO_RANGE_500_DPS:
+    gyro_scale = 17.50;
+    break;
+  case LSM6DS_GYRO_RANGE_250_DPS:
+    gyro_scale = 8.75;
+    break;
+  case LSM6DS_GYRO_RANGE_125_DPS:
+    gyro_scale = 4.375;
+    break;
+  }
+
+  x = data[0] * gyro_scale * SENSORS_DPS_TO_RADS / 1000.0;
+  y = data[1] * gyro_scale * SENSORS_DPS_TO_RADS / 1000.0;
+  z = data[2] * gyro_scale * SENSORS_DPS_TO_RADS / 1000.0;
+
   // scale to range of -2000 – 2000
-  x = data[0] * 2000.0 / 32768.0;
-  y = data[1] * 2000.0 / 32768.0;
-  z = data[2] * 2000.0 / 32768.0;
+  // x = data[0] * 2000.0 / 32768.0;
+  // y = data[1] * 2000.0 / 32768.0;
+  // z = data[2] * 2000.0 / 32768.0;
 
   return 1;
 }
