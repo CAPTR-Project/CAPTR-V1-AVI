@@ -4,7 +4,7 @@
 // ========================== General configuration ===========================
 
 #define LOGGING_FREQUENCY 10 // [Hz] The frequency at which to log data.
-#define CONTROL_FREQUENCY 100 // [Hz] The frequency at which to run the control loop.
+#define CONTROL_FREQUENCY 50 // [Hz] The frequency at which to run the control loop.
 #define FSM_FREQUENCY 10 // [Hz] The frequency at which to run the finite state machine.
 
 // ====================== State estimation configuration ======================
@@ -17,7 +17,7 @@
 // ============================ Sensor configuration ==========================
 
 // Gyroscope
-#define IMU_DATARATE LSM6DS_RATE_208_HZ
+#define IMU_DATARATE LSM6DS_RATE_104_HZ
 #define GYRO_CALIBRATION_TIME 5000 // [ms] The time to calibrate the gyroscope offsets.
 #define GYRO_INT_PIN 40 // The pin to which the gyroscope interrupt is connected.
 

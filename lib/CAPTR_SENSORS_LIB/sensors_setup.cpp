@@ -109,16 +109,17 @@ namespace sensors_lib {
 
         Serial.println("LSM6DS Found!");
 
-        imu->setAccelRange(LSM6DS_ACCEL_RANGE_16_G);
-        imu->setGyroRange(LSM6DS_GYRO_RANGE_2000_DPS);
-        imu->setAccelDataRate(dataRate);
+        imu->setAccelRange(LSM6DS_ACCEL_RANGE_8_G);
+        imu->setGyroRange(LSM6DS_GYRO_RANGE_500_DPS);
+        imu->setAccelDataRate(LSM6DS_RATE_52_HZ);
         imu->setGyroDataRate(dataRate);
+
+        vPortEnterCritical();
 
         imu->configInt1(false, true, false); // enable interrupt on gyroscope data ready
         imu->configInt2(false, false, true); // enable interrupt on accelerometer data ready
         imu->configIntOutputs(false, false); // set to active high and push-pull
 
-        vPortEnterCritical();
 
         attachInterrupt(digitalPinToInterrupt(accel_isr_pin), imu_isr, arduino::RISING);
         attachInterrupt(digitalPinToInterrupt(gyro_isr_pin), gyro_isr, arduino::RISING);

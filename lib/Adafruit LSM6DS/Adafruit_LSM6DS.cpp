@@ -915,9 +915,9 @@ int Adafruit_LSM6DS::readGyroscope(float &x, float &y, float &z) {
   z = data[2] * gyro_scale * SENSORS_DPS_TO_RADS / 1000.0;
 
   // scale to range of -2000 – 2000
-  // x = data[0] * 2000.0 / 32768.0;
-  // y = data[1] * 2000.0 / 32768.0;
-  // z = data[2] * 2000.0 / 32768.0;
+  // x = data[0] * 2000.0 / 32768.0 / 180.0 * M_PI;
+  // y = data[1] * 2000.0 / 32768.0 / 180.0 * M_PI;
+  // z = data[2] * 2000.0 / 32768.0 / 180.0 * M_PI;
 
   return 1;
 }

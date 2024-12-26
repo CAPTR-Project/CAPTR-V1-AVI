@@ -117,4 +117,8 @@ inline sensor_msgs::MagMsg mag_data__;
 inline std::atomic<int> pyro_1_cmd = 0;
 inline std::atomic<int> pyro_2_cmd = 0;
 
+inline std::atomic<float> gyro_offset_x = 0;
+inline std::atomic<float> gyro_offset_y = 0;
+inline std::atomic<float> gyro_offset_z = 0;
+
 #endif
