@@ -44,7 +44,7 @@ inline float minServoPos = -9;
 inline float maxRate_ = 20.0;
 inline float minRate_ = -20.0;
 
-// gains in x, y, z (see if we can get away with using same gains for the same axis)
+// gains in x, y, z (see if we can get away with using same gains for every axis)
 inline Eigen::Vector3f attKp_{1.0, 1.0, 1.0};  
 inline Eigen::Vector3f attKi_{0.5, 0.5, 0.5};
 inline Eigen::Vector3f attKd_{1.0, 1.0, 1.0};
