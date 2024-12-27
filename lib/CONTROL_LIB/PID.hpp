@@ -7,8 +7,8 @@
 class PID
 {
 public:
-    PID(float dt, float max, float min, float Kp, float Kd, float Ki)        // has to be same name as class because it is a constructor like init in python
-        : dt_(dt), max_(max), min_(min), Kp_(Kp), Kd_(Kd), Ki_(Ki), integral_(0.0), prev_error_(0.0) {}
+    PID(float dt, float max, float min, float Kp, float Ki, float Kd)        // has to be same name as class because it is a constructor like init in python
+        : dt_(dt), max_(max), min_(min), Kp_(Kp), Ki_(Ki), Kd_(Kd), integral_(0.0), prev_error_(0.0) {}
 
     float run(float setpoint, float currentValue) {
         error_ = setpoint - currentValue;
@@ -29,11 +29,11 @@ public:
     }
 
 private:
-    float Kp_, Ki_, Kd_;
-    float min_, max_;
-    float setpoint_;
-    float error_, prev_error_, derivative_, integral_;
     double dt_;
+    float max_, min_;
+    float Kp_, Ki_, Kd_;
+    float error_, derivative_, integral_, prev_error_;
+
 };
 
 #endif

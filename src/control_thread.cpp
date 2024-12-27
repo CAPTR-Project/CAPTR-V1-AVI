@@ -27,7 +27,8 @@ void control_thread(void*) {
     sensors_event_t gyro;
     sensors_event_t temp;
 
-    
+    QuaternionPID attitudePID(attitude_dt_, maxRate_, minRate_, attKp_, attKi_, attKd_);
+    RatePID ratePID(rate_dt_, maxServoPos, minServoPos, rateKp_, rateKi_, rateKd_);
 
     // UnitQuaternion current_attitude;
     while (true) {
@@ -54,32 +55,15 @@ void control_thread(void*) {
         // Serial.println("Gyroscope: " + String(gyro_data__.x) + " " + String(gyro_data__.y) + " " + String(gyro_data__.z));
         // Serial.println("Magnetometer: " + String(mag_data__.x) + " " + String(mag_data__.y) + " " + String(mag_data__.z));
         // Eigen::Vector3d euler = att_estimator__.newest_attitude_quat.to_euler();
-        Eigen::Vector3d euler = att_estimator__.integrated_quat.to_euler();
+        // Eigen::Vector3d euler = att_estimator__.integrated_quat.to_euler();
 
         // Serial.println("Orientation: x: " + String(euler(0)) + " y: " + String(euler(1)) + " z: " + String(euler(2)));
         // Serial.println("HeadingX: " + String(headingX));
         // Serial.println();
 
-        // Serial.println("Control loop");
-        // current state
-        curAttitude_ = att_estimator__.newest_attitude_quat;
-
-        // calc error (calc is short for calculate btw chat)     
-        errorAttitude_ = target_attitude_ * curAttitude_.inverse();
-        // Write control outputs
-        // get the vector components of the quaternion
-        error_vector[0] = error_euler[1];   // pitch
-        error_vector[1] = error_euler[2];   // roll
-        error_vector[2] = error_euler[3];   // yaw
-
-        // control law
-        _u_pitch = _Kp[0] * error_vector[0] + _Kd[0] * gyro_data__.x;
-        _u_roll = _Kp[1] * error_vector[1] + _Kd[1] * gyro_data__.y;
-        // _u_yaw = _Kp[2] * error_vector[2] + _Kd[2] * gyro_data__.z;
-
-        att_cmd_pitch = _u_pitch;
-        att_cmd_roll = _u_roll;
-        //att_cmd_yaw = _u_yaw;
+        // call the pids to computer corrections
+        attitudeOutput_ = attitudePID.compute(target_attitude_, att_estimator__.newest_attitude_quat);
+        rateOutput_ = ratePID.compute(attitudeOutput_, gyro_data__.toVector());  // x, y, z for servos
 
         xWasDelayed = xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(int(round(1000/CONTROL_FREQUENCY))));
         if (!xWasDelayed) {
