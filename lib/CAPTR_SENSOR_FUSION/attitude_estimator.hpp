@@ -3,7 +3,7 @@
 
 #include <ArduinoEigenDense.h>
 #include <ArduinoEigen/Eigen/Cholesky>
-#include <Quaternion.h>
+#include <quaternion.h>
 #include <vector>
 #include <atomic>
 #include "arduino_freertos.h"
