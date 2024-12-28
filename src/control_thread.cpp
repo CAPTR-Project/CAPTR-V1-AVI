@@ -38,7 +38,7 @@ void control_thread(void*) {
         //     xSemaphoreGive(att_estimator__.ready);
         // }
 
-        if (mcu_state_.load() == ControllerState::LV_ON || mcu_state_.load() == ControllerState::CALIBRATING) {
+        if (mcu_state_.load() == ControllerState::STBY || mcu_state_.load() == ControllerState::CALIBRATING) {
 
         } else {
 

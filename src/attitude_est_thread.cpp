@@ -40,7 +40,7 @@ void att_est_predict_thread(void*) {
             xSemaphoreGive(gyro_data__.ready);
             
             local_mcu_state = mcu_state_.load();
-            if (local_mcu_state == ControllerState::LV_ON || local_mcu_state == ControllerState::CALIBRATING) continue;
+            if (local_mcu_state == ControllerState::STBY || local_mcu_state == ControllerState::CALIBRATING) continue;
             if (xSemaphoreTake(att_est_mutex_, pdMS_TO_TICKS(8)) == pdTRUE && // TODO: change delay to match freq of gyro
                 att_estimator__.initialized) {
                 
@@ -73,7 +73,7 @@ void att_est_update_thread(void*) {
             xSemaphoreGive(mag_data__.ready);
         
             local_mcu_state = mcu_state_.load();
-            if (local_mcu_state == ControllerState::LV_ON || local_mcu_state == ControllerState::CALIBRATING) continue;
+            if (local_mcu_state == ControllerState::STBY || local_mcu_state == ControllerState::CALIBRATING) continue;
             if (last_action_was_predict) {
                 if (xSemaphoreTake(att_est_mutex_, pdMS_TO_TICKS(23)) == pdTRUE && // TODO: change delay to match freq of mag
                 att_estimator__.initialized) {

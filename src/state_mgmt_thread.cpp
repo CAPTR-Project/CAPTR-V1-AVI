@@ -5,7 +5,7 @@ namespace state_mgmt_thread {
 void state_mgmt_thread(void*) {
 
 
-    mcu_state_.store(ControllerState::LV_ON);
+    mcu_state_.store(ControllerState::STBY);
     error_state_.store(ErrorState::NONE);
     new_state_ = true;
 
@@ -35,20 +35,21 @@ void state_mgmt_thread(void*) {
     
         switch (mcu_state_)
         {
-        case ControllerState::LV_ON:
+        case ControllerState::STBY:
 
             if (new_state_)
             {
-                Serial.println("FSM: LV_ON");
+                Serial.println("FSM: STBY");
                 new_state_ = false;
 
                 last_state_change_ms = millis();
+                tvc_mount__.preflight_test();
+                break;
             }
 
-            // Serial.println("FSM: LV_ON");
-
-            // TODO: LV_ON Code
-            if (millis() - last_state_change_ms > 2000)
+            // TODO: STBY Code
+            // if (millis() - last_state_change_ms > 10000)
+            if (tvc_mount__.busy == false)
             {
                 mcu_state_ = ControllerState::CALIBRATING;
                 new_state_ = true;
@@ -57,7 +58,7 @@ void state_mgmt_thread(void*) {
 
             if (error_state_ == ErrorState::NONE)
             {
-                mcu_state_ = ControllerState::LV_ON;
+                mcu_state_ = ControllerState::STBY;
                 break;
             }
 
@@ -71,14 +72,12 @@ void state_mgmt_thread(void*) {
                 last_state_change_ms = millis();
                 xTaskCreate(gyro_calib_task::gyroBiasEstimation_task, "Gyro Calibration", 2000, nullptr, 8, &gyro_calib_task::taskHandle);
                 xTaskCreate(mag_calib_task::magVectorEstimation_task, "Magnetometer Calibration", 2000, nullptr, 8, &mag_calib_task::taskHandle);
-
             }
 
             if (mag_calib_task::mag_calib_done && gyro_calib_task::gyro_calib_done)
             {
                 att_estimator__.initialized = true;
                 mcu_state_ = ControllerState::LAUNCH_DETECT;
-                Serial.println("FSM: LAUNCH_DETECT");
                 new_state_ = true;
                 break;
             }
@@ -100,7 +99,7 @@ void state_mgmt_thread(void*) {
 
             // Serial.println("FSM: LAUNCH_DETECT");
 
-            if (accel_data__.z > 0.5)
+            if (accel_data__.z > 1.0)
             {
                 mcu_state_ = ControllerState::POWERED_ASCENT;
                 new_state_ = true;
