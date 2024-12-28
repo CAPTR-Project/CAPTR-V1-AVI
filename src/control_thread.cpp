@@ -35,25 +35,18 @@ void control_thread(void*) {
         //     xSemaphoreGive(att_estimator__.ready);
         // }
 
-        if (mcu_state_.load() == ControllerState::LV_ON || mcu_state_.load() == ControllerState::CALIBRATING) {
+        if (mcu_state_.load() == ControllerState::STBY || mcu_state_.load() == ControllerState::CALIBRATING) {
 
         } else {
 
-
-        if (imu__.getEvent(&accel, &gyro, &temp)) {
-            // Serial.println("GyroX: " + String(gyro.gyro.x));
-            // Serial.println("GyroY: " + String(gyro.gyro.y));
-            // Serial.println("GyroZ: " + String(gyro.gyro.z));
-            headingX += (gyro.gyro.x) * 0.02;
-        }
-
+        headingX += (gyro.gyro.x) * pdTICKS_TO_MS(xTaskGetTickCount() - xLastWakeTime) / 1000.0;
 
         // Serial.println("Altitude: " + String(baro_data__.alt_agl) + "m");
         // Serial.println("Acceleration: " + String(accel_data__.x) + " " + String(accel_data__.y) + " " + String(accel_data__.z));
         // Serial.println("Gyroscope: " + String(gyro_data__.x) + " " + String(gyro_data__.y) + " " + String(gyro_data__.z));
         // Serial.println("Magnetometer: " + String(mag_data__.x) + " " + String(mag_data__.y) + " " + String(mag_data__.z));
         // Eigen::Vector3d euler = att_estimator__.newest_attitude_quat.to_euler();
-        Eigen::Vector3d euler = att_estimator__.integrated_quat.to_euler();
+        // Eigen::Vector3d euler = att_estimator__.integrated_quat.to_euler();
 
         // Serial.println("Orientation: x: " + String(euler(0)) + " y: " + String(euler(1)) + " z: " + String(euler(2)));
         Serial.println("HeadingX: " + String(headingX));

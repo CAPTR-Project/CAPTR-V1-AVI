@@ -39,7 +39,7 @@ inline uint32_t msElapsed = 0;
 // ================================= State Machine ================================
 enum class ControllerState
 {
-    LV_ON,
+    STBY,
     CALIBRATING,
     LAUNCH_DETECT,
     POWERED_ASCENT,
@@ -100,7 +100,7 @@ inline float ground_altitude_offset_msl__ = 0.0;
 // State variables
 inline UKF::Attitude att_estimator__;
 
-inline tvc_mount_lib::TVC_mount tvc_mount__(SERVO_PITCH_PIN, 1.0, 0.0, SERVO_YAW_PIN, 1.0, 0.0);
+inline tvc_mount_lib::TVC_mount tvc_mount__(SERVO_PITCH_PIN, 1.0, 0.0, 0.157, SERVO_YAW_PIN, 1.0, 0.0, 0.157);
 
 inline std::atomic<double> att_cmd_yaw = 0;
 inline std::atomic<double> att_cmd_pitch = 0;

@@ -45,7 +45,7 @@
 #define FLASH_CHIP 10 // Chip select pin for flash memory
 
 // TVC mount configuration
-#define SERVO_PITCH_PIN 14
-#define SERVO_YAW_PIN 15
+#define SERVO_PITCH_PIN 22
+#define SERVO_YAW_PIN 23
 
 #endif
