@@ -41,7 +41,7 @@ namespace UKF {
 
         Eigen::MatrixXd sigma_points;
 
-        Eigen::Vector3d ang_vec; // [rad/s] angular velocity in [x, y, z] form. roll, pitch, yaw.
+        Eigen::Vector3d ang_vec; // [rad/s] angular velocity in [z, y, x] form. yaw, pitch, roll.
 
         Eigen::Vector3d mag_vec_up; // [uT] magnetic field vector in [x, y, z] form.
 
@@ -49,7 +49,6 @@ namespace UKF {
 
         SemaphoreHandle_t ready;
         UnitQuaternion newest_attitude_quat;
-        UnitQuaternion integrated_quat;
 
 
         void init(UnitQuaternion starting_orientation,
@@ -57,6 +56,8 @@ namespace UKF {
                     Eigen::Vector3d mag_vec, 
                     Eigen::Matrix<double, Q_DIM, Q_DIM> Q,
                     Eigen::Matrix<double, Z_DIM, Z_DIM> R);
+
+        void Attitude::predict_integrate(double dt, Eigen::Vector3d w_m);
 
         /**
          * @brief Predict the next state of the system. Uses the dynamic model to predict the next state.
@@ -93,12 +94,12 @@ namespace UKF {
 	    UnitQuaternion h_quaternion(Eigen::Vector3d z);
         
         
-        void set_gyroBiases(float x, float y, float z);
+        void set_gyroBiases(float z, float y, float x);
         void set_magVec(float x, float y, float z);
 
     private:
         Eigen::Matrix3d covSqrt;
-        UnitQuaternion q_k;
+        UnitQuaternion q_k_;
         Eigen::MatrixXd quat_sigma_points;
         Eigen::Vector3d bias;
 

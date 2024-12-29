@@ -49,7 +49,11 @@ void gyroBiasEstimation_task(void*) {
     y = y / cnt;
     z = z / cnt;
 
-    att_estimator__.set_gyroBiases(x, y, z);
+    att_estimator__.set_gyroBiases(z, y, x);
+
+    daq_threads::gyro_bias_x_ = x;
+    daq_threads::gyro_bias_y_ = y;
+    daq_threads::gyro_bias_z_ = z;
 
     gyro_calib_done = true;
     Serial.println("Gyro calibration done");

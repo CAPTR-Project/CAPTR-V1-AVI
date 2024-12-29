@@ -23,7 +23,7 @@ void Attitude::init(UnitQuaternion starting_orientation,
     x_hat_.block<3, 1>(4, 0) = starting_bias;
     mag_vec_up = mag_vec;
 
-    q_k = starting_orientation;
+    q_k_ = starting_orientation;
 
     x_prior_ = x_hat_;
 
@@ -44,11 +44,19 @@ void Attitude::init(UnitQuaternion starting_orientation,
 
     if (xSemaphoreTake(ready, 1) == pdTRUE) {
         newest_attitude_quat = starting_orientation;
-        integrated_quat = starting_orientation;
         xSemaphoreGive(ready);
         initialized = true;
     }
 
+}
+
+void Attitude::predict_integrate(double dt, Eigen::Vector3d w_m) {
+    x_hat_ = f_quaternion(x_hat_, w_m, dt);
+    q_k_ = UnitQuaternion(x_hat_(0), x_hat_(1), x_hat_(2), x_hat_(3));
+    if (xSemaphoreTake(ready, 1) == pdTRUE) {
+        newest_attitude_quat = q_k_;
+        xSemaphoreGive(ready);
+    }
 }
 
 void Attitude::predict(double dt, Eigen::Vector3d w_m) {
@@ -79,7 +87,7 @@ void Attitude::predict(double dt, Eigen::Vector3d w_m) {
         q_noise = UnitQuaternion::from_rotVec(sigma_points(0, i), sigma_points(1, i), sigma_points(2, i));
         // w_noise = sigma_points.block<3, 1>(4, i);
 
-        quat_sigma_points.block<4, 1>(0, i) = (q_noise * q_k).to_quaternion_vector();
+        quat_sigma_points.block<4, 1>(0, i) = (q_noise * q_k_).to_quaternion_vector();
 
         quat_sigma_points.block<3, 1>(4, i) = x_hat_.block<3, 1>(4, 0);
     }
@@ -91,7 +99,7 @@ void Attitude::predict(double dt, Eigen::Vector3d w_m) {
     }
     
     // predict mean and covariance
-    UnitQuaternion est_mean = q_k;
+    UnitQuaternion est_mean = q_k_;
     // UnitQuaternion est_mean = UnitQuaternion();
     Eigen::Vector3d euler = est_mean.to_euler();
 
@@ -115,17 +123,17 @@ void Attitude::predict(double dt, Eigen::Vector3d w_m) {
     // Serial.printf("estimated: %.8f, %.8f, %.8f, %.8f\n", est_mean.s, est_mean.v_1, est_mean.v_2, est_mean.v_3);
 
 
-    q_k = est_mean;
+    q_k_ = est_mean;
 
     x_prior_ = x_hat_;
 
-    x_hat_.block<4, 1>(0, 0) = q_k.to_quaternion_vector();
+    x_hat_.block<4, 1>(0, 0) = q_k_.to_quaternion_vector();
 
     Eigen::Matrix3d cov = Eigen::Matrix3d::Zero();
 
     for (int i = 0; i < 2 * P_DIM + 1; i++) {
         UnitQuaternion q_j(quat_sigma_points(0, i), quat_sigma_points(1, i), quat_sigma_points(2, i), quat_sigma_points(3, i));
-        q_j = (q_j * q_k.inverse());
+        q_j = (q_j * q_k_.inverse());
         double theta = 2 * acos(q_j.s);
         Eigen::Vector3d err = Eigen::Vector3d::Zero();
         if (abs(theta) > 1e-12) err = theta / sin(theta) * q_j.to_quaternion_vector().block<3, 1>(1, 0);
@@ -138,12 +146,8 @@ void Attitude::predict(double dt, Eigen::Vector3d w_m) {
 
     ang_vec = w_m - bias;
 
-    UnitQuaternion dq = UnitQuaternion::from_euler(dt * ang_vec(0), dt * ang_vec(1), dt * ang_vec(2));
-
-    integrated_quat = dq * integrated_quat;
-
     if (xSemaphoreTake(ready, pdMS_TO_TICKS(3)) == pdTRUE) {
-        newest_attitude_quat = q_k;
+        newest_attitude_quat = q_k_;
         xSemaphoreGive(ready);
     }
     
@@ -205,9 +209,13 @@ Eigen::VectorXd Attitude::f_quaternion(Eigen::VectorXd x, Eigen::Vector3d w_m, d
 
     UnitQuaternion dq = UnitQuaternion::from_euler(dt * ang_vec(0), dt * ang_vec(1), dt * ang_vec(2));
 
-    q_k = dq * q_k;
+    q_k.normalize();
 
-    Eigen::Vector3d euler = q_k.to_euler();
+    q_k = q_k * dq;
+
+    q_k.normalize();
+
+    // Eigen::Vector3d euler = q_k.to_euler();
 
     // Serial.printf("%.8f, %.8f, %.8f\n", euler(0), euler(1), euler(2));
 
@@ -228,8 +236,8 @@ UnitQuaternion Attitude::h_quaternion(Eigen::Vector3d z) {
     return UnitQuaternion::from_rotVec(angle * axis(0), angle * axis(1), angle * axis(2));
 }
 
-void Attitude::set_gyroBiases(float x, float y, float z) {
-    bias = Eigen::Vector3d(x, y, z);
+void Attitude::set_gyroBiases(float z, float y, float x) {
+    bias = Eigen::Vector3d(z, y, x);
     x_hat_.block<3, 1>(4, 0) = bias;
 }
 

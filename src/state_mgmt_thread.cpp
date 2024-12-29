@@ -9,16 +9,17 @@ void state_mgmt_thread(void*) {
     error_state_.store(ErrorState::NONE);
     new_state_ = true;
 
+    daq_threads::daq_start();
+    
+    vTaskDelay(pdMS_TO_TICKS(10));
     xTaskCreate(att_est_threads::att_est_predict_thread, 
-                "Attitude Predictor", 4000, nullptr, 8, &att_est_threads::predictTaskHandle_);
+                "Attitude Predictor", 20000, nullptr, 8, &att_est_threads::predictTaskHandle_);
     vTaskDelay(pdMS_TO_TICKS(10));
     // xTaskCreate(att_est_threads::att_est_update_thread,
     //             "Attitude Updator", 2000, nullptr, 8, &att_est_threads::updateTaskHandle_);
     vTaskDelay(pdMS_TO_TICKS(10));
     xTaskCreate(controls_thread::control_thread, 
-                "Control", 2000, nullptr, 8, &controls_thread::taskHandle);
-    xTaskCreate(daq_thread::daq_thread, 
-                "Sensor DAQ", 1000, nullptr, 9, &daq_thread::taskHandle);
+                "Control", 10000, nullptr, 8, &controls_thread::taskHandle);
     // xTaskCreate(datalogger_thread::datalogger_thread, 
     //             "Telemetry Logger", 1000, nullptr, 7, &datalogger_thread::taskHandle);
 

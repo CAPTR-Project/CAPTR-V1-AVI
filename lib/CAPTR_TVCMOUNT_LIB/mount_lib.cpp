@@ -43,43 +43,42 @@ namespace tvc_mount_lib {
     void TVC_mount::preflight_test_task(void* mount_ptr_void) {
         TVC_mount* mount_ptr = static_cast<TVC_mount*>(mount_ptr_void);
         // Test pitch
-        vTaskDelay(pdMS_TO_TICKS(1000));
         for (int i = 0; i < 2; i++) {
             mount_ptr->move_mount(mount_ptr->pitch_limit, 0);
-            vTaskDelay(pdMS_TO_TICKS(500));
+            vTaskDelay(pdMS_TO_TICKS(250));
             mount_ptr->move_mount(-mount_ptr->pitch_limit, 0);
-            vTaskDelay(pdMS_TO_TICKS(500));
+            vTaskDelay(pdMS_TO_TICKS(250));
         }
         mount_ptr->move_mount(0, 0);
-        vTaskDelay(pdMS_TO_TICKS(750));
+        vTaskDelay(pdMS_TO_TICKS(500));
 
         // Test yaw
         for (int i = 0; i < 2; i++) {
             mount_ptr->move_mount(0, mount_ptr->yaw_limit);
-            vTaskDelay(pdMS_TO_TICKS(500));
+            vTaskDelay(pdMS_TO_TICKS(250));
             mount_ptr->move_mount(0, -mount_ptr->yaw_limit);
-            vTaskDelay(pdMS_TO_TICKS(500));
+            vTaskDelay(pdMS_TO_TICKS(250));
         }
         mount_ptr->move_mount(0, 0);
-        vTaskDelay(pdMS_TO_TICKS(750));
+        vTaskDelay(pdMS_TO_TICKS(500));
 
         // Test pitch and yaw
         for (int i = 0; i < 1; i++) {
             mount_ptr->move_mount(mount_ptr->pitch_limit, mount_ptr->yaw_limit);
-            vTaskDelay(pdMS_TO_TICKS(500));
+            vTaskDelay(pdMS_TO_TICKS(250));
             mount_ptr->move_mount(-mount_ptr->pitch_limit, -mount_ptr->yaw_limit);
-            vTaskDelay(pdMS_TO_TICKS(500));
-        }
-        mount_ptr->move_mount(0, 0);
-        vTaskDelay(pdMS_TO_TICKS(750));
-        for (int i = 0; i < 1; i++) {
-            mount_ptr->move_mount(-mount_ptr->pitch_limit, mount_ptr->yaw_limit);
-            vTaskDelay(pdMS_TO_TICKS(500));
-            mount_ptr->move_mount(mount_ptr->pitch_limit, -mount_ptr->yaw_limit);
-            vTaskDelay(pdMS_TO_TICKS(500));
+            vTaskDelay(pdMS_TO_TICKS(250));
         }
         mount_ptr->move_mount(0, 0);
         vTaskDelay(pdMS_TO_TICKS(500));
+        for (int i = 0; i < 1; i++) {
+            mount_ptr->move_mount(-mount_ptr->pitch_limit, mount_ptr->yaw_limit);
+            vTaskDelay(pdMS_TO_TICKS(250));
+            mount_ptr->move_mount(mount_ptr->pitch_limit, -mount_ptr->yaw_limit);
+            vTaskDelay(pdMS_TO_TICKS(250));
+        }
+        mount_ptr->move_mount(0, 0);
+        vTaskDelay(pdMS_TO_TICKS(250));
 
         mount_ptr->busy = false;
 

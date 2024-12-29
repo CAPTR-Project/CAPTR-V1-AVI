@@ -20,8 +20,7 @@ Desc: Global variables and constants header file to be included in all relevant 
 
 #include <Wire.h>
 #include "rtos_includes.hpp"
-#include <Adafruit_LSM6DS3TRC.h>
-#include <Adafruit_LSM6DSOX.h>
+#include <Adafruit_LSM6DSO32.h>
 #include <Adafruit_LIS3MDL.h>
 #include <Adafruit_BMP3XX.h>
 #include <TinyGPS++.h>
@@ -88,7 +87,7 @@ inline std::atomic<bool> new_state_;
 // Mutexes
 
 // Sensors
-inline Adafruit_LSM6DS3TRC imu__;
+inline Adafruit_LSM6DSO32 imu__;
 // Adafruit_LSM6DSOX imu__;
 inline Adafruit_LIS3MDL mag__;
 inline Adafruit_BMP3XX bmp__;
@@ -100,7 +99,7 @@ inline float ground_altitude_offset_msl__ = 0.0;
 // State variables
 inline UKF::Attitude att_estimator__;
 
-inline tvc_mount_lib::TVC_mount tvc_mount__(SERVO_PITCH_PIN, 1.0, 0.1, 0.157, SERVO_YAW_PIN, 1.0, -0.05, 0.157);
+inline tvc_mount_lib::TVC_mount tvc_mount__(SERVO_PITCH_PIN, 1.0, 0.1, 0.16, SERVO_YAW_PIN, 1.0, -0.05, 0.16);
 
 inline std::atomic<double> att_cmd_yaw = 0;
 inline std::atomic<double> att_cmd_pitch = 0;

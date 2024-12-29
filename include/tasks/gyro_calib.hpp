@@ -20,6 +20,7 @@ Desc: Header file for gyroscope calibration asynchronous task. Not long-living, 
 #include "rtos_includes.hpp"
 #include "globals.hpp"
 #include "config.hpp"
+#include "threads/daq_thread.hpp"
 
 namespace gyro_calib_task {
 

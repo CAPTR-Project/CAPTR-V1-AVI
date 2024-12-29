@@ -14,36 +14,50 @@ Desc: Source file for data acquisition Interrupt Service Routines
 
 #include "daq_ISRs.hpp"
 
-void imuISR() {
-    if (!imu__.readAcceleration(daq_thread::temp_accel_data_.x, daq_thread::temp_accel_data_.y, daq_thread::temp_accel_data_.z)) {
-        // error_state_ = ErrorState::ACCEL;
-    } else {
-        daq_thread::accel_data_ready_ = true;
+void accelISR() {
+    // if (!imu__.readAcceleration(daq_thread::temp_accel_data_.x, daq_thread::temp_accel_data_.y, daq_thread::temp_accel_data_.z)) {
+    //     // error_state_ = ErrorState::ACCEL;
+    // } else {
+    //     daq_thread::accel_data_ready_ = true;
 
-        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    //     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-        configASSERT( daq_thread::taskHandle != NULL );
-        vTaskNotifyGiveFromISR( daq_thread::taskHandle, &xHigherPriorityTaskWoken);
+    //     configASSERT( daq_thread::taskHandle != NULL );
+    //     vTaskNotifyGiveFromISR( daq_thread::taskHandle, &xHigherPriorityTaskWoken);
         
-        portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
-    }
+    //     portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+    // }
+
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+    configASSERT( daq_threads::accel_taskHandle != NULL );
+    vTaskNotifyGiveFromISR( daq_threads::accel_taskHandle, &xHigherPriorityTaskWoken);
+    
+    portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 }
 
 void gyroISR() {
     // update gyro data global variable
-    if (!imu__.readGyroscope(daq_thread::temp_gyro_data_.x, daq_thread::temp_gyro_data_.y, daq_thread::temp_gyro_data_.z)) {
-        error_state_ = ErrorState::GYRO;
-    } else {
-        daq_thread::gyro_data_ready_ = true;
+    // if (!imu__.readGyroscope(daq_thread::temp_gyro_data_.x, daq_thread::temp_gyro_data_.y, daq_thread::temp_gyro_data_.z)) {
+    //     error_state_ = ErrorState::GYRO;
+    // } else {
+    //     daq_thread::gyro_data_ready_ = true;
 
-        // Send notification to control task on INDEX 0, unblocking the predict(). 
-        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    //     // Send notification to control task on INDEX 0, unblocking the predict(). 
+    //     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-        configASSERT( daq_thread::taskHandle != NULL );
-        vTaskNotifyGiveFromISR( daq_thread::taskHandle, &xHigherPriorityTaskWoken);
+    //     configASSERT( daq_thread::taskHandle != NULL );
+    //     vTaskNotifyGiveFromISR( daq_thread::taskHandle, &xHigherPriorityTaskWoken);
 
-        portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
-    }
+    //     portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+    // }
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+    // Send notification to control task on INDEX 0. 
+    configASSERT( daq_threads::gyro_taskHandle != NULL );
+    vTaskNotifyGiveFromISR( daq_threads::gyro_taskHandle, &xHigherPriorityTaskWoken);
+
+    portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 }
 
 void baroISR() {
@@ -55,42 +69,28 @@ void baroISR() {
     
     //     return;
     // }
-    daq_thread::temp_baro_data_.alt_msl = bmp__.readAltitude(BARO_PRESSURE_ASL * 0.01);
+    // daq_thread::temp_baro_data_.alt_msl = bmp__.readAltitude(BARO_PRESSURE_ASL * 0.01);
 
-    daq_thread::temp_baro_data_.alt_agl = daq_thread::temp_baro_data_.alt_msl - ground_altitude_offset_msl__;
+    // daq_thread::temp_baro_data_.alt_agl = daq_thread::temp_baro_data_.alt_msl - ground_altitude_offset_msl__;
 
-    daq_thread::temp_baro_data_.pressure = bmp__.pressure;
-
-    daq_thread::baro_data_ready_ = true;
+    // daq_thread::temp_baro_data_.pressure = bmp__.pressure;
 
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-    configASSERT( daq_thread::taskHandle != NULL );
-    vTaskNotifyGiveFromISR( daq_thread::taskHandle, &xHigherPriorityTaskWoken);
+    configASSERT( daq_threads::baro_taskHandle != NULL );
+    vTaskNotifyGiveFromISR( daq_threads::baro_taskHandle, &xHigherPriorityTaskWoken);
     
     portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 }
 
 void magISR() {
     // update mag__ data global variable
-    mag__.read();
-
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-
-    // sensor_msgs::MagMsg new_mag_data = sensor_msgs::MagMsg();
-    // new_mag_data.x = mag__.x_gauss + MAG_X_OFFSET;
-    // new_mag_data.y = mag__.y_gauss + MAG_Y_OFFSET;
-    // new_mag_data.z = mag__.z_gauss + MAG_Z_OFFSET;
-
-    daq_thread::temp_mag_data_.x = mag__.x_gauss + MAG_X_OFFSET;
-    daq_thread::temp_mag_data_.y = mag__.y_gauss + MAG_Y_OFFSET;
-    daq_thread::temp_mag_data_.z = mag__.z_gauss + MAG_Z_OFFSET;
-    daq_thread::mag_data_ready_ = true;
     
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
     // Send notification to control task on INDEX 0, unblocking the update(). 
 
-    configASSERT( daq_thread::taskHandle != NULL );
-    vTaskNotifyGiveFromISR(daq_thread::taskHandle, &xHigherPriorityTaskWoken);
+    configASSERT( daq_threads::mag_taskHandle != NULL );
+    vTaskNotifyGiveFromISR(daq_threads::mag_taskHandle, &xHigherPriorityTaskWoken);
     portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 }
 

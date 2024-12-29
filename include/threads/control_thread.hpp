@@ -31,31 +31,33 @@ namespace controls_thread {
 
 inline TaskHandle_t taskHandle = NULL;
 
-Quaternion target_attitude_{1, 0, 0, 0}; // no rotation
-Eigen::Vector3f target_rate_{0, 0, 0};
+inline UnitQuaternion target_attitude_{1, 0, 0, 0}; // no rotation
+inline Eigen::Vector3d target_rate_{0, 0, 0};
 
-float attitude_dt_ = 1/CONTROL_FREQUENCY;
-float rate_dt_ = 1/CONTROL_FREQUENCY;
+inline double attitude_dt_ = 1.0/CONTROL_FREQUENCY;
+inline double rate_dt_ = 1.0/CONTROL_FREQUENCY;
+
+inline UnitQuaternion current_attitude_{1, 0, 0, 0};
 
 // max and min values
-inline float maxServoPos = 9;
-inline float minServoPos = -9;
+inline double maxServoPos = 9;
+inline double minServoPos = -9;
 
-inline float maxRate_ = 20.0;
-inline float minRate_ = -20.0;
+inline double maxRate_ = 20.0;
+inline double minRate_ = -20.0;
 
 // gains in x, y, z (see if we can get away with using same gains for every axis)
-inline Eigen::Vector3f attKp_{1.0, 1.0, 1.0};  
-inline Eigen::Vector3f attKi_{0.5, 0.5, 0.5};
-inline Eigen::Vector3f attKd_{1.0, 1.0, 1.0};
+inline Eigen::Vector3d attKp_{10.0, 10.0, 10.0};  
+inline Eigen::Vector3d attKi_{0, 0, 0};
+inline Eigen::Vector3d attKd_{0, 0, 0};
 
-inline Eigen::Vector3f rateKp_{1.0, 1.0, 1.0};
-inline Eigen::Vector3f rateKi_{0.5, 0.5, 0.5};
-inline Eigen::Vector3f rateKd_{1.0, 1.0, 1.0};
+inline Eigen::Vector3d rateKp_{0.1, 0.1, 0.1};
+inline Eigen::Vector3d rateKi_{0, 0, 0};
+inline Eigen::Vector3d rateKd_{0, 0, 0};
 
 // outputs
-inline Eigen::Vector3f attitudeOutput_{0, 0, 0};
-inline Eigen::Vector3f rateOutput_{0, 0, 0};
+inline Eigen::Vector3d attitudeOutput_{0, 0, 0};
+inline Eigen::Vector3d rateOutput_{0, 0, 0};
 
 // ============================ Function Prototypes ==============================
 

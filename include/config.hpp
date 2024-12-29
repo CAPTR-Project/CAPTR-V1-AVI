@@ -17,7 +17,7 @@
 // ============================ Sensor configuration ==========================
 
 // Gyroscope
-#define IMU_DATARATE LSM6DS_RATE_104_HZ
+#define IMU_DATARATE LSM6DS_RATE_1_66K_HZ
 #define GYRO_CALIBRATION_TIME 5000 // [ms] The time to calibrate the gyroscope offsets.
 #define GYRO_INT_PIN 40 // The pin to which the gyroscope interrupt is connected.
 

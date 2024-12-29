@@ -35,20 +35,27 @@ void att_est_predict_thread(void*) {
 
     while (1) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        if (xSemaphoreTake(gyro_data__.ready, 1) == pdTRUE) {
+        if (xSemaphoreTake(gyro_data__.ready, 0) == pdTRUE) {
             local_gyro_data = gyro_data__;
             xSemaphoreGive(gyro_data__.ready);
+
+            // DEBUG
+            // local_gyro_data.x = 0.0;
+            // local_gyro_data.y = 0.0;
+            // local_gyro_data.z = 0.62831853;
             
             local_mcu_state = mcu_state_.load();
             if (local_mcu_state == ControllerState::STBY || local_mcu_state == ControllerState::CALIBRATING) continue;
-            if (xSemaphoreTake(att_est_mutex_, pdMS_TO_TICKS(8)) == pdTRUE && // TODO: change delay to match freq of gyro
+            if (xSemaphoreTake(att_est_mutex_, 0) == pdTRUE && // TODO: change delay to match freq of gyro
                 att_estimator__.initialized) {
                 
                 // run UKF predict
                 long long current_time_us = pdTICKS_TO_US(xTaskGetTickCount());
-                att_estimator__.predict((current_time_us - last_time_us) * 0.000001,
+                att_estimator__.predict_integrate((current_time_us - last_time_us) * 0.000001,
                                     local_gyro_data.toVector());
-                
+                // att_estimator__.predict_integrate(0.002404,
+                //                     local_gyro_data.toVector());
+                // Serial.println(current_time_us / 1000);
                 last_action_was_predict = true;
                 last_time_us = current_time_us;
                 xSemaphoreGive(att_est_mutex_);

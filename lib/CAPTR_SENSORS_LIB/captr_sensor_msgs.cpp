@@ -6,7 +6,10 @@ namespace sensor_msgs {
         ready = xSemaphoreCreateMutex();
     }
     Eigen::Vector3d GyroMsg::toVector() {
-        return Eigen::Vector3d(x, y, z);
+        return Eigen::Vector3d(z, y, x);
+    }
+    Eigen::Vector3d GyroMsg::toBiasVector() {
+        return Eigen::Vector3d(z_bias, y_bias, x_bias);
     }
 
     // AccelMsg
