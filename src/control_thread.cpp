@@ -21,8 +21,8 @@ void control_thread(void*) {
     TickType_t xLastWakeTime = xTaskGetTickCount();
     BaseType_t xWasDelayed;
 
-    QuaternionPID attitudePID(attitude_dt_, maxRate_, minRate_, attKp_, attKi_, attKd_);
-    RatePID ratePID(rate_dt_, maxServoPos, minServoPos, rateKp_, rateKi_, rateKd_);
+    QuaternionPID attitudePID(attitude_dt_, maxRate_, minRate_, attKp_, attKi_, attKd_, attN_);
+    RatePID ratePID(rate_dt_, maxServoPos, minServoPos, rateKp_, rateKi_, rateKd_, rateN_);
 
     Eigen::Vector3d euler;
     sensor_msgs::GyroMsg current_gyro_data;

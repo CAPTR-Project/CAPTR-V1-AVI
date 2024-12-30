@@ -50,10 +50,12 @@ inline double minRate_ = -20.0;
 inline Eigen::Vector3d attKp_{10.0, 10.0, 10.0};  
 inline Eigen::Vector3d attKi_{0, 0, 0};
 inline Eigen::Vector3d attKd_{0, 0, 0};
+inline float attN_ = 300;
 
 inline Eigen::Vector3d rateKp_{0.1, 0.1, 0.1};
 inline Eigen::Vector3d rateKi_{0, 0, 0};
 inline Eigen::Vector3d rateKd_{0, 0, 0};
+inline float rateN_ = 300;
 
 // outputs
 inline Eigen::Vector3d attitudeOutput_{0, 0, 0};
