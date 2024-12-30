@@ -7,12 +7,12 @@
 class PID
 {
 public:
-    PID(float dt, float max, float min, float Kp, float Ki, float Kd)        // has to be same name as class because it is a constructor like init in python
-        : dt_(dt), max_(max), min_(min), Kp_(Kp), Ki_(Ki), Kd_(Kd), integral_(0.0), prev_error_(0.0) {}
+    PID(float dt, float max, float min, float Kp, float Ki, float Kd, float N)        // has to be same name as class because it is a constructor like init in python
+        : dt_(dt), max_(max), min_(min), Kp_(Kp), Ki_(Ki), Kd_(Kd), N_(N), integral_(0.0), prev_error_(0.0) {}
 
     float run(float setpoint, float currentValue) {
         error_ = setpoint - currentValue;
-        derivative_ = (error_ - prev_error_) / dt_;
+        derivative_ = N_ * (error_ - prev_error_) / (1 + N_ * dt_); // filtered derivative: formula: N/(1+NT_s) * (e(t) - e(t-1))
         float res =  Kp_ * error_ + Ki_ * integral_ + Kd_ * derivative_;
 
         if (res > max_) res = max_; 
@@ -33,6 +33,7 @@ private:
     float max_, min_;
     float Kp_, Ki_, Kd_;
     float error_, derivative_, integral_, prev_error_;
+    float N_;
 
 };
 

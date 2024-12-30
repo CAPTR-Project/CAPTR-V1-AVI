@@ -8,10 +8,10 @@
 class RatePID
 {
 public:
-    RatePID(float dt, float max, float min, Eigen::Vector3d Kp, Eigen::Vector3d Ki, Eigen::Vector3d Kd)
-    : pidX_(dt, max, min, Kp(0), Ki(0), Kd(0)),
-    pidY_(dt, max, min, Kp(1), Ki(1), Kd(1)),
-    pidZ_(dt, max, min, Kp(2), Ki(2), Kd(2)) {}
+    RatePID(float dt, float max, float min, Eigen::Vector3d Kp, Eigen::Vector3d Ki, Eigen::Vector3d Kd, float N)
+    : pidX_(dt, max, min, Kp(0), Ki(0), Kd(0), N),
+    pidY_(dt, max, min, Kp(1), Ki(1), Kd(1), N),
+    pidZ_(dt, max, min, Kp(2), Ki(2), Kd(2), N) {}
 
     // PID functions
     Eigen::Vector3d compute(Eigen::Vector3d rateSetpoint, Eigen::Vector3d currentRate) {
