@@ -44,7 +44,7 @@ namespace state_mgmt_thread {
 // ================================= vars ====================================
 
 inline TaskHandle_t taskHandle = NULL;
-inline uint32_t last_state_change_ms = 0;
+inline uint64_t last_state_change_ms = 0;
 
 // ============================ Function Prototypes ==============================
 

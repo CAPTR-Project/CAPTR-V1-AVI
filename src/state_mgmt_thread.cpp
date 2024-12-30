@@ -44,7 +44,7 @@ void state_mgmt_thread(void*) {
                 new_state_ = false;
 
                 last_state_change_ms = millis();
-                tvc_mount__.preflight_test();
+                // tvc_mount__.preflight_test();
                 break;
             }
 

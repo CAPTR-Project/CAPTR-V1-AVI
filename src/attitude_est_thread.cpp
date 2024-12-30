@@ -33,8 +33,11 @@ void att_est_predict_thread(void*) {
 
     att_est_mutex_ = xSemaphoreCreateMutex();
 
+    uint64_t local_current_time_us;
+
     while (1) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        local_current_time_us = current_time_us_;
         if (xSemaphoreTake(gyro_data__.ready, 0) == pdTRUE) {
             local_gyro_data = gyro_data__;
             xSemaphoreGive(gyro_data__.ready);
@@ -50,14 +53,13 @@ void att_est_predict_thread(void*) {
                 att_estimator__.initialized) {
                 
                 // run UKF predict
-                long long current_time_us = pdTICKS_TO_US(xTaskGetTickCount());
-                att_estimator__.predict_integrate((current_time_us - last_time_us) * 0.000001,
+                att_estimator__.predict_integrate((local_current_time_us - last_time_us) * 0.000001,
                                     local_gyro_data.toVector());
                 // att_estimator__.predict_integrate(0.002404,
                 //                     local_gyro_data.toVector());
                 // Serial.println(current_time_us / 1000);
                 last_action_was_predict = true;
-                last_time_us = current_time_us;
+                last_time_us = local_current_time_us;
                 xSemaphoreGive(att_est_mutex_);
             }
         }

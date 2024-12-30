@@ -15,7 +15,7 @@ Desc: Source file for MCU
 #include "main.hpp"
 // #include "Arduino.h"
 
-unsigned int loop_start;
+uint64_t loop_start;
 
 FLASHMEM __attribute__((noinline)) void setup()
 {

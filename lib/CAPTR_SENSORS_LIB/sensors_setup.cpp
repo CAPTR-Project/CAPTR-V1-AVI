@@ -98,7 +98,47 @@ namespace sensors_lib {
         return true;
     }
 
-    bool initIMU(Adafruit_LSM6DS* imu, uint8_t i2cAddr, TwoWire* I2CBus, lsm6ds_data_rate_t dataRate,
+    bool initIMU_LSM6DSO32(Adafruit_LSM6DSO32* imu, uint8_t i2cAddr, TwoWire* I2CBus, lsm6ds_data_rate_t dataRate,
+                 void (*imu_isr)(), uint8_t accel_isr_pin, 
+                 void (*gyro_isr)(), uint8_t gyro_isr_pin) {
+        
+        if (!imu->begin_I2C(i2cAddr, I2CBus)) {
+            Serial.println("ERROR: Failed to find LSM6DS chip");
+            return false;
+        }
+
+        Serial.println("LSM6DS Found!");
+
+        imu->setAccelRange(LSM6DSO32_ACCEL_RANGE_8_G);
+        imu->setGyroRange(LSM6DS_GYRO_RANGE_500_DPS);
+        imu->setAccelDataRate(dataRate);
+        imu->setGyroDataRate(dataRate);
+
+        imu->getGyroRange();
+        imu->getAccelRange();
+
+        vPortEnterCritical();
+
+        imu->configInt1(false, true, false); // enable interrupt on gyroscope data ready
+        imu->configInt2(false, false, true); // enable interrupt on accelerometer data ready
+        imu->configIntOutputs(false, false); // set to active high and push-pull
+
+
+        attachInterrupt(digitalPinToInterrupt(accel_isr_pin), imu_isr, arduino::RISING);
+        attachInterrupt(digitalPinToInterrupt(gyro_isr_pin), gyro_isr, arduino::RISING);
+
+        // (*imu_isr)(); // read once to clear interrupt
+        // (*gyro_isr)(); // read once to clear interrupt
+        float x, y, z;
+        imu->readAcceleration(x, y, z);
+        imu->readGyroscope(x, y, z);
+
+        vPortExitCritical();
+
+        return true;
+    }
+
+    bool initIMU_LSM6DS(Adafruit_LSM6DS* imu, uint8_t i2cAddr, TwoWire* I2CBus, lsm6ds_data_rate_t dataRate,
                  void (*imu_isr)(), uint8_t accel_isr_pin, 
                  void (*gyro_isr)(), uint8_t gyro_isr_pin) {
         
@@ -111,8 +151,11 @@ namespace sensors_lib {
 
         imu->setAccelRange(LSM6DS_ACCEL_RANGE_8_G);
         imu->setGyroRange(LSM6DS_GYRO_RANGE_500_DPS);
-        imu->setAccelDataRate(LSM6DS_RATE_52_HZ);
+        imu->setAccelDataRate(dataRate);
         imu->setGyroDataRate(dataRate);
+
+        imu->getGyroRange();
+        imu->getAccelRange();
 
         vPortEnterCritical();
 
@@ -124,8 +167,11 @@ namespace sensors_lib {
         attachInterrupt(digitalPinToInterrupt(accel_isr_pin), imu_isr, arduino::RISING);
         attachInterrupt(digitalPinToInterrupt(gyro_isr_pin), gyro_isr, arduino::RISING);
 
-        (*imu_isr)(); // read once to clear interrupt
-        (*gyro_isr)(); // read once to clear interrupt
+        // (*imu_isr)(); // read once to clear interrupt
+        // (*gyro_isr)(); // read once to clear interrupt
+        float x, y, z;
+        imu->readAcceleration(x, y, z);
+        imu->readGyroscope(x, y, z);
 
         vPortExitCritical();
 

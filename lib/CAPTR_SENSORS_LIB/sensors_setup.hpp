@@ -9,6 +9,7 @@
 
 #include <Adafruit_LSM6DS3TRC.h>
 #include <Adafruit_LSM6DSOX.h>
+#include <Adafruit_LSM6DSO32.h>
 #include <Adafruit_LIS3MDL.h>
 #include <Adafruit_BMP3XX.h>
 #include <TinyGPS++.h>
@@ -20,7 +21,11 @@ namespace sensors_lib {
     bool initBMP(Adafruit_BMP3XX* bmp, uint8_t i2cAddr, TwoWire* I2CBus, uint8_t dataRate,
                  void (*baro_isr)(), uint8_t baro_isr_pin);
 
-    bool initIMU(Adafruit_LSM6DS* imu, uint8_t i2cAddr, TwoWire* I2CBus, lsm6ds_data_rate_t dataRate, 
+    bool initIMU_LSM6DSO32(Adafruit_LSM6DSO32* imu, uint8_t i2cAddr, TwoWire* I2CBus, lsm6ds_data_rate_t dataRate, 
+                 void (*imu_isr)(), uint8_t accel_isr_pin, 
+                 void (*gyro_isr)(), uint8_t gyro_isr_pin);
+
+    bool initIMU_LSM6DS(Adafruit_LSM6DS* imu, uint8_t i2cAddr, TwoWire* I2CBus, lsm6ds_data_rate_t dataRate, 
                  void (*imu_isr)(), uint8_t accel_isr_pin, 
                  void (*gyro_isr)(), uint8_t gyro_isr_pin);
 

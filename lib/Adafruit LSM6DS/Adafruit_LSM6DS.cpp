@@ -841,10 +841,25 @@ int Adafruit_LSM6DS::readAcceleration(float &x, float &y, float &z) {
     return 0;
   }
 
-  // scale to range of -4 – 4
-  x = data[0] * 4.0 / 32768.0;
-  y = data[1] * 4.0 / 32768.0;
-  z = data[2] * 4.0 / 32768.0;
+  float accel_scale = 1; // range is in milli-g per bit!
+  switch (accelRangeBuffered) {
+  case LSM6DS_ACCEL_RANGE_16_G:
+    accel_scale = 0.488;
+    break;
+  case LSM6DS_ACCEL_RANGE_8_G:
+    accel_scale = 0.244;
+    break;
+  case LSM6DS_ACCEL_RANGE_4_G:
+    accel_scale = 0.122;
+    break;
+  case LSM6DS_ACCEL_RANGE_2_G:
+    accel_scale = 0.061;
+    break;
+  }
+
+  x = data[0] * accel_scale * SENSORS_GRAVITY_STANDARD / 1000;
+  y = data[1] * accel_scale * SENSORS_GRAVITY_STANDARD / 1000;
+  z = data[2] * accel_scale * SENSORS_GRAVITY_STANDARD / 1000;
 
   return 1;
 }
@@ -885,8 +900,6 @@ int Adafruit_LSM6DS::readGyroscope(float &x, float &y, float &z) {
     x = y = z = NAN;
     return 0;
   }
-
-  getGyroRange();
 
   float gyro_scale = 1; // range is in milli-dps per bit!
   switch (gyroRangeBuffered) {

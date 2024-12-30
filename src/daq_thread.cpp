@@ -16,12 +16,19 @@ Desc: Source file for telemetry and logging thread
 
 namespace daq_threads {
 
+SemaphoreHandle_t i2c0_mutex;
+
 void daq_start() {
+    i2c0_mutex = xSemaphoreCreateMutex();
+
     xTaskCreate(gyro_daq_thread, "Gyro DAQ", 1000, nullptr, 8, &gyro_taskHandle);
     xTaskCreate(accel_daq_thread, "Accel DAQ", 1000, nullptr, 8, &accel_taskHandle);
     xTaskCreate(mag_daq_thread, "Mag DAQ", 1000, nullptr, 8, &mag_taskHandle);
     xTaskCreate(baro_daq_thread, "Baro DAQ", 1000, nullptr, 8, &baro_taskHandle);
-    if (!sensors_lib::initIMU(&imu__, LSM6DS_I2CADDR_DEFAULT, &Wire, IMU_DATARATE, accelISR, ACCEL_INT_PIN, gyroISR, GYRO_INT_PIN)) {
+
+    vPortEnterCritical();
+
+    if (!sensors_lib::initIMU_LSM6DSO32(&imu__, LSM6DS_I2CADDR_DEFAULT, &Wire, IMU_DATARATE, accelISR, ACCEL_INT_PIN, gyroISR, GYRO_INT_PIN)) {
         error_state_.store(ErrorState::IMU);
     }
     // if (!sensors_lib::initMag(&mag__, 0x1E, &Wire, MAG_DATARATE, magISR, MAG_INT_PIN)) {
@@ -32,6 +39,9 @@ void daq_start() {
     }
 
 
+    vPortExitCritical();
+
+
 }
 
 void gyro_daq_thread(void*) {
@@ -39,13 +49,15 @@ void gyro_daq_thread(void*) {
 
     while (true) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        if (xSemaphoreTake(gyro_data__.ready, 1) == pdTRUE) {
+        if (xSemaphoreTake(gyro_data__.ready, 1) == pdTRUE && xSemaphoreTake(i2c0_mutex, 1) == pdTRUE) {
             if (!imu__.readGyroscope(gyro_data__.x, gyro_data__.y, gyro_data__.z)) {
                 error_state_ = ErrorState::GYRO;
             }
             xSemaphoreGive(gyro_data__.ready);
+            xSemaphoreGive(i2c0_mutex);
 
             if ( att_est_threads::predictTaskHandle_ != NULL ) {
+                att_est_threads::current_time_us_ = pdTICKS_TO_US(xTaskGetTickCount());
                 xTaskNotifyGive(att_est_threads::predictTaskHandle_);
             }
             if (gyro_calib_task::taskHandle != NULL) {
@@ -60,12 +72,13 @@ void accel_daq_thread(void*) {
 
     while (true) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-
-        if (xSemaphoreTake(accel_data__.ready, 1)) {
-            // if (!imu__.readAcceleration(accel_data__.x, accel_data__.y, accel_data__.z)) {
-            //     // error_state_ = ErrorState::ACCEL;
-            // }
+        // Serial.println("Accel DAQ");
+        if (xSemaphoreTake(accel_data__.ready, 1) == pdTRUE && xSemaphoreTake(i2c0_mutex, 1) == pdTRUE) {
+            if (!imu__.readAcceleration(accel_data__.x, accel_data__.y, accel_data__.z)) {
+                error_state_ = ErrorState::ACCEL;
+            }
             xSemaphoreGive(accel_data__.ready);
+            xSemaphoreGive(i2c0_mutex);
         }
     }
 }

@@ -143,3 +143,44 @@ void Adafruit_LSM6DSO32::setAccelRange(lsm6dso32_accel_range_t new_range) {
   accel_range.write(new_range);
   delay(20);
 }
+
+/*!
+    @brief Read accelerometer data
+    @param x reference to x axis
+    @param y reference to y axis
+    @param z reference to z axis
+    @returns 1 if success, 0 if not
+*/
+int Adafruit_LSM6DSO32::readAcceleration(float &x, float &y, float &z) {
+  int16_t data[3];
+
+  Adafruit_BusIO_Register accel_data = Adafruit_BusIO_Register(
+      i2c_dev, spi_dev, ADDRBIT8_HIGH_TOREAD, LSM6DS_OUTX_L_A, 6);
+
+  if (!accel_data.read((uint8_t *)data, sizeof(data))) {
+    x = y = z = NAN;
+    return 0;
+  }
+
+  float accel_scale = 1; // range is in milli-g per bit!
+  switch (accelRangeBuffered) {
+  case LSM6DSO32_ACCEL_RANGE_32_G:
+    accel_scale = 0.976;
+    break;
+  case LSM6DSO32_ACCEL_RANGE_16_G:
+    accel_scale = 0.488;
+    break;
+  case LSM6DSO32_ACCEL_RANGE_8_G:
+    accel_scale = 0.244;
+    break;
+  case LSM6DSO32_ACCEL_RANGE_4_G:
+    accel_scale = 0.122;
+    break;
+  }
+
+  x = data[0] * accel_scale * SENSORS_GRAVITY_STANDARD / 1000;
+  y = data[1] * accel_scale * SENSORS_GRAVITY_STANDARD / 1000;
+  z = data[2] * accel_scale * SENSORS_GRAVITY_STANDARD / 1000;
+
+  return 1;
+}

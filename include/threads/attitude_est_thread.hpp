@@ -35,6 +35,8 @@ inline SemaphoreHandle_t att_est_mutex_ = NULL;
 
 inline std::atomic<bool> last_action_was_predict;
 
+inline uint64_t current_time_us_;
+
 // ============================ Function Prototypes ===============================
 
 void att_est_predict_thread(void*);

@@ -40,6 +40,4 @@ void gyroISR();
 void baroISR();
 void magISR();
 
-void GPS_thread();
-
 #endif
