@@ -1,39 +1,44 @@
+/*
+
+██████ ██████ ██████ ██████ ██████
+██     ██  ██ ██  ██   ██   ██  ██
+██     ██████ ██████   ██   ██████ 
+██     ██  ██ ██       ██   ██ ██  
+██████ ██  ██ ██       ██   ██  ██ 
+
+File: main.hpp
+Auth: Alex Wang, Yubo Wang
+Desc: Header file for MCU
+
+*/
+
+// ================================== Includes ====================================
+// ================================================================================
+
 #include <Arduino.h>
 
 #include <Wire.h>
 #include <SPI.h>
 
-#include <Adafruit_Sensor.h>
-#include <Adafruit_BMP3XX.h>
-#include <Adafruit_LSM6DS3TRC.h>
-#include <RH_RF95.h>
-#include <TinyGPS++.h>
+#include "globals.hpp"
+#include "config.hpp"
 
-//Definitions
+// functions
+#include "daq_ISRs.hpp"
 
+// CAPTR libs
+#include "CAPTR_PIN_DRIVER.hpp"
+#include "sensors_setup.hpp"
+#include "attitude_estimator.hpp"
+#include "quaternion.h"
 
-// Variables
-Adafruit_BMP3XX bmp; // barometer
-Adafruit_LSM6DS3TRC lsm; // IMU
-Adafruit_Sensor *lsm_accel, *lsm_gyro;
-sensors_event_t accelMain, gyro;
-// GPS
-RH_RF95 rf95; // Radio
-// SD Card
-// Flash
+// threads
+#include "threads/attitude_est_thread.hpp"
+#include "threads/control_thread.hpp"
+#include "threads/daq_thread.hpp"
+#include "threads/datalogger_thread.hpp"
+#include "threads/state_mgmt_thread.hpp"
 
-// put function declarations here:
-
-/**
- * @brief Initializes the BMP sensor on an I2C bus
- * 
- * @param I2CBus The I2C bus to use. Either Wire, Wire1, Wire2
- */
-void initBMP(TwoWire* I2CBus);
-
-/**
- * @brief Initializes the IMU sensor on an I2C bus
- * 
- * @param I2CBus The I2C bus to use. Either Wire, Wire1, Wire2
- */
-void initIMU(TwoWire* I2CBus);
+// tasks
+#include "tasks/gyro_calib.hpp"
+#include "tasks/mag_calib.hpp"

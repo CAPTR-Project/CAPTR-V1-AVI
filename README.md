@@ -33,3 +33,4 @@ Request another member who is familiar with firmware to review your PR. Ideally,
 
 ## Building and Uploading
 In VSCode, build the project using PlatformIO.
+
