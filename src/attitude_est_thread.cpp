@@ -24,6 +24,8 @@ void att_est_predict_thread(void*) {
                     Q_MATRIX,
                     R_MATRIX);
 
+    att_estimator__.initialized = false;
+
     TickType_t xLastWakeTime = xTaskGetTickCount();
     BaseType_t xWasDelayed;
     long long last_time_us = pdTICKS_TO_US(xLastWakeTime);
@@ -48,7 +50,7 @@ void att_est_predict_thread(void*) {
             // local_gyro_data.z = 0.62831853;
             
             local_mcu_state = mcu_state_.load();
-            if (local_mcu_state == ControllerState::STBY || local_mcu_state == ControllerState::CALIBRATING) continue;
+            if (local_mcu_state == ControllerState::STBY || local_mcu_state == ControllerState::CALIBRATING || !att_estimator__.initialized) continue;
             if (xSemaphoreTake(att_est_mutex_, 0) == pdTRUE && // TODO: change delay to match freq of gyro
                 att_estimator__.initialized) {
                 

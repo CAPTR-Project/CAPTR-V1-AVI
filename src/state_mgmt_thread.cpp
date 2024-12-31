@@ -76,14 +76,14 @@ void state_mgmt_thread(void*) {
 
             if (mag_calib_task::mag_calib_done && gyro_calib_task::gyro_calib_done && orient_calib_task::orient_calib_done)
             {
-                att_estimator__.initialized = true;
-                mcu_state_ = ControllerState::LAUNCH_DETECT;
-                new_state_ = true;
                 att_estimator__.init(orient_calib_task::starting_orientation,
                     Eigen::Vector3d(0, 0, 0),
                     Eigen::Vector3d(0, 0, 0),
                     Q_MATRIX,
                     R_MATRIX);
+                att_estimator__.initialized = true;
+                mcu_state_ = ControllerState::LAUNCH_DETECT;
+                new_state_ = true;
                 break;
             }
 
