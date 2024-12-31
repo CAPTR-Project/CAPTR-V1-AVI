@@ -109,8 +109,8 @@ namespace sensors_lib {
 
         Serial.println("LSM6DS Found!");
 
-        imu->setAccelRange(LSM6DSO32_ACCEL_RANGE_8_G);
-        imu->setGyroRange(LSM6DS_GYRO_RANGE_500_DPS);
+        imu->setAccelRange(LSM6DSO32_ACCEL_RANGE_4_G);
+        imu->setGyroRange(LSM6DS_GYRO_RANGE_1000_DPS);
         imu->setAccelDataRate(LSM6DS_RATE_26_HZ);   // 26 Hz
         imu->setGyroDataRate(dataRate);
 

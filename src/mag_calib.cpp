@@ -51,7 +51,10 @@ void magVectorEstimation_task(void*) {
     att_estimator__.set_magVec(x, y, z);
 
     mag_calib_done = true;
+
+    xSemaphoreTake(serial_port_mutex__, portMAX_DELAY);
     Serial.println("Mag calibration done");
+    xSemaphoreGive(serial_port_mutex__);
 
     vTaskDelete(NULL);
     return;

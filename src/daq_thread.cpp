@@ -21,10 +21,10 @@ SemaphoreHandle_t i2c0_mutex;
 void daq_start() {
     i2c0_mutex = xSemaphoreCreateMutex();
 
-    xTaskCreate(gyro_daq_thread, "Gyro DAQ", 1000, nullptr, 8, &gyro_taskHandle);
-    xTaskCreate(accel_daq_thread, "Accel DAQ", 1000, nullptr, 8, &accel_taskHandle);
-    xTaskCreate(mag_daq_thread, "Mag DAQ", 1000, nullptr, 8, &mag_taskHandle);
-    xTaskCreate(baro_daq_thread, "Baro DAQ", 1000, nullptr, 8, &baro_taskHandle);
+    xTaskCreate(gyro_daq_thread, "Gyro DAQ", 4000, nullptr, 8, &gyro_taskHandle);
+    xTaskCreate(accel_daq_thread, "Accel DAQ", 4000, nullptr, 8, &accel_taskHandle);
+    xTaskCreate(mag_daq_thread, "Mag DAQ", 4000, nullptr, 8, &mag_taskHandle);
+    xTaskCreate(baro_daq_thread, "Baro DAQ", 4000, nullptr, 8, &baro_taskHandle);
 
     vPortEnterCritical();
 
@@ -80,6 +80,9 @@ void accel_daq_thread(void*) {
             }
             xSemaphoreGive(accel_data__.ready);
             xSemaphoreGive(i2c0_mutex);
+            if (orient_calib_task::taskHandle != NULL) {
+                xTaskNotifyGive(orient_calib_task::taskHandle);
+            }
         }
     }
 }

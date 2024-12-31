@@ -18,11 +18,12 @@
 
 // Gyroscope
 #define IMU_DATARATE LSM6DS_RATE_416_HZ
-#define GYRO_CALIBRATION_TIME 5000 // [ms] The time to calibrate the gyroscope offsets.
+#define GYRO_CALIBRATION_TIME 6000 // [ms] The time to calibrate the gyroscope offsets.
 #define GYRO_INT_PIN 40 // The pin to which the gyroscope interrupt is connected.
 
 // Accelerometer
 #define ACCEL_INT_PIN 39 // The pin to which the accelerometer interrupt is connected.
+#define ORIENTATION_CALIBRATION_TIME 8000 // [ms] The time to calibrate the accelerometer offsets.
 
 // Magnetometer
 #define MAG_X_OFFSET 0.0 // [uT]

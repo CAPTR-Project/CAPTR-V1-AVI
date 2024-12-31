@@ -42,3 +42,4 @@ Desc: Header file for MCU
 // tasks
 #include "tasks/gyro_calib.hpp"
 #include "tasks/mag_calib.hpp"
+#include "tasks/orient_calib.hpp"

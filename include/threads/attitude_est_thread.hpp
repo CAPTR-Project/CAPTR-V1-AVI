@@ -21,6 +21,8 @@ Desc: Header file for Attitude Estimation Thread
 #include "globals.hpp"
 #include "config.hpp"
 
+#include "tasks/orient_calib.hpp"
+
 #include "attitude_estimator.hpp"
 
 namespace att_est_threads {

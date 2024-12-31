@@ -8,7 +8,7 @@ void state_mgmt_thread(void*) {
     mcu_state_.store(ControllerState::STBY);
     error_state_.store(ErrorState::NONE);
     new_state_ = true;
-        
+
     vTaskDelay(pdMS_TO_TICKS(10));
     xTaskCreate(att_est_threads::att_est_predict_thread, 
                 "Attitude Predictor", 20000, nullptr, 8, &att_est_threads::predictTaskHandle_);
@@ -71,13 +71,19 @@ void state_mgmt_thread(void*) {
                 last_state_change_ms = millis();
                 xTaskCreate(gyro_calib_task::gyroBiasEstimation_task, "Gyro Calibration", 2000, nullptr, 8, &gyro_calib_task::taskHandle);
                 xTaskCreate(mag_calib_task::magVectorEstimation_task, "Magnetometer Calibration", 2000, nullptr, 8, &mag_calib_task::taskHandle);
+                xTaskCreate(orient_calib_task::startingOrientationEstimation_task, "Orientation Calibration", 5000, nullptr, 8, &orient_calib_task::taskHandle);
             }
 
-            if (mag_calib_task::mag_calib_done && gyro_calib_task::gyro_calib_done)
+            if (mag_calib_task::mag_calib_done && gyro_calib_task::gyro_calib_done && orient_calib_task::orient_calib_done)
             {
                 att_estimator__.initialized = true;
                 mcu_state_ = ControllerState::LAUNCH_DETECT;
                 new_state_ = true;
+                att_estimator__.init(orient_calib_task::starting_orientation,
+                    Eigen::Vector3d(0, 0, 0),
+                    Eigen::Vector3d(0, 0, 0),
+                    Q_MATRIX,
+                    R_MATRIX);
                 break;
             }
 
@@ -98,7 +104,7 @@ void state_mgmt_thread(void*) {
 
             // Serial.println("FSM: LAUNCH_DETECT");
 
-            if (accel_data__.z > 1.0)
+            if (accel_data__.z > 15.0)
             {
                 mcu_state_ = ControllerState::POWERED_ASCENT;
                 new_state_ = true;
@@ -195,7 +201,9 @@ void state_mgmt_thread(void*) {
         xWasDelayed = xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(int(round(1000/FSM_FREQUENCY))));
         if (!xWasDelayed) {
             // error_state_ = ErrorState::FSM;
+            xSemaphoreTake(serial_port_mutex__, 0);
             Serial.println("FSM loop delayed");
+            xSemaphoreGive(serial_port_mutex__);
         }
     }
 }

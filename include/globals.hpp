@@ -85,6 +85,7 @@ inline std::atomic<bool> new_state_;
 // semaphores
 
 // Mutexes
+inline SemaphoreHandle_t serial_port_mutex__;
 
 // Sensors
 inline Adafruit_LSM6DSO32 imu__;

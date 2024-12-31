@@ -56,7 +56,10 @@ void gyroBiasEstimation_task(void*) {
     daq_threads::gyro_bias_z_ = z;
 
     gyro_calib_done = true;
+
+    xSemaphoreTake(serial_port_mutex__, portMAX_DELAY);
     Serial.println("Gyro calibration done");
+    xSemaphoreGive(serial_port_mutex__);
 
     vTaskDelete(NULL);
     return;

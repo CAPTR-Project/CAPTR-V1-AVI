@@ -15,6 +15,9 @@ namespace gps_thread {
 
         xWasDelayed = xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(int(1000/GPS_FREQUENCY)));
         if (!xWasDelayed) {
+            xSemaphoreTake(serial_port_mutex__, 0);
+            Serial.println("GPS loop delayed");
+            xSemaphoreGive(serial_port_mutex__);
             error_state_ = ErrorState::GPS;
         }
     }

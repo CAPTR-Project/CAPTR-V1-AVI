@@ -26,6 +26,7 @@ void control_thread(void*) {
 
     Eigen::Vector3d euler;
     sensor_msgs::GyroMsg current_gyro_data;
+    sensor_msgs::AccelMsg current_accel_data;
 
     // UnitQuaternion current_attitude;
     while (true) {
@@ -38,21 +39,25 @@ void control_thread(void*) {
             current_gyro_data = gyro_data__;
             xSemaphoreGive(gyro_data__.ready);
         }
+        if (xSemaphoreTake(accel_data__.ready, 1) == pdTRUE) {
+            current_accel_data = accel_data__;
+            xSemaphoreGive(accel_data__.ready);
+        }
 
         if (mcu_state_.load() == ControllerState::STBY || mcu_state_.load() == ControllerState::CALIBRATING) {
 
         } else {
             
 
-
+            xSemaphoreTake(serial_port_mutex__, pdMS_TO_TICKS(10));
             // call the pids to computer corrections
             attitudeOutput_ = attitudePID.compute(target_attitude_, current_attitude_);
-            rateOutput_ = ratePID.compute(attitudeOutput_, gyro_data__.toVector() - gyro_data__.toBiasVector());  // z, y, x for servos
+            rateOutput_ = ratePID.compute(attitudeOutput_, current_gyro_data.toVector() - current_gyro_data.toBiasVector());  // z, y, x for servos
             tvc_mount__.move_mount(rateOutput_(1), rateOutput_(0));
             
             Serial.println("Altitude: " + String(baro_data__.alt_agl) + "m");
-            Serial.println("Acceleration: " + String(accel_data__.x) + " " + String(accel_data__.y) + " " + String(accel_data__.z));
-            Serial.println("Gyroscope: " + String(gyro_data__.x) + " " + String(gyro_data__.y) + " " + String(gyro_data__.z));
+            Serial.println("Acceleration: " + String(current_accel_data.x) + " " + String(current_accel_data.y) + " " + String(current_accel_data.z));
+            Serial.println("Gyroscope: " + String(current_gyro_data.x) + " " + String(current_gyro_data.y) + " " + String(current_gyro_data.z));
             // Serial.println("Magnetometer: " + String(mag_data__.x) + " " + String(mag_data__.y) + " " + String(mag_data__.z));
             euler = current_attitude_.to_euler();
 
@@ -67,12 +72,15 @@ void control_thread(void*) {
 
             Serial.println();
             Serial.println();
+            xSemaphoreGive(serial_port_mutex__);
             
         }
         xWasDelayed = xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(int(round(1000/CONTROL_FREQUENCY))));
         if (!xWasDelayed) {
             // error_state_ = ErrorState::CONTROL;
+            xSemaphoreTake(serial_port_mutex__, 0);
             Serial.println("Control loop delayed");
+            xSemaphoreTake(serial_port_mutex__, 0);
         }
     }
 
