@@ -32,7 +32,7 @@ namespace tvc_mount_lib {
         int yaw_us = 1500 + ((int)((yaw_rad + offset_yaw) * this->scaling_yaw / (M_PI / 4) * 500));
         this->servo_yaw.writeMicroseconds(yaw_us);
 
-        Serial.println("Mount Pitch CMD: " + String(pitch_rad) + " Yaw CMD: " + String(yaw_rad));
+        // Serial.println("Mount Pitch CMD: " + String(pitch_rad) + " Yaw CMD: " + String(yaw_rad));
     }
 
     void TVC_mount::preflight_test() {

@@ -11,7 +11,7 @@ namespace sensor_msgs {
         GyroMsg();
 
         Eigen::Vector3d toVector();
-        Eigen::Vector3d GyroMsg::toBiasVector();
+        Eigen::Vector3d toBiasVector();
 
         SemaphoreHandle_t ready;
 

@@ -21,8 +21,8 @@ void control_thread(void*) {
     TickType_t xLastWakeTime = xTaskGetTickCount();
     BaseType_t xWasDelayed;
 
-    QuaternionPID attitudePID(attitude_dt_, maxRate_, minRate_, attKp_, attKi_, attKd_, attN_);
-    RatePID ratePID(rate_dt_, maxServoPos, minServoPos, rateKp_, rateKi_, rateKd_, rateN_);
+    QuaternionPID attitudePID(attitude_dt_, maxRate_, minRate_, attKp_, attKi_, attKd_, attIntegClamp_, att_alpha_, att_tau_);
+    RatePID ratePID(rate_dt_, maxServoPos, minServoPos, rateKp_, rateKi_, rateKd_, rateIntegClamp_, att_alpha_, att_tau_);
 
     Eigen::Vector3d euler;
     sensor_msgs::GyroMsg current_gyro_data;
@@ -30,11 +30,11 @@ void control_thread(void*) {
     // UnitQuaternion current_attitude;
     while (true) {
         // Control loop
-        if (xSemaphoreTake(att_estimator__.ready, 0) == pdTRUE) {
+        if (xSemaphoreTake(att_estimator__.ready, 1) == pdTRUE) {
             current_attitude_ = att_estimator__.newest_attitude_quat;
             xSemaphoreGive(att_estimator__.ready);
         }
-        if (xSemaphoreTake(gyro_data__.ready, 0) == pdTRUE) {
+        if (xSemaphoreTake(gyro_data__.ready, 1) == pdTRUE) {
             current_gyro_data = gyro_data__;
             xSemaphoreGive(gyro_data__.ready);
         }
@@ -44,21 +44,21 @@ void control_thread(void*) {
         } else {
             
 
+
+            // call the pids to computer corrections
+            attitudeOutput_ = attitudePID.compute(target_attitude_, current_attitude_);
+            rateOutput_ = ratePID.compute(attitudeOutput_, gyro_data__.toVector() - gyro_data__.toBiasVector());  // z, y, x for servos
+            tvc_mount__.move_mount(rateOutput_(1), rateOutput_(0));
+            
             Serial.println("Altitude: " + String(baro_data__.alt_agl) + "m");
             Serial.println("Acceleration: " + String(accel_data__.x) + " " + String(accel_data__.y) + " " + String(accel_data__.z));
             Serial.println("Gyroscope: " + String(gyro_data__.x) + " " + String(gyro_data__.y) + " " + String(gyro_data__.z));
             // Serial.println("Magnetometer: " + String(mag_data__.x) + " " + String(mag_data__.y) + " " + String(mag_data__.z));
             euler = current_attitude_.to_euler();
-            // Eigen::Vector3d euler = att_estimator__.integrated_quat.to_euler();
 
             Serial.println("Orientation: yaw: " + String(euler(0)) + " pitch: " + String(euler(1)) + " roll: " + String(euler(2)));
             // Serial.println("HeadingX: " + String(headingX));
 
-            // call the pids to computer corrections
-            attitudeOutput_ = attitudePID.compute(target_attitude_, current_attitude_);
-            rateOutput_ = ratePID.compute(attitudeOutput_, gyro_data__.toVector() - gyro_data__.toBiasVector());  // x, y, z for servos
-            tvc_mount__.move_mount(rateOutput_(0), rateOutput_(1));
-            
             Serial.println();
 
 

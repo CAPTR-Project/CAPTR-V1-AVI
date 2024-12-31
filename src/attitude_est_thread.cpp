@@ -55,6 +55,7 @@ void att_est_predict_thread(void*) {
                 // run UKF predict
                 att_estimator__.predict_integrate((local_current_time_us - last_time_us) * 0.000001,
                                     local_gyro_data.toVector());
+                // Serial.println("Local Gyro Data: " + String(local_gyro_data.x) + " " + String(local_gyro_data.y) + " " + String(local_gyro_data.z));
                 // att_estimator__.predict_integrate(0.002404,
                 //                     local_gyro_data.toVector());
                 // Serial.println(current_time_us / 1000);

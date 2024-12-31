@@ -111,7 +111,7 @@ namespace sensors_lib {
 
         imu->setAccelRange(LSM6DSO32_ACCEL_RANGE_8_G);
         imu->setGyroRange(LSM6DS_GYRO_RANGE_500_DPS);
-        imu->setAccelDataRate(dataRate);
+        imu->setAccelDataRate(LSM6DS_RATE_26_HZ);   // 26 Hz
         imu->setGyroDataRate(dataRate);
 
         imu->getGyroRange();

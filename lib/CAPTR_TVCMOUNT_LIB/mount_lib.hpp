@@ -24,7 +24,7 @@ namespace tvc_mount_lib {
         bool busy = false;
 
 
-        void move_mount(double x_rad, double y_rad);
+        void move_mount(double pitch_rad, double yaw_rad);
 
         void preflight_test();
 

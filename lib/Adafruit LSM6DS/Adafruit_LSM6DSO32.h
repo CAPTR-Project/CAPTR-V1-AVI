@@ -41,7 +41,7 @@ public:
   lsm6dso32_accel_range_t getAccelRange(void);
   void setAccelRange(lsm6dso32_accel_range_t new_range);
   void _read(void);
-  int Adafruit_LSM6DSO32::readAcceleration(float &x, float &y, float &z);
+  int readAcceleration(float &x, float &y, float &z);
 
 private:
   bool _init(int32_t sensor_id);

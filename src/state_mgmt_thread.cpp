@@ -8,9 +8,7 @@ void state_mgmt_thread(void*) {
     mcu_state_.store(ControllerState::STBY);
     error_state_.store(ErrorState::NONE);
     new_state_ = true;
-
-    daq_threads::daq_start();
-    
+        
     vTaskDelay(pdMS_TO_TICKS(10));
     xTaskCreate(att_est_threads::att_est_predict_thread, 
                 "Attitude Predictor", 20000, nullptr, 8, &att_est_threads::predictTaskHandle_);
@@ -44,7 +42,7 @@ void state_mgmt_thread(void*) {
                 new_state_ = false;
 
                 last_state_change_ms = millis();
-                // tvc_mount__.preflight_test();
+                tvc_mount__.preflight_test();
                 break;
             }
 

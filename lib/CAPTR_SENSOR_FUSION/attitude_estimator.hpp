@@ -57,7 +57,7 @@ namespace UKF {
                     Eigen::Matrix<double, Q_DIM, Q_DIM> Q,
                     Eigen::Matrix<double, Z_DIM, Z_DIM> R);
 
-        void Attitude::predict_integrate(double dt, Eigen::Vector3d w_m);
+        void predict_integrate(double dt, Eigen::Vector3d w_m);
 
         /**
          * @brief Predict the next state of the system. Uses the dynamic model to predict the next state.

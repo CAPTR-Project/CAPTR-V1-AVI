@@ -49,6 +49,7 @@ void gyro_daq_thread(void*) {
 
     while (true) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        // Serial.println("Gyro DAQ");
         if (xSemaphoreTake(gyro_data__.ready, 1) == pdTRUE && xSemaphoreTake(i2c0_mutex, 1) == pdTRUE) {
             if (!imu__.readGyroscope(gyro_data__.x, gyro_data__.y, gyro_data__.z)) {
                 error_state_ = ErrorState::GYRO;
@@ -73,7 +74,7 @@ void accel_daq_thread(void*) {
     while (true) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
         // Serial.println("Accel DAQ");
-        if (xSemaphoreTake(accel_data__.ready, 1) == pdTRUE && xSemaphoreTake(i2c0_mutex, 1) == pdTRUE) {
+        if (xSemaphoreTake(accel_data__.ready, 1) == pdTRUE && xSemaphoreTake(i2c0_mutex, 4) == pdTRUE) {
             if (!imu__.readAcceleration(accel_data__.x, accel_data__.y, accel_data__.z)) {
                 error_state_ = ErrorState::ACCEL;
             }

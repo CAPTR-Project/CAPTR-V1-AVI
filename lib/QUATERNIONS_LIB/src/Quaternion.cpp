@@ -1,4 +1,4 @@
-#include "Quaternion.h"
+#include "quaternion.h"
 
 /*** Constructors ***/
 // -- Quaternion --
@@ -444,7 +444,7 @@ Eigen::Vector3d UnitQuaternion::to_euler() {
     // roll (x-axis rotation)
     double sinr_cosp = 2 * (w * x + y * z);
     double cosr_cosp = 1 - 2 * (x * x + y * y);
-    angles[0] = std::atan2(sinr_cosp, cosr_cosp);
+    angles[2] = std::atan2(sinr_cosp, cosr_cosp);
 
     // pitch (y-axis rotation)
     double sinp = 2 * (w * y - z * x);
@@ -456,6 +456,6 @@ Eigen::Vector3d UnitQuaternion::to_euler() {
     // yaw (z-axis rotation)
     double siny_cosp = 2 * (w * z + x * y);
     double cosy_cosp = 1 - 2 * (y * y + z * z);
-    angles[2] = atan2(siny_cosp, cosy_cosp);
+    angles[0] = atan2(siny_cosp, cosy_cosp);
     return angles;
 }

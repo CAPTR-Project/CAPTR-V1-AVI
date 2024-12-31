@@ -209,8 +209,6 @@ Eigen::VectorXd Attitude::f_quaternion(Eigen::VectorXd x, Eigen::Vector3d w_m, d
 
     UnitQuaternion dq = UnitQuaternion::from_euler(dt * ang_vec(0), dt * ang_vec(1), dt * ang_vec(2));
 
-    q_k.normalize();
-
     q_k = q_k * dq;
 
     q_k.normalize();
