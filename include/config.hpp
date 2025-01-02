@@ -4,7 +4,7 @@
 // ========================== General configuration ===========================
 
 #define LOGGING_FREQUENCY 10 // [Hz] The frequency at which to log data.
-#define CONTROL_FREQUENCY 50 // [Hz] The frequency at which to run the control loop.
+#define CONTROL_FREQUENCY 100 // [Hz] The frequency at which to run the control loop.
 #define FSM_FREQUENCY 10 // [Hz] The frequency at which to run the finite state machine.
 
 // ====================== State estimation configuration ======================

@@ -53,7 +53,7 @@ void control_thread(void*) {
             // call the pids to computer corrections
             attitudeOutput_ = attitudePID.compute(target_attitude_, current_attitude_);
             rateOutput_ = ratePID.compute(attitudeOutput_, current_gyro_data.toVector() - current_gyro_data.toBiasVector());  // z, y, x for servos
-            tvc_mount__.move_mount(rateOutput_(1), rateOutput_(0));
+            tvc_mount__.move_mount(-rateOutput_(1), -rateOutput_(0));
             
             Serial.println("Altitude: " + String(baro_data__.alt_agl) + "m");
             Serial.println("Acceleration: " + String(current_accel_data.x) + " " + String(current_accel_data.y) + " " + String(current_accel_data.z));
