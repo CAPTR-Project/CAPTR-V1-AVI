@@ -1,5 +1,5 @@
-#ifndef SENSORS_SETUP_HPP
-#define SENSORS_SETUP_HPP
+#pragma once
+
 
 #include <Wire.h>
 #include <Arduino.h>
@@ -37,5 +37,3 @@ namespace sensors_lib {
     void initGPS(TinyGPSPlus* gps, HardwareSerial* serialPort, uint32_t baudrate);
     
 }
-
-#endif

@@ -6,22 +6,14 @@
 ██      ██   ██ ██         ██    ██   ██
  ██████ ██   ██ ██         ██    ██   ██
 
-File: main.cpp
+File: main.hpp
 Auth: Alex Wang, Yubo Wang
-Desc: Source file for MCU
-
+Desc: Header file for main.cpp
 */
 
-#include "main.hpp"
+#pragma once
 
-void setup() {
+#include <Arduino.h>
+#include "arduino_freertos.h"
 
-    // Initialize the serial port
-    Serial.begin(0);
-
-    Serial.println(PSTR("\r\nBooted FreeRTOS kernel " tskKERNEL_VERSION_NUMBER ". Built by gcc " __VERSION__ " (newlib " _NEWLIB_VERSION ") on " __DATE__ ". ***\r\n"));
-    
-    
-
-    vTaskStartScheduler();
-}
+void setup();

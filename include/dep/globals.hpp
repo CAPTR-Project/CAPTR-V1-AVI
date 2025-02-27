@@ -29,6 +29,7 @@ Desc: Global variables and constants header file to be included in all relevant 
 #include "captr_sensor_msgs.hpp"
 #include "CAPTR_PIN_DRIVER.hpp"
 #include "mount_lib.hpp"
+
 // #include <driver_bmp390.h>
 
 inline uint32_t msElapsed = 0;
@@ -75,19 +76,19 @@ enum class ErrorState
     GPS
 };
 
-inline std::atomic<ControllerState> mcu_state_;
-inline std::atomic<ErrorState> error_state_;
+inline std::atomic<ControllerState> currentState;
+inline std::atomic<ErrorState> errorState_;
 
 inline std::atomic<bool> new_state_;
 
 // ============================ Shared Variables =================================
 
-// semaphores
+//----------------------------------------semaphores
 
-// Mutexes
+//----------------------------------------Mutexes
 inline SemaphoreHandle_t serial_port_mutex__;
 
-// Sensors
+//----------------------------------------Sensors
 inline Adafruit_LSM6DSO32 imu__;
 // Adafruit_LSM6DSOX imu__;
 inline Adafruit_LIS3MDL mag__;
@@ -95,20 +96,12 @@ inline Adafruit_BMP3XX bmp__;
 // inline bmp390_handle_s bmp__;
 inline TinyGPSPlus gps__;
 
-inline float ground_altitude_offset_msl__ = 0.0;
-
-// State variables
+//----------------------------------------State variables
 inline UKF::Attitude att_estimator__;
 
-inline tvc_mount_lib::TVC_mount tvc_mount__(SERVO_PITCH_PIN, 1.0, 0.1, 0.16, SERVO_YAW_PIN, 1.0, -0.05, 0.16);
+inline tvc_mount_lib::TVC_mount tvc_mount__(SERVO_PITCH_PIN, SCALING_PITCH, OFFSET_PITCH, LIMIT_PITCH, SERVO_YAW_PIN, SCALING_YAW, OFFSET_YAW, LIMIT_YAW);
 
-inline std::atomic<double> att_cmd_yaw = 0;
-inline std::atomic<double> att_cmd_pitch = 0;
-inline std::atomic<double> att_cmd_roll = 0;
-
-inline std::atomic<double> tvc_cmd_x = 0;
-inline std::atomic<double> tvc_cmd_y = 0;
-
+inline float ground_altitude_offset_msl__ = 0.0;
 inline sensor_msgs::BaroMsg baro_data__;
 inline sensor_msgs::AccelMsg accel_data__;
 inline sensor_msgs::GyroMsg gyro_data__;

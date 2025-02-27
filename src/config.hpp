@@ -1,5 +1,4 @@
-#ifndef CFG_HPP
-#define CFG_HPP
+#pragma once
 
 // ========================== General configuration ===========================
 
@@ -7,12 +6,14 @@
 #define CONTROL_FREQUENCY 100 // [Hz] The frequency at which to run the control loop.
 #define FSM_FREQUENCY 10 // [Hz] The frequency at which to run the finite state machine.
 
+#define RADIO_ROCKET_ADDRESS 1 // The address of the radio client. ENSURE SAME AS GROUND STATION
+#define RADIO_GS_ADDRESS 2 // The address of the radio server. ENSURE SAME AS GROUND STATION
+#define RF95_FREQ 915.0 // [MHz] The frequency of the radio module.
+
 // ====================== State estimation configuration ======================
 
 #define Q_MATRIX (Eigen::Matrix<double, Q_DIM, Q_DIM>::Identity() * 0) // The process noise matrix.
 #define R_MATRIX (Eigen::Matrix<double, Z_DIM, Z_DIM>::Identity() * 0.01) // The measurement noise matrix.
-
-
 
 // ============================ Sensor configuration ==========================
 
@@ -47,6 +48,10 @@
 
 // TVC mount configuration
 #define SERVO_PITCH_PIN 22
+#define SCALING_PITCH 1.3
+#define OFFSET_PITCH 0.0
+#define LIMIT_PITCH 0.16
 #define SERVO_YAW_PIN 23
-
-#endif
+#define SCALING_YAW 1.3
+#define OFFSET_YAW 0.0
+#define LIMIT_YAW 0.16

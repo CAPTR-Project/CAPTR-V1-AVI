@@ -13,9 +13,8 @@ Desc: Header file for data acquisition Interrupt Service Routines
 */
 
 // IMU, Gyro, Baro, Mag, GPS
+#pragma once
 
-#ifndef DAQ_THREADS_HPP
-#define DAQ_THREADS_HPP
 
 // ================================== Includes ====================================
 
@@ -40,4 +39,4 @@ void gyroISR();
 void baroISR();
 void magISR();
 
-#endif
+#pragma once

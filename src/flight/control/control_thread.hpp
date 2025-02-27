@@ -11,19 +11,19 @@ Auth: Yubo Wang
 Desc: Header file for control thread
 
 */
-
-#ifndef CONTROL_THREAD_HPP
-#define CONTROL_THREAD_HPP
+#pragma once
 
 // ================================== Includes ====================================
 
-#include "rtos_includes.hpp"
-#include "config.hpp"
-#include "globals.hpp"
+#include "arduino_freertos.h"
 #include "attitude_estimator.hpp"
 #include "quaternion.h"
 #include "QuaternionPID.hpp"
 #include "RatePID.hpp"
+#include "mount_lib.hpp"
+
+#include "config.hpp"
+#include "../sensor_fusion/attitude_est_thread.hpp"
 
 namespace controls_thread {
 
@@ -31,8 +31,8 @@ namespace controls_thread {
 
 inline TaskHandle_t taskHandle = NULL;
 
-inline UnitQuaternion target_attitude_{1, 0, 0, 0}; // no rotation
-inline Eigen::Vector3d target_rate_{0, 0, 0};
+inline UnitQuaternion targetAttitude_{1, 0, 0, 0}; // no rotation
+inline Eigen::Vector3d targetRate_{0, 0, 0};
 
 inline double attitude_dt_ = 1.0/CONTROL_FREQUENCY;
 inline double rate_dt_ = 1.0/CONTROL_FREQUENCY;
@@ -51,24 +51,24 @@ inline Eigen::Vector3d attKp_{20, 20, 20};
 inline Eigen::Vector3d attKi_{0, 0, 0};
 inline Eigen::Vector3d attKd_{0, 0, 0};
 inline Eigen::Vector3d attIntegClamp_{0, 0, 0};
-inline float att_alpha_ = 1;
-inline float att_tau_ = 0;
+inline float attAlpha_ = 1;
+inline float attTau_ = 0;
 
 inline Eigen::Vector3d rateKp_{0.6, 0.6, 0.6};
 inline Eigen::Vector3d rateKi_{1.8, 1.8, 1.8};
 inline Eigen::Vector3d rateKd_{0.038, 0.038, 0.038};
 inline Eigen::Vector3d rateIntegClamp_{maxServoPos / 4, maxServoPos / 4, maxServoPos / 4};
-inline float rate_alpha_ = 0.9;
-inline float rate_tau_ = 0.01;
+inline float rateAlpha_ = 0.9;
+inline float rateTau_ = 0.01;
 
-// outputs
-inline Eigen::Vector3d attitudeOutput_{0, 0, 0};
-inline Eigen::Vector3d rateOutput_{0, 0, 0};
+Eigen::Vector3d attitudeOutput_;
+Eigen::Vector3d rateOutput_;
+
+// TVC mount object
+inline tvc_mount_lib::TVC_mount tvcMount_(SERVO_PITCH_PIN, SCALING_PITCH, OFFSET_PITCH, LIMIT_PITCH, SERVO_YAW_PIN, SCALING_YAW, OFFSET_YAW, LIMIT_YAW);
 
 // ============================ Function Prototypes ==============================
 
 void control_thread(void*);
 
 }
-
-#endif // CONTROL_THREAD_HPP
