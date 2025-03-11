@@ -185,6 +185,8 @@ public:
   float accelerationSampleRate(void);
   int accelerationAvailable(void);
 
+  void read();
+
   int readGyroscope(float &x, float &y, float &z);
   float gyroscopeSampleRate(void);
   int gyroscopeAvailable(void);

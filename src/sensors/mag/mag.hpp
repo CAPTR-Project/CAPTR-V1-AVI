@@ -14,7 +14,6 @@ Desc: Header file for magnetometer data acquisition
 
 #pragma once
 
-
 #include <Arduino.h>
 #include <Adafruit_LIS3MDL.h>
 #include <Wire.h>
@@ -31,10 +30,10 @@ namespace sensors::mag {
     inline sensor_msgs::MagMsg mag_data_;
 
     // ============================ Function Prototypes ===============================
-    void mag_init(void*);
+    void magInit(void*);
 
-    void mag_daq_ISR(void);
+    void magDaqISR(void);
 
-    void mag_daq_thread(void*);
+    void magDaqThread(void*);
 
 } // namespace mag

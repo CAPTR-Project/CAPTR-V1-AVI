@@ -23,7 +23,7 @@ void daq_start() {
 
     xTaskCreate(gyro_daq_thread, "Gyro DAQ", 4000, nullptr, 8, &gyro_taskHandle);
     xTaskCreate(accel_daq_thread, "Accel DAQ", 4000, nullptr, 8, &accel_taskHandle);
-    xTaskCreate(mag_daq_thread, "Mag DAQ", 4000, nullptr, 8, &mag_taskHandle);
+    xTaskCreate(magDaqThread, "Mag DAQ", 4000, nullptr, 8, &mag_taskHandle);
     xTaskCreate(baro_daq_thread, "Baro DAQ", 4000, nullptr, 8, &baro_taskHandle);
 
     vPortEnterCritical();
@@ -87,7 +87,7 @@ void accel_daq_thread(void*) {
     }
 }
 
-void mag_daq_thread(void*) {
+void magDaqThread(void*) {
     mag_data__ = sensor_msgs::MagMsg();
 
     while (true) {

@@ -49,7 +49,7 @@ inline float gyro_bias_z_ = 0;
 void daq_start();
 void gyro_daq_thread(void*);
 void accel_daq_thread(void*);
-void mag_daq_thread(void*);
+void magDaqThread(void*);
 void baro_daq_thread(void*);
 
 } // namespace daq_threads
