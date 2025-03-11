@@ -48,10 +48,18 @@ namespace sensors::IMU_main {
         imu_.readGyroscope(x, y, z);
 
         vPortExitCritical();
+
+        xTaskCreate(GyroDaqThread, "Gyro DAQ", 4000, nullptr, 8, &gyro_taskHandle);
     }
 
     void GyroDaqISR() {
-        
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+        // Send notification to control task on INDEX 0. 
+        configASSERT( gyro_taskHandle != NULL );
+        vTaskNotifyGiveFromISR( gyro_taskHandle, &xHigherPriorityTaskWoken);
+
+        portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
     }
 
     void GyroDaqThread(void*) {

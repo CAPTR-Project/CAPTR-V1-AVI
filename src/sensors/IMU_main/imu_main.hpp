@@ -34,8 +34,10 @@ namespace sensors::IMU_main {
     inline sensor_msgs::GyroMsg gyroData_;
     inline sensor_msgs::AccelMsg accelData_;
 
+    TaskHandle_t gyro_taskHandle = NULL;
+
     // ============================ Function Prototypes ===============================
-    void IMUinit();
+    void IMUInit();
 
     void GyroDaqISR();
 
