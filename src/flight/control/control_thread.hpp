@@ -23,7 +23,7 @@ Desc: Header file for control thread
 #include "mount_lib.hpp"
 
 #include "config.hpp"
-#include "../sensor_fusion/attitude_est_thread.hpp"
+#include "sensor_fusion/attitude_est_thread.hpp"
 
 namespace controls_thread {
 

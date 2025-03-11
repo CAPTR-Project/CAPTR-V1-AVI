@@ -21,7 +21,7 @@ Desc: Header file for Attitude Estimation Thread
 #include "captr_sensor_msgs.hpp"
 
 #include "config.hpp"
-#include "../sensors/IMU/imu.hpp"
+#include "../sensors/IMU/imu_main.hpp"
 #include "../sensors/mag/mag.hpp"
 
 namespace att_est_threads {
