@@ -33,29 +33,26 @@ void att_est_predict_thread(void*) {
     while (1) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
         local_current_time_us = current_time_us_;
-        if (xSemaphoreTake(mag::mag_data.ready, 0) == pdTRUE) {
-            local_gyro_data = mag::mag_data;
-            xSemaphoreGive(mag::mag_data.ready);
+        local_gyro_data = sensors::IMU_main::gyroData_;
 
-            // DEBUG
-            // local_gyro_data.x = 0.0;
-            // local_gyro_data.y = 0.0;
-            // local_gyro_data.z = 0.62831853;
+        // DEBUG
+        // local_gyro_data.x = 0.0;
+        // local_gyro_data.y = 0.0;
+        // local_gyro_data.z = 0.62831853;
+        
+        if (xSemaphoreTake(att_est_mutex_, 0) == pdTRUE && // TODO: change delay to match freq of gyro
+            att_estimator_.initialized) {
             
-            if (xSemaphoreTake(att_est_mutex_, 0) == pdTRUE && // TODO: change delay to match freq of gyro
-                att_estimator_.initialized) {
-                
-                // run UKF predict
-                att_estimator_.predict_integrate((local_current_time_us - last_time_us) * 0.000001,
-                                    local_gyro_data.toVector());
-                // Serial.println("Local Gyro Data: " + String(local_gyro_data.x) + " " + String(local_gyro_data.y) + " " + String(local_gyro_data.z));
-                // att_estimator_.predict_integrate(0.002404,
-                //                     local_gyro_data.toVector());
-                // Serial.println(current_time_us / 1000);
-                last_action_was_predict = true;
-                last_time_us = local_current_time_us;
-                xSemaphoreGive(att_est_mutex_);
-            }
+            // run UKF predict
+            att_estimator_.predict_integrate((local_current_time_us - last_time_us) * 0.000001,
+                                local_gyro_data.toVector());
+            // Serial.println("Local Gyro Data: " + String(local_gyro_data.x) + " " + String(local_gyro_data.y) + " " + String(local_gyro_data.z));
+            // att_estimator_.predict_integrate(0.002404,
+            //                     local_gyro_data.toVector());
+            // Serial.println(current_time_us / 1000);
+            last_action_was_predict = true;
+            last_time_us = local_current_time_us;
+            xSemaphoreGive(att_est_mutex_);
         }
     }
 }
@@ -66,26 +63,20 @@ void att_est_update_thread(void*) {
     BaseType_t xWasDelayed;
     long long last_time_us = pdTICKS_TO_US(xLastWakeTime);
     
-    sensor_msgs::MagMsg local_mag_data;
-    ControllerState local_mcu_state;
+    sensor_msgs::MagMsg local_mag_data_;
 
     while (1) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        if (xSemaphoreTake(mag_data__.ready, 1) == pdTRUE) {
-            local_mag_data = mag_data__;
-            xSemaphoreGive(mag_data__.ready);
-        
-            local_mcu_state = currentState.load();
-            if (local_mcu_state == ControllerState::STBY || local_mcu_state == ControllerState::CALIBRATING) continue;
-            if (last_action_was_predict) {
-                if (xSemaphoreTake(att_est_mutex_, pdMS_TO_TICKS(23)) == pdTRUE && // TODO: change delay to match freq of mag
-                att_estimator_.initialized) {
-                    // Get mag data
-                    long long current_time_us = pdTICKS_TO_US(xTaskGetTickCount());
-                    att_estimator_.update_mag(local_mag_data.toVector());
-                    last_action_was_predict = false;
-                    xSemaphoreGive(att_est_mutex_);
-                }
+        local_mag_data_ = sensors::mag::mag_data_;
+    
+        if (last_action_was_predict) {
+            if (xSemaphoreTake(att_est_mutex_, pdMS_TO_TICKS(23)) == pdTRUE && // TODO: change delay to match freq of mag
+            att_estimator_.initialized) {
+                // Get mag data
+                long long current_time_us = pdTICKS_TO_US(xTaskGetTickCount());
+                att_estimator_.update_mag(local_mag_data_.toVector());
+                last_action_was_predict = false;
+                xSemaphoreGive(att_est_mutex_);
             }
         }
     }

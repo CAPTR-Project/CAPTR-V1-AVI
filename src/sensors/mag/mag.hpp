@@ -22,7 +22,7 @@ Desc: Header file for magnetometer data acquisition
 
 #include "config.hpp"
 
-namespace mag {
+namespace sensors::mag {
 
     // ================================= Constants ====================================
 
