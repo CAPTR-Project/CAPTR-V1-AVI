@@ -20,7 +20,7 @@ Desc: Header file for magnetometer data acquisition
 #include "captr_sensor_msgs.hpp"
 
 #include "config.hpp"
-#include "../IMU_main/imu.hpp"
+#include "sensors/IMU/imu_main.hpp"
 #include 
 
 namespace sensors::mag {
