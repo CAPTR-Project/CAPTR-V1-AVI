@@ -16,4 +16,78 @@ Desc: Source file for Calibration routine
 
 namespace calibration_routine {
     
+    void calibrate_task(void*) {
+        // Initialize variables
+        calibration_done = false;
+
+        long cnt = 0;
+        sensor_msgs::GyroMsg localGyroData;
+        sensor_msgs::AccelMsg localAccelData;
+        sensor_msgs::MagMsg localMagData;
+
+
+        float gyroX = 0;
+        float gyroY = 0;
+        float gyroZ = 0;
+
+        float accelX = 0;
+        float accelY = 0;
+        float accelZ = 0;
+
+        float magX = 0;
+        float magY = 0;
+        float magZ = 0;
+
+        TickType_t xLastWakeTime = xTaskGetTickCount();
+        BaseType_t xWasDelayed;
+        TickType_t start_time = xTaskGetTickCount();
+
+        while (xLastWakeTime < start_time + pdMS_TO_TICKS(GYRO_CALIBRATION_TIME)) {
+            // Read gyro data
+            localGyroData = sensors::IMU_main::gyroData_;
+            localAccelData = sensors::IMU_main::accelData_;
+            localMagData = sensors::mag::magData_;
+        
+            gyroX += localGyroData.x;
+            gyroY += localGyroData.y;
+            gyroZ += localGyroData.z;
+
+            accelX += localAccelData.x;
+            accelY += localAccelData.y;
+            accelZ += localAccelData.z;
+
+            magX += localMagData.x;
+            magY += localMagData.y;
+            magZ += localMagData.z;
+
+            cnt++;
+            xLastWakeTime = xTaskGetTickCount();
+        }
+        gyroBiasX = gyroX / cnt;
+        gyroBiasY = gyroY / cnt;
+        gyroBiasZ = gyroZ / cnt;
+
+        accelX = accelX / cnt;
+        accelY = accelY / cnt;
+        accelZ = accelZ / cnt;
+
+        magStartX = magX / cnt;
+        magStartY = magY / cnt;
+        magStartZ = magZ / cnt;
+
+        // Calculate starting orientation
+        Eigen::Vector3d normalized = Eigen::Vector3d(accelX, accelY, accelZ).normalized();
+        Eigen::Vector3d up = Eigen::Vector3d(1, 0, 0);
+        Eigen::Vector3d axis = up.cross(normalized);
+        double angle = acos(up.dot(normalized) / (up.norm() * normalized.norm()));
+        startingOrientation = UnitQuaternion::from_rotVec(angle * axis(0), angle * axis(1), angle * axis(2)).conjugate();
+
+        calibration_done = true;
+
+        Serial.println("Gyro calibration done");
+
+        vTaskDelete(NULL);
+        return;
+    }
+
 } // namespace calibration_routine
