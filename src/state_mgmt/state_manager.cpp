@@ -18,6 +18,8 @@ namespace state_manager {
     void state_manager_thread(void*) {
         stateQueue = xQueueCreate(10, sizeof(ControllerState));
 
+        TickType_t xLastWakeTime = xTaskGetTickCount();
+        BaseType_t xWasDelayed;
 
         // Initialize the state manager
         currentState = ControllerState::STBY;
@@ -80,6 +82,10 @@ namespace state_manager {
                         break;
                     }
                 }
+            }
+            xWasDelayed = xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(int(round(1000/FSM_FREQUENCY))));
+            if (!xWasDelayed) {
+                Serial.println("State manager loop delayed");
             }
         }
     }

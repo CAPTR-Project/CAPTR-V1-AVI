@@ -2,9 +2,9 @@
 
 // ========================== General configuration ===========================
 
-#define LOGGING_FREQUENCY 10 // [Hz] The frequency at which to log data.
+#define LOGGING_FREQUENCY 50 // [Hz] The frequency at which to log data.
 #define CONTROL_FREQUENCY 100 // [Hz] The frequency at which to run the control loop.
-#define FSM_FREQUENCY 10 // [Hz] The frequency at which to run the finite state machine.
+#define FSM_FREQUENCY 30 // [Hz] The frequency at which to run the finite state machine.
 
 #define RADIO_ROCKET_ADDRESS 1 // The address of the radio client. ENSURE SAME AS GROUND STATION
 #define RADIO_GS_ADDRESS 2 // The address of the radio server. ENSURE SAME AS GROUND STATION
