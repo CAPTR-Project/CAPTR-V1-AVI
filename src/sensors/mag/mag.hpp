@@ -21,15 +21,17 @@ Desc: Header file for magnetometer data acquisition
 
 #include "config.hpp"
 #include "sensors/IMU/imu_main.hpp"
-#include 
+#include ""
 
 namespace sensors::mag {
 
     // ================================= Constants ====================================
 
     // =============================== Variables ======================================
-    inline Adafruit_LIS3MDL mag_sensor_ = Adafruit_LIS3MDL();
-    inline sensor_msgs::MagMsg mag_data_;
+    inline Adafruit_LIS3MDL mag_ = Adafruit_LIS3MDL();
+    inline sensor_msgs::MagMsg magData_;
+
+    inline TaskHandle_t mag_taskHandle = NULL;
 
     // ============================ Function Prototypes ===============================
     void magInit(void*);

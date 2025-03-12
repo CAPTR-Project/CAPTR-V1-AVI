@@ -29,12 +29,13 @@ namespace sensors::IMU_main {
     // =============================== Variables ======================================
     inline SemaphoreHandle_t i2c0_mutex_;
 
-    Adafruit_LSM6DSOX imu_;
+    inline Adafruit_LSM6DSOX imu_;
+    // inline Adafruit_LSM6DS33 imu_;
 
     inline sensor_msgs::GyroMsg gyroData_;
     inline sensor_msgs::AccelMsg accelData_;
 
-    TaskHandle_t gyro_taskHandle = NULL;
+    inline TaskHandle_t gyro_taskHandle = NULL;
 
     // ============================ Function Prototypes ===============================
     void IMUInit();
