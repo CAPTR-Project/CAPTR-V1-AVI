@@ -25,55 +25,28 @@ void control_thread(void*) {
     RatePID ratePID(rate_dt_, maxServoPos, minServoPos, rateKp_, rateKi_, rateKd_, rateIntegClamp_, attAlpha_, attTau_);
 
     Eigen::Vector3d euler;
-    sensor_msgs::GyroMsg current_gyro_data;
-    sensor_msgs::AccelMsg current_accel_data;
+    UnitQuaternion currentAttitude{1, 0, 0, 0};
+    sensor_msgs::GyroMsg currentGyroData;
+    sensor_msgs::AccelMsg currentAccelData;
 
     // UnitQuaternion current_attitude;
     while (true) {
         // Control loop
-        if (xSemaphoreTake(att_estimator__.ready, 1) == pdTRUE) {
-            current_attitude_ = att_estimator__.newest_attitude_quat;
-            xSemaphoreGive(att_estimator__.ready);
-        }
-        if (xSemaphoreTake(gyro_data__.ready, 1) == pdTRUE) {
-            current_gyro_data = gyro_data__;
-            xSemaphoreGive(gyro_data__.ready);
-        }
-        if (xSemaphoreTake(accel_data__.ready, 1) == pdTRUE) {
-            current_accel_data = accel_data__;
-            xSemaphoreGive(accel_data__.ready);
-        }
+        currentAttitude = att_est_threads::att_estimator_.newest_attitude_quat;
+
+        currentGyroData = sensors::IMU_main::gyroData_;
+
+        currentAccelData = sensors::IMU_main::accelData_;
 
         // call the pids to computer corrections
-        attitudeOutput_ = attitudePID.compute(targetAttitude_, current_attitude_);
-        rateOutput_ = ratePID.compute(attitudeOutput_, current_gyro_data.toVector() - current_gyro_data.toBiasVector());  // z, y, x for servos
+        attitudeOutput_ = attitudePID.compute(targetAttitude_, currentAttitude);
+        rateOutput_ = ratePID.compute(attitudeOutput_, currentGyroData.toVector() - currentGyroData.toBiasVector());  // z, y, x for servos
         tvcMount_.move_mount(-rateOutput_(1), -rateOutput_(0));
-        
-        Serial.println("Altitude: " + String(baro_data__.alt_agl) + "m");
-        Serial.println("Acceleration: " + String(current_accel_data.x) + " " + String(current_accel_data.y) + " " + String(current_accel_data.z));
-        Serial.println("Gyroscope: " + String(current_gyro_data.x) + " " + String(current_gyro_data.y) + " " + String(current_gyro_data.z));
-        // Serial.println("Magnetometer: " + String(mag_data__.x) + " " + String(mag_data__.y) + " " + String(mag_data__.z));
-        euler = current_attitude_.to_euler();
-
-        Serial.println("Orientation: yaw: " + String(euler(0)) + " pitch: " + String(euler(1)) + " roll: " + String(euler(2)));
-        // Serial.println("HeadingX: " + String(headingX));
-
-        Serial.println();
-
-
-        Serial.println("Attitude Output: " + String(attitudeOutput_(0)) + " " + String(attitudeOutput_(1)) + " " + String(attitudeOutput_(2)));
-        Serial.println("Rate Output: " + String(rateOutput_(0)) + " " + String(rateOutput_(1)) + " " + String(rateOutput_(2)));
-
-        Serial.println();
-        Serial.println();
-        xSemaphoreGive(serial_port_mutex__);
             
         xWasDelayed = xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(int(round(1000/CONTROL_FREQUENCY))));
         if (!xWasDelayed) {
             // errorState_ = ErrorState::CONTROL;
-            xSemaphoreTake(serial_port_mutex__, 0);
             Serial.println("Control loop delayed");
-            xSemaphoreTake(serial_port_mutex__, 0);
         }
     }
 

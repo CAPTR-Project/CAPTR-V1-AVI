@@ -37,8 +37,6 @@ inline Eigen::Vector3d targetRate_{0, 0, 0};
 inline double attitude_dt_ = 1.0/CONTROL_FREQUENCY;
 inline double rate_dt_ = 1.0/CONTROL_FREQUENCY;
 
-inline UnitQuaternion current_attitude_{1, 0, 0, 0};
-
 // max and min values
 inline double maxServoPos = 9 * M_PI / 180;
 inline double minServoPos = -9 * M_PI / 180;
