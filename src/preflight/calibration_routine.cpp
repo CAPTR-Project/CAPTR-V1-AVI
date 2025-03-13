@@ -86,6 +86,8 @@ namespace calibration_routine {
 
         Serial.println("Gyro calibration done");
 
+        state_manager::request_state(ControllerState::STBY);
+
         vTaskDelete(NULL);
         return;
     }

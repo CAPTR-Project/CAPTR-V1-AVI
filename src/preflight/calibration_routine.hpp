@@ -19,6 +19,7 @@ Desc: Header file for Attitude Estimation Thread
 #include "quaternion.h"
 
 #include "config.hpp"
+#include "state_mgmt/state_manager.hpp"
 #include "attitude_estimator.hpp"
 #include "captr_sensor_msgs.hpp"
 #include "sensors/IMU/imu_main.hpp"
