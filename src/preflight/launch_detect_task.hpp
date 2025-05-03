@@ -26,7 +26,7 @@ namespace launch_detect {
 
     // =============================== Variables ======================================
 
-    inline TaskHandle_t launch_detect_taskHandle = NULL;
+    inline TaskHandle_t taskHandle = NULL;
 
     // ============================ Function Prototypes ===============================
 

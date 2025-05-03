@@ -26,12 +26,14 @@ namespace launch_detect {
 
         // Main loop
         while (1) {
-            // Check if the launch has been detected
-            if (!launchDetected) {
-                // Check if the acceleration is above the threshold
-                if (sensors::IMU_main::accelData_.x > 10) {
+            // Check if the acceleration is above the threshold
+            if (sensors::IMU_main::accelData_.x > 10) {
+                // Check if the launch has been detected
+                if (!launchDetected) {
                     // Set the launch detected flag
                     launchDetected = true;
+                }
+                else {
                     // Notify the state manager that the launch has been detected
                     state_manager::request_state(ControllerState::LAUNCH_DETECT);
                     // Log the launch detection
@@ -42,7 +44,7 @@ namespace launch_detect {
             }
 
             // Delay the task
-            xWasDelayed = xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(1000/FSM_FREQUENCY));
+            xWasDelayed = xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(10));
             if (!xWasDelayed) {
                 // Set the error state
                 state_manager::set_error(ErrorState::FSM);

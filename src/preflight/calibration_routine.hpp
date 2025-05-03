@@ -36,6 +36,8 @@ namespace calibration_routine {
 
     inline bool calibration_done = false;
 
+    inline bool stop_flag = false;
+
     inline float gyroBiasX, gyroBiasY, gyroBiasZ;
 
     inline float magStartX, magStartY, magStartZ;
@@ -45,5 +47,6 @@ namespace calibration_routine {
     // ============================ Function Prototypes ===============================
 
     void calibrate_task(void*);
+    void stop_calibration();
 
 } // namespace calibration_routine

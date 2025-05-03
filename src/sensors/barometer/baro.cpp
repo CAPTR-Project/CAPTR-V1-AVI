@@ -40,6 +40,8 @@ namespace sensors::baro {
         bmp_.readAltitude(1013.25);
 
         vPortExitCritical();
+
+        xTaskCreate(baroDaqThread, "Barometer", 2048, NULL, 1, &baro_taskHandle);
     }
 
     void baroDaqISR() {

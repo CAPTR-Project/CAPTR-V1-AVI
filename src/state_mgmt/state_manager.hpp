@@ -17,13 +17,16 @@ Desc: Header file for state manager thread
 
 #include "config.hpp"
 #include "state_defs.hpp"
+#include "sensors/sensors.hpp"
+#include "preflight/calibration_routine.hpp"
+#include "preflight/launch_detect_task.hpp"
 
 namespace state_manager {
 
     // ================================= Constants ====================================
 
     // =============================== Variables ======================================
-    inline TaskHandle_t stateManagerTaskHandle;
+    inline TaskHandle_t taskHandle;
 
     QueueHandle_t stateQueue;
 

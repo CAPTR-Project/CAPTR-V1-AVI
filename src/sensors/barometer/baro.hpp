@@ -33,7 +33,7 @@ namespace sensors::baro {
     double ground_altitude_offset_msl_ = 0;
 
     // ============================ Function Prototypes ===============================
-    void baroInit(void*);
+    void baroInit();
 
     void baroDaqISR(void);
 

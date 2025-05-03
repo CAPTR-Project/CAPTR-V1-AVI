@@ -33,7 +33,7 @@ namespace sensors::mag {
     inline TaskHandle_t mag_taskHandle = NULL;
 
     // ============================ Function Prototypes ===============================
-    void magInit(void*);
+    void magInit();
 
     void magDaqISR(void);
 

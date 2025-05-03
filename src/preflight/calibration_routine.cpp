@@ -17,6 +17,11 @@ Desc: Source file for Calibration routine
 namespace calibration_routine {
     
     void calibrate_task(void*) {
+        if (state_manager::currentState != ControllerState::CALIBRATING) {
+            vTaskDelete(NULL);
+            return;
+        }
+
         // Initialize variables
         calibration_done = false;
 
@@ -42,7 +47,8 @@ namespace calibration_routine {
         BaseType_t xWasDelayed;
         TickType_t start_time = xTaskGetTickCount();
 
-        while (xLastWakeTime < start_time + pdMS_TO_TICKS(GYRO_CALIBRATION_TIME)) {
+        stop_flag = false;
+        while (xLastWakeTime < start_time + pdMS_TO_TICKS(GYRO_CALIBRATION_TIME) && !stop_flag) {
             // Read gyro data
             localGyroData = sensors::IMU_main::gyroData_;
             localAccelData = sensors::IMU_main::accelData_;
@@ -90,6 +96,17 @@ namespace calibration_routine {
 
         vTaskDelete(NULL);
         return;
+    }
+    void stop_calibration() {
+        if (calibration_done) {
+            return;
+        }
+        stop_flag = true;
+        // Wait for the calibration task to finish
+        while (calibration_done == false) {
+            vTaskDelay(pdMS_TO_TICKS(10));
+        }
+        calibration_done = false;
     }
 
 } // namespace calibration_routine
