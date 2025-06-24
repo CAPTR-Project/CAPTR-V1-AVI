@@ -6,7 +6,7 @@
 ██      ██   ██ ██         ██    ██   ██  
  ██████ ██   ██ ██         ██    ██   ██ 
 
-File: datalogger_thread.hpp
+File: local_logging_task.hpp
 Auth: Joseph Mi
 Desc: Header file for datalogger thread of BaroMsg, AccelMsg, GyroMsg, and mag_data
 
@@ -17,13 +17,14 @@ Desc: Header file for datalogger thread of BaroMsg, AccelMsg, GyroMsg, and mag_d
 
 // ================================== Includes ====================================
 
-#include "rtos_includes.hpp"
-#include "globals.hpp"
-#include "config.hpp"
+#include "arduino_freertos.h"
 #include <cmath>
 #include <SerialFlash.h>
+#include <captr_sensor_msgs.hpp>
 
-namespace datalogger_thread {
+#include "config.hpp"
+
+namespace local_logging {
 
 // Include libs
 
@@ -39,6 +40,7 @@ struct SensorLog {
     sensor_msgs::AccelMsg accel;
     sensor_msgs::GyroMsg gyro;
     sensor_msgs::MagMsg mag;
+    
     uint32_t timestamp;
 };
 
@@ -55,4 +57,4 @@ bool isValidMagData(const sensor_msgs::MagMsg& mag);
 
 }
 
-#endif
+#endif // DATALOGGER_THREAD_HPP

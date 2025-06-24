@@ -4,11 +4,11 @@ namespace UKF {
 
 Attitude::Attitude(){
     ready = xSemaphoreCreateMutex();
-    init(UnitQuaternion(1, 0, 0, 0),
-    Eigen::Vector3d(0, 0, 0),
-    Eigen::Vector3d(0, 0, 0),
-    Eigen::Matrix<double, Q_DIM, Q_DIM>::Identity(),
-    Eigen::Matrix<double, Z_DIM, Z_DIM>::Identity());
+    // init(UnitQuaternion(1, 0, 0, 0),
+    // Eigen::Vector3d(0, 0, 0),
+    // Eigen::Vector3d(0, 0, 0),
+    // Eigen::Matrix<double, Q_DIM, Q_DIM>::Identity(),
+    // Eigen::Matrix<double, Z_DIM, Z_DIM>::Identity());
     initialized = false;
 }
 

@@ -12,7 +12,8 @@ Desc: Header file for magnetometer data acquisition
 
 */
 
-#pragma once
+#ifndef MAG_HPP
+#define MAG_HPP
 
 #include <Arduino.h>
 #include <Adafruit_LIS3MDL.h>
@@ -40,3 +41,5 @@ namespace sensors::mag {
     void magDaqThread(void*);
 
 } // namespace mag
+
+#endif // MAG_HPP

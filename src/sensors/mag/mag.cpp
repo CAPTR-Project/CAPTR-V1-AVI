@@ -37,7 +37,9 @@ namespace sensors::mag {
 
         vPortExitCritical();
 
-
+        // Create the task for magnetometer data acquisition
+        xTaskCreate(magDaqThread, "Mag Daq", 2048, NULL, 1, &mag_taskHandle);
+        Serial.println("Magnetometer task created");
     }
 
     void magDaqISR() {
@@ -60,8 +62,8 @@ namespace sensors::mag {
                 magData_.z = mag_.z_gauss + MAG_Z_OFFSET;
                 xSemaphoreGive(magData_.ready);
     
-                if (att_est_threads::updateTaskHandle_ != NULL ) {
-                    xTaskNotifyGive(att_est_threads::updateTaskHandle_);
+                if (att_est_tasks::updateTaskHandle_ != NULL ) {
+                    xTaskNotifyGive(att_est_tasks::updateTaskHandle_);
                 }
             }
         }

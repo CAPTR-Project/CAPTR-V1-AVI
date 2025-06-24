@@ -24,6 +24,12 @@ public:
         };
     }
 
+    void reset() {
+        qpidX_.reset();
+        qpidY_.reset();
+        qpidZ_.reset();
+    }
+
 private:
     Quaternion errorQuat_;
     PID qpidX_;

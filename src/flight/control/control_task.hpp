@@ -11,7 +11,8 @@ Auth: Yubo Wang
 Desc: Header file for control thread
 
 */
-#pragma once
+#ifndef CONTROL_TASK_HPP
+#define CONTROL_TASK_HPP
 
 // ================================== Includes ====================================
 
@@ -23,13 +24,16 @@ Desc: Header file for control thread
 #include "mount_lib.hpp"
 
 #include "config.hpp"
-#include "sensor_fusion/attitude_est_thread.hpp"
+#include "state_mgmt/state_manager_task.hpp"
+#include "sensor_fusion/attitude_est_task.hpp"
 
-namespace controls_thread {
+namespace control {
 
 // ================================= vars ====================================
 
 inline TaskHandle_t taskHandle = NULL;
+
+inline bool resetFlag_ = false; // flag to reset integrators
 
 inline UnitQuaternion targetAttitude_{1, 0, 0, 0}; // no rotation
 inline Eigen::Vector3d targetRate_{0, 0, 0};
@@ -59,14 +63,18 @@ inline Eigen::Vector3d rateIntegClamp_{maxServoPos / 4, maxServoPos / 4, maxServ
 inline float rateAlpha_ = 0.9;
 inline float rateTau_ = 0.01;
 
-Eigen::Vector3d attitudeOutput_;
-Eigen::Vector3d rateOutput_;
+inline Eigen::Vector3d attitudeOutput_;
+inline Eigen::Vector3d rateOutput_;
 
 // TVC mount object
 inline tvc_mount_lib::TVC_mount tvcMount_(SERVO_PITCH_PIN, SCALING_PITCH, OFFSET_PITCH, LIMIT_PITCH, SERVO_YAW_PIN, SCALING_YAW, OFFSET_YAW, LIMIT_YAW);
 
 // ============================ Function Prototypes ==============================
 
-void control_thread(void*);
+void control_task(void*);
+
+void zeroIntegrators();
 
 }
+
+#endif // CONTROL_TASK_HPP

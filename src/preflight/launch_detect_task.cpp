@@ -35,9 +35,7 @@ namespace launch_detect {
                 }
                 else {
                     // Notify the state manager that the launch has been detected
-                    state_manager::request_state(ControllerState::LAUNCH_DETECT);
-                    // Log the launch detection
-                    
+                    state_manager::requestState(MCUState::LAUNCH_DETECT);
                     // Quit the task
                     break;
                 }
@@ -47,7 +45,7 @@ namespace launch_detect {
             xWasDelayed = xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(10));
             if (!xWasDelayed) {
                 // Set the error state
-                state_manager::set_error(ErrorState::FSM);
+                // state_manager::setError(ErrorState::FSM);
                 Serial.println("Launch detect task delayed");
             }
         }

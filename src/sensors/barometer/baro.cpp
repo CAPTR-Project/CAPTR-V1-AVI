@@ -42,6 +42,7 @@ namespace sensors::baro {
         vPortExitCritical();
 
         xTaskCreate(baroDaqThread, "Barometer", 2048, NULL, 1, &baro_taskHandle);
+        Serial.println("Barometer thread started");
     }
 
     void baroDaqISR() {

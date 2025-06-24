@@ -6,27 +6,28 @@
 ██     ██  ██ ██       ██   ██ ██  
 ██████ ██  ██ ██       ██   ██  ██ 
 
-File: calibration_routine.hpp
+File: calibration_worker.hpp
 Auth: Yubo Wang
 Desc: Header file for Attitude Estimation Thread
 
 */
 
-#pragma once
+#ifndef CALIBRATION_WORKER_HPP
+#define CALIBRATION_WORKER_HPP
 
 #include "arduino_freertos.h"
 #include "ArduinoEigenDense.h"
 #include "quaternion.h"
 
 #include "config.hpp"
-#include "state_mgmt/state_manager.hpp"
+#include "state_mgmt/state_manager_task.hpp"
 #include "attitude_estimator.hpp"
 #include "captr_sensor_msgs.hpp"
 #include "sensors/IMU/imu_main.hpp"
 #include "sensors/mag/mag.hpp"
 #include "sensors/barometer/baro.hpp"
 
-namespace calibration_routine {
+namespace calibration_worker {
 
     // ================================= Constants ====================================
 
@@ -49,4 +50,6 @@ namespace calibration_routine {
     void calibrate_task(void*);
     void stop_calibration();
 
-} // namespace calibration_routine
+} // namespace calibration_worker
+
+#endif // CALIBRATION_WORKER_HPP

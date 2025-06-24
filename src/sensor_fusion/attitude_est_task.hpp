@@ -11,7 +11,8 @@ Auth: Yubo Wang
 Desc: Header file for Attitude Estimation Thread
 
 */
-#pragma once
+#ifndef ATTITUDE_EST_TASK_HPP
+#define ATTITUDE_EST_TASK_HPP
 
 // ================================== Includes ====================================
 
@@ -24,7 +25,7 @@ Desc: Header file for Attitude Estimation Thread
 #include "../sensors/IMU/imu_main.hpp"
 #include "../sensors/mag/mag.hpp"
 
-namespace att_est_threads {
+namespace att_est_tasks {
 
 // ================================= Constants ====================================
 
@@ -45,4 +46,6 @@ inline uint64_t current_time_us_;
 void att_est_predict_thread(void*);
 void att_est_update_thread(void*);
 
-} // namespace att_est_threads
+} // namespace att_est_tasks
+
+#endif // ATTITUDE_EST_TASK_HPP

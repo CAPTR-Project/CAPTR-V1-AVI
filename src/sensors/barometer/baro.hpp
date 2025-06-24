@@ -18,7 +18,8 @@ Desc: Header file for barometer data acquisition
 
 #include "config.hpp"
 
-#pragma once
+#ifndef BARO_HPP
+#define BARO_HPP
 
 namespace sensors::baro {
 
@@ -30,7 +31,7 @@ namespace sensors::baro {
 
     inline TaskHandle_t baro_taskHandle = NULL;
 
-    double ground_altitude_offset_msl_ = 0;
+    inline double ground_altitude_offset_msl_ = 0;
 
     // ============================ Function Prototypes ===============================
     void baroInit();
@@ -40,3 +41,5 @@ namespace sensors::baro {
     void baroDaqThread(void*);
 
 } // namespace barometer
+
+#endif // BARO_HPP

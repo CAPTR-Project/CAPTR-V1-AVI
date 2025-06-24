@@ -12,15 +12,16 @@ Desc: Header file for IMU data acquisition
 
 */
 
+#ifndef IMU_MAIN_H
+#define IMU_MAIN_H
+
 #include "Arduino.h"
 #include "arduino_freertos.h"
 #include "Adafruit_LSM6DSOX.h"
 #include "captr_sensor_msgs.hpp"
 
 #include "config.hpp"
-#include "sensor_fusion/attitude_est_thread.hpp"
-
-#pragma once
+#include "sensor_fusion/attitude_est_task.hpp"
 
 namespace sensors::IMU_main {
     
@@ -40,11 +41,13 @@ namespace sensors::IMU_main {
     // ============================ Function Prototypes ===============================
     void IMUInit();
 
-    void GyroDaqISR();
+    void gyroDaqISR();
 
-    void GyroDaqThread(void*);
+    void imuDaqThread(void*);
 
     // void AccelDaqISR();
 
     // void AccelDaqThread(void*);
 }
+
+#endif // IMU_MAIN_H

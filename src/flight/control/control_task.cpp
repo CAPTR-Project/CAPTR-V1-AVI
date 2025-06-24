@@ -12,11 +12,11 @@ Desc: Source file for MCU
 
 */
 
-#include "control_thread.hpp"
+#include "control_task.hpp"
 
-namespace controls_thread {
+namespace control {
 
-void control_thread(void*) {
+void control_task(void*) {
     // Control
     TickType_t xLastWakeTime = xTaskGetTickCount();
     BaseType_t xWasDelayed;
@@ -32,24 +32,35 @@ void control_thread(void*) {
     // UnitQuaternion current_attitude;
     while (true) {
         // Control loop
-        currentAttitude = att_est_threads::att_estimator_.newest_attitude_quat;
+        currentAttitude = att_est_tasks::att_estimator_.newest_attitude_quat;
 
         currentGyroData = sensors::IMU_main::gyroData_;
 
         currentAccelData = sensors::IMU_main::accelData_;
 
-        // call the pids to computer corrections
+        if (resetFlag_) {
+            // reset the integrators
+            attitudePID.reset();
+            ratePID.reset();
+            resetFlag_ = false;
+        }
+
+        // call the pids to compute corrections
         attitudeOutput_ = attitudePID.compute(targetAttitude_, currentAttitude);
         rateOutput_ = ratePID.compute(attitudeOutput_, currentGyroData.toVector() - currentGyroData.toBiasVector());  // z, y, x for servos
         tvcMount_.move_mount(-rateOutput_(1), -rateOutput_(0));
             
         xWasDelayed = xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(int(round(1000/CONTROL_FREQUENCY))));
         if (!xWasDelayed) {
-            // errorState_ = ErrorState::CONTROL;
+            // state_manager::setError(ErrorState::CONTROL);
             Serial.println("Control loop delayed");
         }
     }
 
 }
 
-} // namespace controls_thread
+void zeroIntegrators() {
+    resetFlag_ = true;
+}
+
+} // namespace control_task

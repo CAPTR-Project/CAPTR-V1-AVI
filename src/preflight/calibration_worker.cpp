@@ -6,18 +6,18 @@
 ██     ██  ██ ██       ██   ██ ██  
 ██████ ██  ██ ██       ██   ██  ██ 
 
-File: calibration_routine.cpp
+File: calibration_worker.cpp
 Auth: Yubo Wang
 Desc: Source file for Calibration routine
 
 */
 
-#include "calibration_routine.hpp"
+#include "calibration_worker.hpp"
 
-namespace calibration_routine {
+namespace calibration_worker {
     
     void calibrate_task(void*) {
-        if (state_manager::currentState != ControllerState::CALIBRATING) {
+        if (state_manager::currentState != MCUState::CALIBRATING) {
             vTaskDelete(NULL);
             return;
         }
@@ -92,7 +92,7 @@ namespace calibration_routine {
 
         Serial.println("Gyro calibration done");
 
-        state_manager::request_state(ControllerState::STBY);
+        state_manager::requestState(MCUState::STBY);
 
         vTaskDelete(NULL);
         return;
@@ -109,4 +109,4 @@ namespace calibration_routine {
         calibration_done = false;
     }
 
-} // namespace calibration_routine
+} // namespace calibration_worker

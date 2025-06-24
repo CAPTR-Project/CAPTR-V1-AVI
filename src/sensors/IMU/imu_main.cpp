@@ -39,7 +39,7 @@ namespace sensors::IMU_main {
         imu_.configIntOutputs(false, false); // set to active high and push-pull
 
         // attachInterrupt(digitalPinToInterrupt(accel_isr_pin), imu__isr, arduino::RISING);
-        attachInterrupt(digitalPinToInterrupt(GYRO_INT_PIN), GyroDaqISR, arduino::RISING);
+        attachInterrupt(digitalPinToInterrupt(GYRO_INT_PIN), gyroDaqISR, arduino::RISING);
 
         // (*imu__isr)(); // read once to clear interrupt
         // (*gyro_isr)(); // read once to clear interrupt
@@ -49,10 +49,11 @@ namespace sensors::IMU_main {
 
         vPortExitCritical();
 
-        xTaskCreate(GyroDaqThread, "Gyro DAQ", 4000, nullptr, 8, &gyro_taskHandle);
+        xTaskCreate(imuDaqThread, "Gyro DAQ", 4000, nullptr, 8, &gyro_taskHandle);
+        Serial.println("Gyro DAQ thread created");
     }
 
-    void GyroDaqISR() {
+    void gyroDaqISR() {
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
         // Send notification to control task on INDEX 0. 
@@ -62,7 +63,7 @@ namespace sensors::IMU_main {
         portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
     }
 
-    void GyroDaqThread(void*) {
+    void imuDaqThread(void*) {
 
         while (true) {
             ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
@@ -79,9 +80,9 @@ namespace sensors::IMU_main {
                 xSemaphoreGive(gyroData_.ready);
                 xSemaphoreGive(i2c0_mutex_);
 
-                if ( att_est_threads::predictTaskHandle_ != NULL ) {
-                    att_est_threads::current_time_us_ = pdTICKS_TO_US(xTaskGetTickCount());
-                    xTaskNotifyGive(att_est_threads::predictTaskHandle_);
+                if ( att_est_tasks::predictTaskHandle_ != NULL ) {
+                    att_est_tasks::current_time_us_ = pdTICKS_TO_US(xTaskGetTickCount());
+                    xTaskNotifyGive(att_est_tasks::predictTaskHandle_);
                 }
             }
         }

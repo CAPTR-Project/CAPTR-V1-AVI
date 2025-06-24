@@ -10,7 +10,8 @@ File: state_manager.hpp
 Auth: Yubo Wang
 Desc: Header file for state manager thread
 */
-#pragma once
+#ifndef STATE_MANAGER_TASK_HPP
+#define STATE_MANAGER_TASK_HPP
 
 #include "arduino_freertos.h"
 #include <atomic>
@@ -18,8 +19,11 @@ Desc: Header file for state manager thread
 #include "config.hpp"
 #include "state_defs.hpp"
 #include "sensors/sensors.hpp"
-#include "preflight/calibration_routine.hpp"
+#include "sensor_fusion/attitude_est_task.hpp"
+#include "preflight/calibration_worker.hpp"
 #include "preflight/launch_detect_task.hpp"
+#include "flight/ascent_task.hpp"
+#include "flight/control/control_task.hpp"
 
 namespace state_manager {
 
@@ -28,22 +32,24 @@ namespace state_manager {
     // =============================== Variables ======================================
     inline TaskHandle_t taskHandle;
 
-    QueueHandle_t stateQueue;
+    inline QueueHandle_t stateQueue;
 
-    inline ControllerState currentState;
+    inline MCUState currentState;
     inline ErrorState errorState_;
 
     inline bool newStateFlag_;
 
     // ============================ Function Prototypes ===============================
-    void state_manager_thread(void*);
+    void stateManagerTask(void*);
 
-    void request_state(ControllerState state);
+    void requestState(MCUState state);
 
-    void set_error(ErrorState error);
+    void setError(ErrorState error);
 
-    ControllerState get_state();
+    MCUState getState();
 
-    ErrorState get_error();
+    ErrorState getError();
 
 } // namespace state_manager
+
+#endif // STATE_MANAGER_TASK_HPP

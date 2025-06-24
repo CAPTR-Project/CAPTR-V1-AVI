@@ -12,9 +12,9 @@ Desc: Source file for attitude estimation thread
 
 */
 
-#include "attitude_est_thread.hpp"
+#include "attitude_est_task.hpp"
 
-namespace att_est_threads {
+namespace att_est_tasks {
 
 void att_est_predict_thread(void*) {
 
@@ -63,18 +63,18 @@ void att_est_update_thread(void*) {
     BaseType_t xWasDelayed;
     long long last_time_us = pdTICKS_TO_US(xLastWakeTime);
     
-    sensor_msgs::MagMsg local_mag_data_;
+    sensor_msgs::MagMsg localMagData;
 
     while (1) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        local_mag_data_ = sensors::mag::mag_data_;
+        localMagData = sensors::mag::magData_;
     
         if (last_action_was_predict) {
             if (xSemaphoreTake(att_est_mutex_, pdMS_TO_TICKS(23)) == pdTRUE && // TODO: change delay to match freq of mag
             att_estimator_.initialized) {
                 // Get mag data
                 long long current_time_us = pdTICKS_TO_US(xTaskGetTickCount());
-                att_estimator_.update_mag(local_mag_data_.toVector());
+                att_estimator_.update_mag(localMagData.toVector());
                 last_action_was_predict = false;
                 xSemaphoreGive(att_est_mutex_);
             }
@@ -82,4 +82,4 @@ void att_est_update_thread(void*) {
     }
 }
 
-} // namespace att_est_threads
+} // namespace att_est_tasks

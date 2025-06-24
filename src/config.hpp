@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CONFIG_HPP
+#define CONFIG_HPP
 
 // ========================== General configuration ===========================
 
@@ -9,6 +10,8 @@
 #define RADIO_ROCKET_ADDRESS 1 // The address of the radio client. ENSURE SAME AS GROUND STATION
 #define RADIO_GS_ADDRESS 2 // The address of the radio server. ENSURE SAME AS GROUND STATION
 #define RF95_FREQ 915.0 // [MHz] The frequency of the radio module.
+#define RFM95_CS 10 // Chip select pin for the radio module
+#define RFM95_INT 2 // Interrupt pin for the radio module
 
 // ====================== State estimation configuration ======================
 
@@ -42,7 +45,7 @@
 // GPS
 #define GPS_SERIAL_PORT Serial2 // The serial port to which the GPS is connected.
 #define GPS_BAUDRATE 9600 // The baudrate of the GPS.
-#define GPS_FREQUENCY 10 // [Hz] The frequency at which to read the GPS.
+#define GPS_FREQUENCY 100 // [Hz] The frequency at which to read the GPS.
 
 // Flash configuration
 #define FLASH_CHIP 10 // Chip select pin for flash memory
@@ -56,3 +59,5 @@
 #define SCALING_YAW 1.3
 #define OFFSET_YAW 0.0
 #define LIMIT_YAW 0.16
+
+#endif // CONFIG_HPP

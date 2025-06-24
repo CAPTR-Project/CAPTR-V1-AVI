@@ -13,12 +13,16 @@ Desc: States that the system can be in
 
 #pragma once
 
+#ifndef STATE_DEFS_HPP
+#define STATE_DEFS_HPP
+
 #include <Arduino.h>
 #include <atomic>
 
-enum class ControllerState
+enum class MCUState
 {
     STBY,
+    SERVOTEST,
     CALIBRATING,
     LAUNCH_DETECT,
     POWERED_ASCENT,
@@ -26,6 +30,7 @@ enum class ControllerState
     RECOVERY,
     // POWERED_DESCENT,
     LANDED,
+    ERROR,
 };
 
 enum class ErrorState
@@ -54,3 +59,5 @@ enum class ErrorState
     RF,
     GPS
 };
+
+#endif // STATE_DEFS_HPP

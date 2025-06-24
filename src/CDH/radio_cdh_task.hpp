@@ -12,29 +12,33 @@ Desc: Header file for telemtry and logging thread
 
 */
 
-#ifndef RADIO_CDH_HPP
-#define RADIO_CDH_HPP
+#ifndef RADIO_CDH_TASK_HPP
+#define RADIO_CDH_TASK_HPP
 
 #include <RHReliableDatagram.h>
 #include <RH_RF95.h>
 #include <SPI.h>
+#include "arduino_freertos.h"
 
-#include "globals.hpp"
 #include "config.hpp"
+#include "telemetry_protocol_shared.hpp"
+#include "state_mgmt/state_manager_task.hpp"
+
 
 namespace radio_cdh {
 
     // ================================= Vars ====================================
 
-    RH_RF95 rf95(RFM95_CS, RFM95_INT);
-    RHReliableDatagram manager(rf95, RADIO_ADDRESS);
+    inline RH_RF95 rf95(RFM95_CS, RFM95_INT);
+    inline RHReliableDatagram manager(rf95, RADIO_ROCKET_ADDRESS);
     
-
     // ============================ Function Prototypes ==============================
 
-    void radio_cdh_start();
-    void radio_cdh_thread(void*);
+    void radioInit();
+
+    void radioRxTask   (void* arg);
+    void radioTxTask  (void* arg);
 
 } // namespace radio_cdh
 
-#endif
+#endif // RADIO_CDH_TASK_HPP

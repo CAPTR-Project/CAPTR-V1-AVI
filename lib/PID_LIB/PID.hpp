@@ -8,8 +8,8 @@ class PID
 {
 public:
     PID(float dt, float max, float min, float Kp, float Ki, float Kd, float integ_clamp, float alpha, float tau)        // has to be same name as class because it is a constructor like init in python
-        : dt_(dt), max_(max), min_(min), Kp_(Kp), Ki_(Ki), Kd_(Kd), integ_clamp_(integ_clamp), alpha_(alpha), alpha_lpf(dt / (dt + tau)), 
-            integral_(0.0), prev_error_(0.0), old_error_filtered_(0.0), old_output_filtered_(0.0) {}
+        : dt_(dt), max_(max), min_(min), Kp_(Kp), Ki_(Ki), Kd_(Kd), integ_clamp_(integ_clamp), error_(0.0), derivative_(0.0), alpha_(alpha), alpha_lpf(dt / (dt + tau)), 
+          integral_(0.0), prev_error_(0.0), old_error_filtered_(0.0), old_output_filtered_(0.0) {}
 
     float run(float setpoint, float currentValue) {
         error_ = setpoint - currentValue;
