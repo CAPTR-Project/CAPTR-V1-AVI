@@ -79,6 +79,7 @@ public:
 	 */
 	Eigen::Vector3d to_euler();
 	Eigen::Vector3d to_rotVec();
+	Eigen::Vector4d to_axis_angle();
 
 	/*** Vector rotated by quaternion ***/
 	// Note: v is pure quaternion i.e v = 0<v> 

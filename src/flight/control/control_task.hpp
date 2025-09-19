@@ -39,7 +39,7 @@ inline UnitQuaternion targetAttitude_{1, 0, 0, 0}; // no rotation
 inline Eigen::Vector3d targetRate_{0, 0, 0};
 
 inline double attitude_dt_ = 1.0/CONTROL_FREQUENCY;
-inline double rate_dt_ = 1.0/CONTROL_FREQUENCY;
+inline double rate_dt_ = 0.5/CONTROL_FREQUENCY;
 
 // max and min values
 inline double maxServoPos = 9 * M_PI / 180;
@@ -49,18 +49,18 @@ inline double maxRate_ = 3.0;
 inline double minRate_ = -3.0;
 
 // gains in x, y, z (see if we can get away with using same gains for every axis)
-inline Eigen::Vector3d attKp_{20, 20, 20};  
+inline Eigen::Vector3d attKp_{6, 3, 0};  
 inline Eigen::Vector3d attKi_{0, 0, 0};
 inline Eigen::Vector3d attKd_{0, 0, 0};
 inline Eigen::Vector3d attIntegClamp_{0, 0, 0};
 inline float attAlpha_ = 1;
 inline float attTau_ = 0;
 
-inline Eigen::Vector3d rateKp_{0.6, 0.6, 0.6};
-inline Eigen::Vector3d rateKi_{1.8, 1.8, 1.8};
-inline Eigen::Vector3d rateKd_{0.038, 0.038, 0.038};
-inline Eigen::Vector3d rateIntegClamp_{maxServoPos / 4, maxServoPos / 4, maxServoPos / 4};
-inline float rateAlpha_ = 0.9;
+inline Eigen::Vector3d rateKp_{0.038, 0.038, 0};
+inline Eigen::Vector3d rateKi_{0.03, 0.03, 0};
+inline Eigen::Vector3d rateKd_{0.0012, 0.0012, 0};
+inline Eigen::Vector3d rateIntegClamp_{maxServoPos / 4, maxServoPos / 4, 0};
+inline float rateAlpha_ = 0.2;
 inline float rateTau_ = 0.01;
 
 inline Eigen::Vector3d attitudeOutput_;

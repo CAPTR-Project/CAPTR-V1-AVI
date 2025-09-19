@@ -8,10 +8,10 @@
 class QuaternionPID
 {
 public:
-    QuaternionPID(float dt, float max, float min, Eigen::Vector3d Kp, Eigen::Vector3d Ki, Eigen::Vector3d Kd, Eigen::Vector3d integ_clamp, float alpha, float tau)
-    : qpidX_(dt, max, min, Kp(0), Ki(0), Kd(0), integ_clamp(0), alpha, tau),
-    qpidY_(dt, max, min, Kp(1), Ki(1), Kd(1), integ_clamp(1), alpha, tau),
-    qpidZ_(dt, max, min, Kp(2), Ki(2), Kd(2), integ_clamp(2), alpha, tau) {}
+    QuaternionPID(float dt, float max, float min, Eigen::Vector3d K, Eigen::Vector3d Kp, Eigen::Vector3d Ki, Eigen::Vector3d Kd, Eigen::Vector3d integ_clamp, float alpha, float tau)
+    : qpidX_(dt, max, min, K(0), Kp(0), Ki(0), Kd(0), integ_clamp(0), alpha, tau),
+    qpidY_(dt, max, min, K(1), Kp(1), Ki(1), Kd(1), integ_clamp(1), alpha, tau),
+    qpidZ_(dt, max, min, K(2), Kp(2), Ki(2), Kd(2), integ_clamp(2), alpha, tau) {}
 
     // calc (calc stands for calculate if you just joined) the error and return pid computed values in vector3
     Eigen::Vector3d compute(UnitQuaternion attSetpoint, UnitQuaternion currentAtt) {

@@ -429,6 +429,17 @@ Eigen::Vector3d UnitQuaternion::to_rotVec() {
 	return rotVec;
 }
 
+Eigen::Vector4d UnitQuaternion::to_axis_angle() {
+	Eigen::Vector3d rotVec;
+	rotVec << v_1, v_2, v_3;
+	Eigen::Vector4d axis_angle;
+	axis_angle.head<3>() = rotVec;
+	axis_angle(3) = 2 * atan2(rotVec.norm(), s);
+	if (axis_angle(3) == 0) axis_angle.head<3>() = Eigen::Vector3d::Zero();
+	else axis_angle.head<3>() = axis_angle.head<3>() / axis_angle.head<3>().norm();
+	return axis_angle;
+}
+
 Eigen::Vector3d UnitQuaternion::to_euler() {
 	// double roll = atan2(2 * (s * v_1 + v_2 * v_3), 1 - 2 * (v_1 * v_1 + v_2 * v_2));
 	// double pitch = asin(2 * (s * v_2 - v_3 * v_1));

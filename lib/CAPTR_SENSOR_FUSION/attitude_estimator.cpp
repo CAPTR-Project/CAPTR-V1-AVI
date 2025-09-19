@@ -4,6 +4,12 @@ namespace UKF {
 
 Attitude::Attitude(){
     ready = xSemaphoreCreateMutex();
+    
+    // Initialize fixed-size matrices to zero
+    sigma_points.setZero();
+    quat_sigma_points.setZero();
+    z_sigma_points.setZero();
+    
     // init(UnitQuaternion(1, 0, 0, 0),
     // Eigen::Vector3d(0, 0, 0),
     // Eigen::Vector3d(0, 0, 0),
@@ -36,11 +42,12 @@ void Attitude::init(UnitQuaternion starting_orientation,
 
     R_ = R;
 
-    sigma_points = Eigen::MatrixXd::Zero(P_DIM, 2 * P_DIM + 1);
+    // sigma_points and quat_sigma_points are now pre-allocated in constructor
+    // sigma_points = Eigen::MatrixXd::Zero(P_DIM, 2 * P_DIM + 1);
 
     ang_vec = Eigen::Vector3d(0, 0, 0);
 
-    quat_sigma_points = Eigen::MatrixXd(X_DIM, 2 * P_DIM + 1);
+    // quat_sigma_points = Eigen::MatrixXd(X_DIM, 2 * P_DIM + 1);
 
     if (xSemaphoreTake(ready, 1) == pdTRUE) {
         newest_attitude_quat = starting_orientation;
@@ -62,11 +69,8 @@ void Attitude::predict_integrate(double dt, Eigen::Vector3d w_m) {
 void Attitude::predict(double dt, Eigen::Vector3d w_m) {
     x_prior_ = Eigen::VectorXd(x_hat_);
     // generate sigma points
-    // sigma_points = Eigen::MatrixXd::Zero(P_DIM, 2 * P_DIM + 1);
     // cholesky factorize P_
     covSqrt = (P_ + Q_).llt().matrixU();
-    // covSqrt = Eigen::Matrix3d::Zero();
-
 
     // Serial.printf("P_ + Q_: %.2f, %.2f, %.2f\n%.2f, %.2f, %.2f\n%.2f, %.2f, %.2f\n", (P_ + Q_)(0, 0), (P_ + Q_)(0, 1), (P_ + Q_)(0, 2), (P_ + Q_)(1, 0), (P_ + Q_)(1, 1), (P_ + Q_)(1, 2), (P_ + Q_)(2, 0), (P_ + Q_)(2, 1), (P_ + Q_)(2, 2));
 
@@ -100,7 +104,6 @@ void Attitude::predict(double dt, Eigen::Vector3d w_m) {
     
     // predict mean and covariance
     UnitQuaternion est_mean = q_k_;
-    // UnitQuaternion est_mean = UnitQuaternion();
     Eigen::Vector3d euler = est_mean.to_euler();
 
     // Serial.printf("%.2f, %.2f, %.2f\n", euler(0), euler(1), euler(2));
@@ -156,8 +159,6 @@ void Attitude::predict(double dt, Eigen::Vector3d w_m) {
 void Attitude::update_mag(Eigen::Vector3d measurement) {
     UnitQuaternion x_k_quat = UnitQuaternion(x_hat_(0), x_hat_(1), x_hat_(2), x_hat_(3));
 
-    Eigen::MatrixXd z_sigma_points(R_DIM, 2 * R_DIM + 1);
-
     for (int i = 0; i < 2 * R_DIM + 1; i++) {
         UnitQuaternion q_j(sigma_points(0, i), sigma_points(1, i), sigma_points(2, i), sigma_points(3, i));
         z_sigma_points.block<R_DIM, 1>(0, i) = q_j.vector_rotation_by_quaternion(mag_vec_up);
@@ -185,11 +186,11 @@ void Attitude::update_mag(Eigen::Vector3d measurement) {
     Eigen::MatrixXd K = P_xz * (P_zz + R_).inverse();
 
     // calculate weighted average of xhat and z to get new xhat. 
-    Eigen::Vector3d innovation = measurement - z_k_predicted;
+    Eigen::Vector3d innovation_rotvec = K * h_quaternion(measurement, z_k_predicted).to_rotVec();
 
-    Eigen::Vector3d fused_measurement = z_k_predicted + K * innovation;
+    UnitQuaternion innovation = UnitQuaternion::from_rotVec(innovation_rotvec(0), innovation_rotvec(1), innovation_rotvec(2));
 
-    UnitQuaternion new_orientation = h_quaternion(fused_measurement);
+    UnitQuaternion new_orientation = x_k_quat * innovation;
 
     x_prior_ = x_hat_;
 
@@ -226,10 +227,10 @@ Eigen::VectorXd Attitude::f_quaternion(Eigen::VectorXd x, Eigen::Vector3d w_m, d
     return x_k_plus_1;
 }
 
-UnitQuaternion Attitude::h_quaternion(Eigen::Vector3d z) {
+UnitQuaternion Attitude::h_quaternion(Eigen::Vector3d z, Eigen::Vector3d z_pred) {
     // calculate rotation needed to take mag_vec_up to z
-    Eigen::Vector3d axis = mag_vec_up.cross(z);
-    double angle = acos(mag_vec_up.dot(z) / (mag_vec_up.norm() * z.norm()));
+    Eigen::Vector3d axis = z_pred.cross(z);
+    double angle = acos(z_pred.dot(z) / (z_pred.norm() * z.norm()));
 
     return UnitQuaternion::from_rotVec(angle * axis(0), angle * axis(1), angle * axis(2));
 }

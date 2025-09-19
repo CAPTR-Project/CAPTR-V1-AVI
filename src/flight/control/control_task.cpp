@@ -21,13 +21,15 @@ void control_task(void*) {
     TickType_t xLastWakeTime = xTaskGetTickCount();
     BaseType_t xWasDelayed;
 
-    QuaternionPID attitudePID(attitude_dt_, maxRate_, minRate_, attKp_, attKi_, attKd_, attIntegClamp_, attAlpha_, attTau_);
-    RatePID ratePID(rate_dt_, maxServoPos, minServoPos, rateKp_, rateKi_, rateKd_, rateIntegClamp_, attAlpha_, attTau_);
+    QuaternionPID attitudePID(attitude_dt_, maxRate_, minRate_, Eigen::Vector3d::Ones(), attKp_, attKi_, attKd_, attIntegClamp_, attAlpha_, attTau_);
+    RatePID ratePID(rate_dt_, maxServoPos, minServoPos, Eigen::Vector3d::Ones(), rateKp_, rateKi_, rateKd_, rateIntegClamp_, rateAlpha_, rateTau_);
 
     Eigen::Vector3d euler;
     UnitQuaternion currentAttitude{1, 0, 0, 0};
     sensor_msgs::GyroMsg currentGyroData;
     sensor_msgs::AccelMsg currentAccelData;
+
+    bool runAtt = true;
 
     // UnitQuaternion current_attitude;
     while (true) {
@@ -46,7 +48,10 @@ void control_task(void*) {
         }
 
         // call the pids to compute corrections
-        attitudeOutput_ = attitudePID.compute(targetAttitude_, currentAttitude);
+        if (runAtt) attitudeOutput_ = attitudePID.compute(targetAttitude_, currentAttitude);
+
+        runAtt = !runAtt;
+
         rateOutput_ = ratePID.compute(attitudeOutput_, currentGyroData.toVector() - currentGyroData.toBiasVector());  // z, y, x for servos
         tvcMount_.move_mount(-rateOutput_(1), -rateOutput_(0));
             
