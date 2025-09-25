@@ -208,11 +208,12 @@ Eigen::VectorXd Attitude::f_quaternion(Eigen::VectorXd x, Eigen::Vector3d w_m, d
 
     ang_vec = w_m - bias;
 
-    UnitQuaternion dq = UnitQuaternion::from_euler(dt * ang_vec(0), dt * ang_vec(1), dt * ang_vec(2));
+    // UnitQuaternion dq_eul = UnitQuaternion::from_euler(dt * ang_vec(0), dt * ang_vec(1), dt * ang_vec(2));
+    UnitQuaternion dq = (ang_vec.norm() > 1e-9) ? UnitQuaternion::from_axis_angle(ang_vec.normalized(), ang_vec.norm() * dt) : UnitQuaternion(); // rotation vector to delta quaternion if rotation is not insignificant
 
     q_k = q_k * dq;
 
-    q_k.normalize();
+    q_k.normalize(); // not really needed since angle axis is a unit norm (unless ang_vec is not normalized) - this can save computation of sqrts
 
     // Eigen::Vector3d euler = q_k.to_euler();
 
