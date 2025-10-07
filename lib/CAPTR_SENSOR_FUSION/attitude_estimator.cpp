@@ -104,7 +104,7 @@ void Attitude::predict(double dt, Eigen::Vector3d w_m) {
     
     // predict mean and covariance
     UnitQuaternion est_mean = q_k_;
-    Eigen::Vector3d euler = est_mean.to_euler();
+    // Eigen::Vector3d euler = est_mean.to_euler();
 
     // Serial.printf("%.2f, %.2f, %.2f\n", euler(0), euler(1), euler(2));
     // Serial.printf("%.2f, %.2f, %.2f, %.2f\n", est_mean.s, est_mean.v_1, est_mean.v_2, est_mean.v_3);
@@ -206,14 +206,12 @@ void Attitude::update_mag(Eigen::Vector3d measurement) {
 Eigen::VectorXd Attitude::f_quaternion(Eigen::VectorXd x, Eigen::Vector3d w_m, double dt) {
     UnitQuaternion q_k(x(0), x(1), x(2), x(3));
 
-    ang_vec = w_m - bias;
+    ang_vec = w_m - x_hat_.block<3, 1>(4, 0);
 
     // UnitQuaternion dq_eul = UnitQuaternion::from_euler(dt * ang_vec(0), dt * ang_vec(1), dt * ang_vec(2));
     UnitQuaternion dq = (ang_vec.norm() > 1e-9) ? UnitQuaternion::from_axis_angle(ang_vec.normalized(), ang_vec.norm() * dt) : UnitQuaternion(); // rotation vector to delta quaternion if rotation is not insignificant
 
     q_k = q_k * dq;
-
-    q_k.normalize(); // not really needed since angle axis is a unit norm (unless ang_vec is not normalized) - this can save computation of sqrts
 
     // Eigen::Vector3d euler = q_k.to_euler();
 
@@ -222,9 +220,9 @@ Eigen::VectorXd Attitude::f_quaternion(Eigen::VectorXd x, Eigen::Vector3d w_m, d
     Eigen::VectorXd x_k_plus_1 = Eigen::VectorXd::Zero(X_DIM);
 
     x_k_plus_1.block<4, 1>(0, 0) = q_k.to_quaternion_vector();
-
-    x_k_plus_1.block<3, 1>(4, 0) = bias;
     
+    x_k_plus_1.block<3, 1>(4, 0) = x.block<3, 1>(4, 0);
+
     return x_k_plus_1;
 }
 
@@ -237,8 +235,7 @@ UnitQuaternion Attitude::h_quaternion(Eigen::Vector3d z, Eigen::Vector3d z_pred)
 }
 
 void Attitude::set_gyroBiases(float z, float y, float x) {
-    bias = Eigen::Vector3d(z, y, x);
-    x_hat_.block<3, 1>(4, 0) = bias;
+    x_hat_.block<3, 1>(4, 0) = Eigen::Vector3d(x, y, z);
 }
 
 void Attitude::set_magVec(float x, float y, float z) {

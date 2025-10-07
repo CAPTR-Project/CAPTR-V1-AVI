@@ -47,9 +47,11 @@ void control_task(void*) {
             resetFlag_ = false;
         }
 
+        Eigen::Vector3d euler = currentAttitude.to_euler();
+        Serial.println("Current Attitude: yaw" + String(euler(0) * 180 / M_PI) + ", pitch" + String(euler(1) * 180 / M_PI) + ", roll" + String(euler(2) * 180 / M_PI));
+
         // call the pids to compute corrections
         if (runAtt) attitudeOutput_ = attitudePID.compute(targetAttitude_, currentAttitude);
-
         runAtt = !runAtt;
 
         rateOutput_ = ratePID.compute(attitudeOutput_, currentGyroData.toVector() - currentGyroData.toBiasVector());  // z, y, x for servos

@@ -24,6 +24,8 @@ namespace state_manager {
         currentState = MCUState::STBY;
         errorState_ = ErrorState::NONE;
 
+        requestState(MCUState::CALIBRATING);
+
         MCUState newState;
         while (1)
         {
@@ -50,26 +52,26 @@ namespace state_manager {
                             Serial.println("Calibration started");
                         }
                         break;
-
                     case MCUState::LAUNCH_DETECT:
-                        if (currentState == MCUState::STBY) {
+                        if (currentState == MCUState::STBY || currentState == MCUState::CALIBRATING) {
                             if (!calibration_worker::calibration_done) {
                                 // if calibration not done, don't allow launch detection
                                 Serial.println("Calibration not done, cannot start launch detection");
                                 break;
                             }
+                            Serial.println("Starting launch detection");
                             att_est_tasks::att_estimator_.init(
                                 calibration_worker::startingOrientation,
-                                Eigen::Vector3d(calibration_worker::gyroBiasX, calibration_worker::gyroBiasY, calibration_worker::gyroBiasZ),
+                                Eigen::Vector3d(calibration_worker::gyroBiasZ, calibration_worker::gyroBiasY, calibration_worker::gyroBiasX),
                                 Eigen::Vector3d(calibration_worker::magStartX, calibration_worker::magStartY, calibration_worker::magStartZ),
                                 Eigen::Matrix<double, Q_DIM, Q_DIM>::Identity() * 0.01,
                                 Eigen::Matrix<double, Z_DIM, Z_DIM>::Identity() * 0.01
                             );
                             // start attitude estimation tasks
                             xTaskCreate(att_est_tasks::att_est_predict_thread, "Attitude Estimation", 2048, NULL, 5, &att_est_tasks::predictTaskHandle_);
-                            xTaskCreate(att_est_tasks::att_est_update_thread, "Attitude Estimation", 2048, NULL, 5, &att_est_tasks::updateTaskHandle_);
+                            // xTaskCreate(att_est_tasks::att_est_update_thread, "Attitude Estimation", 2048, NULL, 5, &att_est_tasks::updateTaskHandle_);
                             // start launch detection task
-                            xTaskCreate(launch_detect::launch_detect_task, "Launch Detect", 2048, NULL, 5, &launch_detect::taskHandle);
+                            // xTaskCreate(launch_detect::launch_detect_task, "Launch Detect", 2048, NULL, 5, &launch_detect::taskHandle);
                             // start controller
                             xTaskCreate(control::control_task, "Control", 2048, NULL, 5, &control::taskHandle);
                             currentState = MCUState::LAUNCH_DETECT;
@@ -126,6 +128,7 @@ namespace state_manager {
     }
 
     void requestState(MCUState state) {
+        Serial.println("State change requested: " + String(static_cast<int>(state)));
         xQueueSend(stateQueue, &state, portMAX_DELAY);
     }
 

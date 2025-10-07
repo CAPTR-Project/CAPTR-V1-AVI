@@ -49,6 +49,8 @@ namespace sensors::IMU_main {
 
         vPortExitCritical();
 
+        i2c0_mutex_ = xSemaphoreCreateMutex();
+
         xTaskCreate(imuDaqThread, "Gyro DAQ", 4000, nullptr, 8, &gyro_taskHandle);
         Serial.println("Gyro DAQ thread created");
     }
@@ -73,13 +75,18 @@ namespace sensors::IMU_main {
                 // if (!imu_.readGyroscope(gyroData_.x, gyroData_.y, gyroData_.z)) {
                 //     error_state_ = ErrorState::GYRO;
                 // }
-                gyroData_.x = imu_.gyroX; gyroData_.y = imu_.gyroY; gyroData_.z = imu_.gyroZ;
+                if (xSemaphoreTake(gyroData_.ready, 0) == pdTRUE) {
+                    gyroData_.x = imu_.gyroX; gyroData_.y = imu_.gyroY; gyroData_.z = imu_.gyroZ;
+                    accelData_.x = imu_.accX; accelData_.y = imu_.accY; accelData_.z = imu_.accZ;
+                    xSemaphoreGive(gyroData_.ready);
+                }
 
-                accelData_.x = imu_.accX; accelData_.y = imu_.accY; accelData_.z = imu_.accZ;
-
-                xSemaphoreGive(gyroData_.ready);
                 xSemaphoreGive(i2c0_mutex_);
 
+                if ( att_est_tasks::predictTaskHandle_ != NULL ) {
+                    att_est_tasks::current_time_us_ = pdTICKS_TO_US(xTaskGetTickCount());
+                    xTaskNotifyGive(att_est_tasks::predictTaskHandle_);
+                }
                 if ( att_est_tasks::predictTaskHandle_ != NULL ) {
                     att_est_tasks::current_time_us_ = pdTICKS_TO_US(xTaskGetTickCount());
                     xTaskNotifyGive(att_est_tasks::predictTaskHandle_);

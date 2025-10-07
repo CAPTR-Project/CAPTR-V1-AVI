@@ -35,7 +35,7 @@ namespace launch_detect {
                 }
                 else {
                     // Notify the state manager that the launch has been detected
-                    state_manager::requestState(MCUState::LAUNCH_DETECT);
+                    state_manager::requestState(MCUState::POWERED_ASCENT);
                     // Quit the task
                     break;
                 }
