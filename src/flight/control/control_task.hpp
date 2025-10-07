@@ -48,18 +48,18 @@ inline double minServoPos = -9 * M_PI / 180;
 inline double maxRate_ = 3.0;
 inline double minRate_ = -3.0;
 
-// gains in x, y, z (see if we can get away with using same gains for every axis)
-inline Eigen::Vector3d attKp_{6, 3, 0};  
-inline Eigen::Vector3d attKi_{0, 0, 0};
+// gains in x, y, z
+inline Eigen::Vector3d attKp_{6, 6, 0};  
+inline Eigen::Vector3d attKi_{3, 3, 0};
 inline Eigen::Vector3d attKd_{0, 0, 0};
-inline Eigen::Vector3d attIntegClamp_{0, 0, 0};
+inline Eigen::Vector3d attIntegClamp_{0.05, 0.05, 0};
 inline float attAlpha_ = 1;
 inline float attTau_ = 0;
 
 inline Eigen::Vector3d rateKp_{0.038, 0.038, 0};
 inline Eigen::Vector3d rateKi_{0.03, 0.03, 0};
 inline Eigen::Vector3d rateKd_{0.0012, 0.0012, 0};
-inline Eigen::Vector3d rateIntegClamp_{maxServoPos / 4, maxServoPos / 4, 0};
+inline Eigen::Vector3d rateIntegClamp_{maxServoPos / 3, maxServoPos / 3, 0};
 inline float rateAlpha_ = 0.2;
 inline float rateTau_ = 0.01;
 
