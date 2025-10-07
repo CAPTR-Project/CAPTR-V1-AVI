@@ -59,6 +59,7 @@ public:
 	UnitQuaternion(float s, float v_1, float v_2, float v_3);
 	static UnitQuaternion from_rotVec(float wx, float wy, float wz);
 	static UnitQuaternion from_euler(float yaw, float pitch, float roll);
+    static UnitQuaternion from_axis_angle(Eigen::Vector3d axis, float angle);
 
 	static UnitQuaternion average_quaternions(std::vector<UnitQuaternion> quaternions, std::vector<double> weights);
 
@@ -79,6 +80,7 @@ public:
 	 */
 	Eigen::Vector3d to_euler();
 	Eigen::Vector3d to_rotVec();
+	Eigen::Vector4d to_axis_angle();
 
 	/*** Vector rotated by quaternion ***/
 	// Note: v is pure quaternion i.e v = 0<v> 

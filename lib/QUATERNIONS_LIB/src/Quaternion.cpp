@@ -153,6 +153,27 @@ UnitQuaternion UnitQuaternion::from_euler(float yaw, float pitch, float roll)
 	return uq;
 }
 
+UnitQuaternion UnitQuaternion::from_axis_angle(Eigen::Vector3d axis, float angle) {
+    /***
+    Unit Quaternion Constructor from axis-angle representation
+
+    Constructs a UnitQuaternion from axis-angle representation.
+    EQN reference: https://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm
+
+    Inputs:
+    axis: rotation axis (should be a unit vector - not enforced but recommended for the result to remain a unit quaternion)
+    angle: rotation angle (rads)
+    ***/
+    UnitQuaternion uq;
+
+    uq.s = cos(angle / 2.0);
+    uq.v_1 = sin(angle / 2.0) * axis(0);
+    uq.v_2 = sin(angle / 2.0) * axis(1);
+    uq.v_3 = sin(angle / 2.0) * axis(2);
+
+    return uq;
+}
+
 /*** Destructors ***/
 // Quaternion::~Quaternion()
 // {
@@ -427,6 +448,17 @@ Eigen::Vector3d UnitQuaternion::to_rotVec() {
 	if (theta == 0) rotVec = Eigen::Vector3d::Zero();
 	else rotVec = theta * rotVec / rotVec.norm();
 	return rotVec;
+}
+
+Eigen::Vector4d UnitQuaternion::to_axis_angle() {
+	Eigen::Vector3d rotVec;
+	rotVec << v_1, v_2, v_3;
+	Eigen::Vector4d axis_angle;
+	axis_angle.head<3>() = rotVec;
+	axis_angle(3) = 2 * atan2(rotVec.norm(), s);
+	if (axis_angle(3) == 0) axis_angle.head<3>() = Eigen::Vector3d::Zero();
+	else axis_angle.head<3>() = axis_angle.head<3>() / axis_angle.head<3>().norm();
+	return axis_angle;
 }
 
 Eigen::Vector3d UnitQuaternion::to_euler() {

@@ -13,32 +13,26 @@ Desc: Source file for MCU
 */
 
 #include "main.hpp"
-// #include "Arduino.h"
 
-uint64_t loop_start;
+void setup() {
 
-FLASHMEM __attribute__((noinline)) void setup()
-{
-    serial_port_mutex__ = xSemaphoreCreateMutex();
+    delay(2000); // wait for serial monitor to open
 
-    // Initialize the serial port
-    Serial.begin(0);
-
-    HwSetupPins();
-
-    xSemaphoreTake(serial_port_mutex__, portMAX_DELAY);
     Serial.println(PSTR("\r\nBooted FreeRTOS kernel " tskKERNEL_VERSION_NUMBER ". Built by gcc " __VERSION__ " (newlib " _NEWLIB_VERSION ") on " __DATE__ ". ***\r\n"));
-    xSemaphoreGive(serial_port_mutex__);
-
-    daq_threads::daq_start();
-
-    xTaskCreate(state_mgmt_thread::state_mgmt_thread, 
-                "FSM", 1000, nullptr, 0, &state_mgmt_thread::taskHandle);
-
+    
+    // radio_cdh::radioInit();
+    // local_logging::localLoggingInit();
+    
+    // Initialize the sensors
+    sensors::baro::baroInit();
+    sensors::IMU_main::IMUInit();
+    sensors::mag::magInit();
+    // sensors::gps::gpsInit();
+    
+    xTaskCreate(state_manager::stateManagerTask, "State Manager", 2048, NULL, 9, &state_manager::taskHandle);
+    
     vTaskStartScheduler();
-
 }
 
 void loop() {
-    
 }

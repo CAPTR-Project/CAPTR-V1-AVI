@@ -39,7 +39,7 @@ namespace UKF {
 
         Eigen::Matrix3d R_;
 
-        Eigen::MatrixXd sigma_points;
+        Eigen::Matrix<double, P_DIM, 2 * P_DIM + 1> sigma_points;
 
         Eigen::Vector3d ang_vec; // [rad/s] angular velocity in [z, y, x] form. yaw, pitch, roll.
 
@@ -67,6 +67,7 @@ namespace UKF {
          */
         void predict(double dt, Eigen::Vector3d w_m);
 
+
         /**
          * @brief 
          * 
@@ -91,7 +92,7 @@ namespace UKF {
          * @param z [uT] The magnetic field vector in the body frame. IMPORTANT: Must be corrected for hard and soft iron biases.
          * @return UnitQuaternion
          */
-	    UnitQuaternion h_quaternion(Eigen::Vector3d z);
+	    UnitQuaternion h_quaternion(Eigen::Vector3d z, Eigen::Vector3d z_pred);
         
         
         void set_gyroBiases(float z, float y, float x);
@@ -100,7 +101,8 @@ namespace UKF {
     private:
         Eigen::Matrix3d covSqrt;
         UnitQuaternion q_k_;
-        Eigen::MatrixXd quat_sigma_points;
+        Eigen::Matrix<double, X_DIM, 2 * P_DIM + 1> quat_sigma_points;
+        Eigen::Matrix<double, R_DIM, 2 * R_DIM + 1> z_sigma_points; // Pre-allocated for update_mag
         Eigen::Vector3d bias;
 
     } ;

@@ -882,6 +882,10 @@ int Adafruit_LSM6DS::gyroscopeAvailable(void) {
   return (this->status() & 0x02) ? 1 : 0;
 }
 
+void Adafruit_LSM6DS::read(void) {
+  this->_read();
+}
+
 /**************************************************************************/
 /*!
     @brief Read gyroscope data
