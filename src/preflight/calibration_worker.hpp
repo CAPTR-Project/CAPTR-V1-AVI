@@ -39,9 +39,9 @@ namespace calibration_worker {
 
     inline bool stop_flag = false;
 
-    inline float gyroBiasX, gyroBiasY, gyroBiasZ;
+    inline double gyroBiasX, gyroBiasY, gyroBiasZ;
 
-    inline float magStartX, magStartY, magStartZ;
+    inline double magStartX, magStartY, magStartZ;
 
     inline UnitQuaternion startingOrientation;
 

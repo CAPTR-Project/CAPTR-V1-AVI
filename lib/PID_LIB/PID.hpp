@@ -58,6 +58,8 @@ public:
         setKi(Ki);
         setKd(Kd);
         setIntegClamp(integ_clamp);
+
+        reset();
     }
 
     float run(float setpoint, float measurement) {
@@ -87,15 +89,15 @@ public:
         integral_ = 0.0;
         prev_meas_ = 0.0;
     }
-    float integral_;
-
-private:
+    
+    private:
     double Ts_ = 0.1;
     float max_, min_ = 0.0f;
     float k_, kp_, ki_Ts_, kd_Ts_, integ_clamp_ = 0.0f;
     float error_, derivative_, alpha_d_, alpha_lpf = 0.0f;
     float prev_meas_, old_error_filtered_, old_output_filtered_ = 0.0;
     float output_;
+    float integral_;
 
     void setK(float K) { this->k_ = K; }
     void setKp(float Kp) { this->kp_ = Kp; }  // for compatibility with other PID libraries

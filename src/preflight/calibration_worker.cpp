@@ -67,6 +67,7 @@ namespace calibration_worker {
             magZ += localMagData.z;
 
             cnt++;
+            vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(5));
             xLastWakeTime = xTaskGetTickCount();
         }
         gyroBiasX = gyroX / cnt;
@@ -83,16 +84,16 @@ namespace calibration_worker {
 
         // Calculate starting orientation
         Eigen::Vector3d normalized = Eigen::Vector3d(accelX, accelY, accelZ).normalized();
-        Eigen::Vector3d up = Eigen::Vector3d(1, 0, 0);
+        Eigen::Vector3d up = Eigen::Vector3d(0, 0, 1);
         Eigen::Vector3d axis = up.cross(normalized);
-        double angle = acos(up.dot(normalized) / (up.norm() * normalized.norm()));
+        double angle = acos(up.dot(normalized));
         startingOrientation = UnitQuaternion::from_rotVec(angle * axis(0), angle * axis(1), angle * axis(2)).conjugate();
 
         calibration_done = true;
 
-        Serial.println("Gyro calibration done");
+        Serial.println("Calibration done");
 
-        state_manager::requestState(MCUState::STBY);
+        state_manager::requestState(MCUState::LAUNCH_DETECT);
 
         vTaskDelete(NULL);
         return;
