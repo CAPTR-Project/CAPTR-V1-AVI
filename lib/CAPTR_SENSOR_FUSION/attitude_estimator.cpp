@@ -207,6 +207,7 @@ Eigen::VectorXd Attitude::f_quaternion(Eigen::VectorXd x, Eigen::Vector3d w_m, d
     UnitQuaternion q_k(x(0), x(1), x(2), x(3));
 
     ang_vec = w_m - x_hat_.block<3, 1>(4, 0);
+    ang_vec = Eigen::Vector3d(ang_vec(2), ang_vec(1), ang_vec(0));
 
     // UnitQuaternion dq_eul = UnitQuaternion::from_euler(dt * ang_vec(0), dt * ang_vec(1), dt * ang_vec(2));
     UnitQuaternion dq = (ang_vec.norm() > 1e-9) ? UnitQuaternion::from_axis_angle(ang_vec.normalized(), ang_vec.norm() * dt) : UnitQuaternion(); // rotation vector to delta quaternion if rotation is not insignificant
