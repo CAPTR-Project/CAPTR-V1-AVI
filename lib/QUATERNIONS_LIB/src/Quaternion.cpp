@@ -340,8 +340,8 @@ Eigen::Vector3d UnitQuaternion::vector_rotation_by_quaternion(Eigen::Vector3d v)
 	rotated_vec: vector after being rotated by quaternion. Returns the vector itself instead 
 				 of a pure quaternion.
 	***/
-	UnitQuaternion v_unit_quat = UnitQuaternion(0, v(0), v(1), v(2));
-	UnitQuaternion quat_result =  (*this) * v_unit_quat * conjugate();
+	Quaternion v_unit_quat = Quaternion(0, v(0), v(1), v(2));
+	Quaternion quat_result =  ((Quaternion)(*this)) * v_unit_quat * conjugate();
 
 	Eigen::Vector3d  rotated_vec(quat_result.v_1, quat_result.v_2, quat_result.v_3);
 	return rotated_vec;		
@@ -442,12 +442,15 @@ UnitQuaternion UnitQuaternion::average_quaternions(std::vector<UnitQuaternion> q
 }
 
 Eigen::Vector3d UnitQuaternion::to_rotVec() {
-	Eigen::Vector3d rotVec;
-	rotVec << v_1, v_2, v_3;
-	double theta = 2 * atan2(rotVec.norm(), s);
-	if (theta == 0) rotVec = Eigen::Vector3d::Zero();
-	else rotVec = theta * rotVec / rotVec.norm();
-	return rotVec;
+	const double eps = 1e-12;
+    Eigen::Vector3d v(v_1, v_2, v_3);
+    double vNorm = v.norm();
+	double theta = 2 * atan2(vNorm, s);
+	if (vNorm < eps || abs(theta) < eps) {
+        return Eigen::Vector3d::Zero();
+    }
+	v = v / sin(theta);
+	return theta * v;
 }
 
 Eigen::Vector4d UnitQuaternion::to_axis_angle() {

@@ -17,7 +17,8 @@ Desc: Header file for IMU data acquisition
 
 #include "Arduino.h"
 #include "arduino_freertos.h"
-#include "Adafruit_LSM6DSOX.h"
+// #include "Adafruit_LSM6DSOX.h"
+#include "Adafruit_LSM6DS3TRC.h"
 #include "captr_sensor_msgs.hpp"
 
 #include "config.hpp"
@@ -30,8 +31,8 @@ namespace sensors::IMU_main {
     // =============================== Variables ======================================
     inline SemaphoreHandle_t i2c0_mutex_;
 
-    inline Adafruit_LSM6DSOX imu_;
-    // inline Adafruit_LSM6DS33 imu_;
+    // inline Adafruit_LSM6DSOX imu_;
+    inline Adafruit_LSM6DS3TRC imu_;
 
     inline sensor_msgs::GyroMsg gyroData_;
     inline sensor_msgs::AccelMsg accelData_;

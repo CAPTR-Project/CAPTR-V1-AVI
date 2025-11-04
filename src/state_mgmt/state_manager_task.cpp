@@ -17,8 +17,17 @@ namespace state_manager {
 
     void stateManagerTask(void*) {
         stateQueue = xQueueCreate(10, sizeof(MCUState));
-        vTaskDelay(pdMS_TO_TICKS(200)); // wait for kernel to start
         Serial.println("State manager thread started");
+
+        // radio_cdh::radioInit();
+        // local_logging::localLoggingInit();
+        
+        // Initialize the sensors
+        sensors::baro::baroInit();
+        sensors::IMU_main::i2c0_mutex_ = xSemaphoreCreateMutex();
+        sensors::IMU_main::IMUInit();
+        sensors::mag::magInit();
+        // sensors::gps::gpsInit();
 
         // Initialize the state manager
         currentState = MCUState::STBY;
@@ -40,7 +49,6 @@ namespace state_manager {
                         if (currentState == MCUState::CALIBRATING) {
                             // stop calibration routine, if not stopped
                             calibration_worker::stop_calibration();
-
                             currentState = MCUState::STBY;
                         }
                         break;
@@ -63,13 +71,13 @@ namespace state_manager {
                             att_est_tasks::att_estimator_.init(
                                 calibration_worker::startingOrientation,
                                 Eigen::Vector3d(calibration_worker::gyroBiasZ, calibration_worker::gyroBiasY, calibration_worker::gyroBiasX),
-                                Eigen::Vector3d(calibration_worker::magStartX, calibration_worker::magStartY, calibration_worker::magStartZ),
+                                calibration_worker::mag_vec_,
                                 Eigen::Matrix<double, Q_DIM, Q_DIM>::Identity() * 0.01,
                                 Eigen::Matrix<double, Z_DIM, Z_DIM>::Identity() * 0.01
                             );
                             // start attitude estimation tasks
                             xTaskCreate(att_est_tasks::att_est_predict_thread, "Attitude Estimation", 2048, NULL, 5, &att_est_tasks::predictTaskHandle_);
-                            // xTaskCreate(att_est_tasks::att_est_update_thread, "Attitude Estimation", 2048, NULL, 5, &att_est_tasks::updateTaskHandle_);
+                            xTaskCreate(att_est_tasks::att_est_update_thread, "Attitude Estimation", 2048, NULL, 5, &att_est_tasks::updateTaskHandle_);
                             // start launch detection task
                             // xTaskCreate(launch_detect::launch_detect_task, "Launch Detect", 2048, NULL, 5, &launch_detect::taskHandle);
                             // start controller

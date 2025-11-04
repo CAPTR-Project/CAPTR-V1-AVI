@@ -11,7 +11,6 @@ namespace sensor_msgs {
         GyroMsg();
 
         Eigen::Vector3d toVector();
-        Eigen::Vector3d toBiasVector();
 
         SemaphoreHandle_t ready;
 
@@ -19,9 +18,6 @@ namespace sensor_msgs {
         float y = 0; // [rad/s]
         float z = 0; // [rad/s]
 
-        float x_bias = 0; // [rad/s]
-        float y_bias = 0; // [rad/s]
-        float z_bias = 0; // [rad/s]
     };
 
     class AccelMsg {

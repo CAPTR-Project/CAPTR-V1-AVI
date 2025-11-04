@@ -87,12 +87,12 @@ namespace UKF {
         Eigen::VectorXd f_quaternion(Eigen::VectorXd x, Eigen::Vector3d w_m, double dt);
 
         /**
-         * @brief Measurement model. 
+         * @brief innovation function for magnetic field measurement update.
          * 
          * @param z [uT] The magnetic field vector in the body frame. IMPORTANT: Must be corrected for hard and soft iron biases.
          * @return UnitQuaternion
          */
-	    UnitQuaternion h_quaternion(Eigen::Vector3d z, Eigen::Vector3d z_pred);
+	    Eigen::Vector3d innovation(Eigen::Vector3d z, Eigen::Vector3d z_pred);
         
         
         void set_gyroBiases(float z, float y, float x);

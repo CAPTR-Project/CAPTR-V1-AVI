@@ -21,6 +21,9 @@ namespace tvc_mount_lib {
         double pitch_limit = 0;
         double yaw_limit = 0;
 
+        double pitch_cmd_rad_ = 0;
+        double yaw_cmd_rad_ = 0;
+
         bool busy = false;
 
 

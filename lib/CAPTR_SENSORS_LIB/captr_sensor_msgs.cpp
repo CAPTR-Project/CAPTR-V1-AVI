@@ -8,7 +8,7 @@ namespace sensor_msgs {
     Eigen::Vector3d GyroMsg::toVector() {
         return Eigen::Vector3d(z, y, x);
     }
-    Eigen::Vector3d GyroMsg::toBiasVector() {
+    Eigen::Vector3d GyroMsg::getBiasVector() {
         return Eigen::Vector3d(z_bias, y_bias, x_bias);
     }
 

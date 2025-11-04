@@ -536,6 +536,12 @@ void Adafruit_LSM6DS::configIntOutputs(bool active_low, bool open_drain) {
       Adafruit_BusIO_RegisterBits(&ctrl3, 2, 4);
 
   ppod_bits.write((active_low << 1) | open_drain);
+
+  Adafruit_BusIO_Register drdy_pulse_cfg_g = Adafruit_BusIO_Register(
+      i2c_dev, spi_dev, ADDRBIT8_HIGH_TOREAD, 0x0b);
+  Adafruit_BusIO_RegisterBits drdy_pulse_bits = Adafruit_BusIO_RegisterBits(
+      &drdy_pulse_cfg_g, 1, 7);
+  drdy_pulse_bits.write(true);
 }
 
 /**************************************************************************/

@@ -41,7 +41,7 @@ namespace calibration_worker {
 
     inline double gyroBiasX, gyroBiasY, gyroBiasZ;
 
-    inline double magStartX, magStartY, magStartZ;
+    inline Eigen::Vector3d mag_vec_;
 
     inline UnitQuaternion startingOrientation;
 

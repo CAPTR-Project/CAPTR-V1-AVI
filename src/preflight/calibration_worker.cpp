@@ -30,7 +30,6 @@ namespace calibration_worker {
         sensor_msgs::AccelMsg localAccelData;
         sensor_msgs::MagMsg localMagData;
 
-
         float gyroX = 0;
         float gyroY = 0;
         float gyroZ = 0;
@@ -78,17 +77,45 @@ namespace calibration_worker {
         accelY = accelY / cnt;
         accelZ = accelZ / cnt;
 
-        magStartX = magX / cnt;
-        magStartY = magY / cnt;
-        magStartZ = magZ / cnt;
+        magX = magX / cnt;
+        magY = magY / cnt;
+        magZ = magZ / cnt;
 
-        // Calculate starting orientation
-        Eigen::Vector3d normalized = Eigen::Vector3d(accelX, accelY, accelZ).normalized();
-        Eigen::Vector3d up = Eigen::Vector3d(0, 0, 1);
-        Eigen::Vector3d axis = up.cross(normalized);
-        double angle = acos(up.dot(normalized));
-        startingOrientation = UnitQuaternion::from_rotVec(angle * axis(0), angle * axis(1), angle * axis(2)).conjugate();
+        // Calculate starting orientation (roll/pitch only) from gravity
+        Eigen::Vector3d g_b = Eigen::Vector3d(accelX, accelY, accelZ).normalized();
 
+        // Choose inertial gravity direction
+        Eigen::Vector3d g_i(1, 0, 0);
+
+        // Robust quaternion: rotate body -> inertial so that g_b maps to g_i
+        Eigen::Vector3d v = g_b.cross(g_i);
+        double c = std::clamp(g_b.dot(g_i), -1.0, 1.0);
+        double s2 = (1.0 + c) * 2.0;
+
+        Eigen::Quaterniond q_BI;
+        if (s2 < 1e-8) {
+            // g_b and g_i are opposite; choose any orthogonal axis
+            Eigen::Vector3d axis = g_b.unitOrthogonal();
+            q_BI = Eigen::AngleAxisd(M_PI, axis);
+        } else {
+            double s = std::sqrt(s2);
+            q_BI.w() = 0.5 * s;
+            q_BI.x() = v.x() / s;
+            q_BI.y() = v.y() / s;
+            q_BI.z() = v.z() / s;
+        }
+        q_BI.normalize();
+
+        // Save for later if you need it in your UnitQuaternion type
+        startingOrientation = UnitQuaternion(q_BI.w(), q_BI.x(), q_BI.y(), q_BI.z());
+
+        // Tilt-compensate magnetometer: inertial mag vector is obtained by rotating the body mag vector
+        Eigen::Vector3d mag_b(magX, magY, magZ);
+        mag_vec_ = startingOrientation.vector_rotation_by_quaternion(mag_b);
+
+        // Serial.printf("Mag vector in inertial frame: %.2f, %.2f, %.2f\n",
+        //       mag_vec_(0), mag_vec_(1), mag_vec_(2));
+       
         calibration_done = true;
 
         Serial.println("Calibration done");

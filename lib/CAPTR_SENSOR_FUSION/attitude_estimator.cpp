@@ -77,7 +77,7 @@ void Attitude::predict(double dt, Eigen::Vector3d w_m) {
 
     // Serial.printf("%.2f, %.2f, %.2f\n%.2f, %.2f, %.2f\n%.2f, %.2f, %.2f\n", covSqrt(0, 0), covSqrt(0, 1), covSqrt(0, 2), covSqrt(1, 0), covSqrt(1, 1), covSqrt(1, 2), covSqrt(2, 0), covSqrt(2, 1), covSqrt(2, 2));
 
-    // q_k.s = x_hat_(0); q_k.v_1 = x_hat_(1); q_k.v_2 = x_hat_(2); q_k.v_3 = x_hat_(3);
+    q_k_.s = x_hat_(0); q_k_.v_1 = x_hat_(1); q_k_.v_2 = x_hat_(2); q_k_.v_3 = x_hat_(3);
 
     sigma_points.block<P_DIM, 1>(0, 0) = Eigen::Vector3d(0, 0, 0);
     for (int i = 1; i <= P_DIM; i++) {
@@ -128,8 +128,6 @@ void Attitude::predict(double dt, Eigen::Vector3d w_m) {
 
     q_k_ = est_mean;
 
-    x_prior_ = x_hat_;
-
     x_hat_.block<4, 1>(0, 0) = q_k_.to_quaternion_vector();
 
     Eigen::Matrix3d cov = Eigen::Matrix3d::Zero();
@@ -146,7 +144,6 @@ void Attitude::predict(double dt, Eigen::Vector3d w_m) {
     cov /= (2 * P_DIM + 1);
 
     P_ = cov;
-
     ang_vec = w_m - bias;
 
     if (xSemaphoreTake(ready, pdMS_TO_TICKS(3)) == pdTRUE) {
@@ -156,50 +153,77 @@ void Attitude::predict(double dt, Eigen::Vector3d w_m) {
     
 }
 
-void Attitude::update_mag(Eigen::Vector3d measurement) {
-    UnitQuaternion x_k_quat = UnitQuaternion(x_hat_(0), x_hat_(1), x_hat_(2), x_hat_(3));
-
+void Attitude::update_mag(Eigen::Vector3d z_k) {
+    Eigen::Vector3d z_k_prior(0, 0, 0);
     for (int i = 0; i < 2 * R_DIM + 1; i++) {
-        UnitQuaternion q_j(sigma_points(0, i), sigma_points(1, i), sigma_points(2, i), sigma_points(3, i));
-        z_sigma_points.block<R_DIM, 1>(0, i) = q_j.vector_rotation_by_quaternion(mag_vec_up);
+        UnitQuaternion q_j(quat_sigma_points(0, i), quat_sigma_points(1, i), quat_sigma_points(2, i), quat_sigma_points(3, i));
+        z_sigma_points.block<R_DIM, 1>(0, i) = q_j.conjugate().vector_rotation_by_quaternion(mag_vec_up);
+        z_k_prior += z_sigma_points.block<R_DIM, 1>(0, i);
     }
+    z_k_prior /= (2 * R_DIM + 1);
 
-    // calculate uncertainty in measurement caused by uncertainty in state, P_zz
-    Eigen::Vector3d z_k_predicted = x_k_quat.vector_rotation_by_quaternion(mag_vec_up);
+    // Serial.println("Predicted mag z_k: ");
+    // Serial.printf("%.6f, %.6f, %.6f\n", z_k_prior(0), z_k_prior(1), z_k_prior(2));
 
+    // calculate uncertainty in z_k caused by uncertainty in state, P_zz
     Eigen::Matrix3d P_zz = Eigen::Matrix3d::Zero();
     for (int i = 0; i < 2 * R_DIM + 1; i++) {
-        P_zz += (z_sigma_points.block<R_DIM, 1>(0, i) - z_k_predicted) * (z_sigma_points.block<R_DIM, 1>(0, i) - z_k_predicted).transpose();
+        P_zz += (z_sigma_points.block<R_DIM, 1>(0, i) - z_k_prior) * (z_sigma_points.block<R_DIM, 1>(0, i) - z_k_prior).transpose();
     }
-    P_zz /= (2 * R_DIM + 1);
+    P_zz /= (2 * R_DIM);
 
+    // Serial.printf("Predicted mag P_zz: \n%.6f, %.6f, %.6f\n%.6f, %.6f, %.6f\n%.6f, %.6f, %.6f\n", P_zz(0, 0), P_zz(0, 1), P_zz(0, 2),
+    //                                     P_zz(1, 0), P_zz(1, 1), P_zz(1, 2),
+    //                                     P_zz(2, 0), P_zz(2, 1), P_zz(2, 2));
+    
     // calculate cross covariance matrix
     Eigen::MatrixXd P_xz = Eigen::MatrixXd::Zero(P_DIM, R_DIM);
-
+    
     for (int i = 0; i < 2 * P_DIM + 1; i++) {
-        P_xz += sigma_points.block<P_DIM, 1>(0, i) * (z_sigma_points.block<R_DIM, 1>(0, i) - z_k_predicted).transpose();
+        P_xz += sigma_points.block<P_DIM, 1>(0, i) * (z_sigma_points.block<R_DIM, 1>(0, i) - z_k_prior).transpose();
     }
     P_xz /= (2 * P_DIM + 1);
 
-    // calculate kalman gain
+    // Serial.printf("Predicted mag P_xz: \n%.6f, %.6f, %.6f\n%.6f, %.6f, %.6f\n%.6f, %.6f, %.6f\n", P_xz(0, 0), P_xz(0, 1), P_xz(0, 2),
+    //                                     P_xz(1, 0), P_xz(1, 1), P_xz(1, 2),
+    //                                     P_xz(2, 0), P_xz(2, 1), P_xz(2, 2));
+    
 
-    Eigen::MatrixXd K = P_xz * (P_zz + R_).inverse();
+    Eigen::MatrixXd Pvv_inv = (P_zz + R_).inverse();
+
+    // Serial.printf("Predicted mag Pvv_inv: \n%.6f, %.6f, %.6f\n%.6f, %.6f, %.6f\n%.6f, %.6f, %.6f\n", Pvv_inv(0, 0), Pvv_inv(0, 1), Pvv_inv(0, 2),
+    //                                     Pvv_inv(1, 0), Pvv_inv(1, 1), Pvv_inv(1, 2),
+    //                                     Pvv_inv(2, 0), Pvv_inv(2, 1), Pvv_inv(2, 2));
+
+    Eigen::MatrixXd K = P_xz * Pvv_inv;
+
+    // Serial.println("Kalman gain K: ");
+    // Serial.printf("%.6f, %.6f, %.6f\n%.6f, %.6f, %.6f\n%.6f,%.6f,%.6f\n", K(0, 0), K(0, 1), K(0, 2),
+    //                                     K(1, 0), K(1, 1), K(1, 2),
+    //                                     K(2, 0), K(2, 1), K(2, 2));
 
     // calculate weighted average of xhat and z to get new xhat. 
-    Eigen::Vector3d innovation_rotvec = K * h_quaternion(measurement, z_k_predicted).to_rotVec();
+    Eigen::Vector3d v_k = K*(z_k - z_k_prior);
 
-    UnitQuaternion innovation = UnitQuaternion::from_rotVec(innovation_rotvec(0), innovation_rotvec(1), innovation_rotvec(2));
+    UnitQuaternion dq_innovation = UnitQuaternion::from_rotVec(v_k(0), v_k(1), v_k(2));
 
-    UnitQuaternion new_orientation = x_k_quat * innovation;
+    Eigen::Vector4d axis_angle = dq_innovation.to_axis_angle();
+    // Serial.println("Mag innovation: ");
+    // Serial.printf("Axis: %.6f, %.6f, %.6f; Angle: %.6f\n", axis_angle(0), axis_angle(1), axis_angle(2), axis_angle(3));
+    // Serial.printf("%.6f, %.6f, %.6f\n", v_k(0), v_k(1), v_k(2));
 
-    x_prior_ = x_hat_;
+    q_k_ = q_k_ * dq_innovation;
+    q_k_.normalize();
 
-    x_hat_.block<4, 1>(0, 0) = new_orientation.to_quaternion_vector();
+    x_hat_.block<4, 1>(0, 0) = q_k_.to_quaternion_vector();
+
+    P_ = P_ - K * (P_zz + R_) * K.transpose();
 
     if (xSemaphoreTake(ready, pdMS_TO_TICKS(3)) == pdTRUE) {
-        newest_attitude_quat = new_orientation;
+        newest_attitude_quat = q_k_;
         xSemaphoreGive(ready);
     }
+
     
 }
 
@@ -225,14 +249,6 @@ Eigen::VectorXd Attitude::f_quaternion(Eigen::VectorXd x, Eigen::Vector3d w_m, d
     x_k_plus_1.block<3, 1>(4, 0) = x.block<3, 1>(4, 0);
 
     return x_k_plus_1;
-}
-
-UnitQuaternion Attitude::h_quaternion(Eigen::Vector3d z, Eigen::Vector3d z_pred) {
-    // calculate rotation needed to take mag_vec_up to z
-    Eigen::Vector3d axis = z_pred.cross(z);
-    double angle = acos(z_pred.dot(z) / (z_pred.norm() * z.norm()));
-
-    return UnitQuaternion::from_rotVec(angle * axis(0), angle * axis(1), angle * axis(2));
 }
 
 void Attitude::set_gyroBiases(float z, float y, float x) {

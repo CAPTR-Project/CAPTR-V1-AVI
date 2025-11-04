@@ -27,6 +27,9 @@ namespace tvc_mount_lib {
         if (yaw_rad > this->yaw_limit) yaw_rad = this->yaw_limit;
         if (yaw_rad < -this->yaw_limit) yaw_rad = -this->yaw_limit;
 
+        this->pitch_cmd_rad_ = pitch_rad;
+        this->yaw_cmd_rad_ = yaw_rad;
+
         int pitch_us = 1500 + ((int) ((pitch_rad + offset_pitch) * this->scaling_pitch / (M_PI / 4) * 500));
         this->servo_pitch.writeMicroseconds(pitch_us);
         int yaw_us = 1500 + ((int)((yaw_rad + offset_yaw) * this->scaling_yaw / (M_PI / 4) * 500));

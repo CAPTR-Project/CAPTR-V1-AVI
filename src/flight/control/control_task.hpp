@@ -37,16 +37,12 @@ inline bool resetFlag_ = false; // flag to reset integrators
 
 inline UnitQuaternion targetAttitude_{1, 0, 0, 0}; // no rotation
 inline Eigen::Vector3d targetRate_{0, 0, 0};
+inline Eigen::Vector3d actuatorOutputs_;
 
-inline double attitude_dt_ = 1.0/CONTROL_FREQUENCY;
-inline double rate_dt_ = 0.5/CONTROL_FREQUENCY;
+inline Eigen::Vector3d currentRates_{0, 0, 0};
 
-// max and min values
-inline double maxServoPos = 9 * M_PI / 180;
-inline double minServoPos = -9 * M_PI / 180;
-
-inline double maxRate_ = 3.0;
-inline double minRate_ = -3.0;
+inline double attitude_dt_ = (1.0 * CONTROL_OUTER_RATE_DIVISION) / CONTROL_FREQUENCY;
+inline double rate_dt_ = 1.0 / CONTROL_FREQUENCY;
 
 // gains in x, y, z
 inline Eigen::Vector3d attKp_{6, 6, 0};  
@@ -62,9 +58,6 @@ inline Eigen::Vector3d rateKd_{0.0012, 0.0012, 0};
 inline Eigen::Vector3d rateIntegClamp_{maxServoPos / 3, maxServoPos / 3, 0};
 inline float rateAlpha_ = 0.2;
 inline float rateTau_ = 0.01;
-
-inline Eigen::Vector3d attitudeOutput_;
-inline Eigen::Vector3d rateOutput_;
 
 // TVC mount object
 inline tvc_mount_lib::TVC_mount tvcMount_(SERVO_PITCH_PIN, SCALING_PITCH, OFFSET_PITCH, LIMIT_PITCH, SERVO_YAW_PIN, SCALING_YAW, OFFSET_YAW, LIMIT_YAW);
