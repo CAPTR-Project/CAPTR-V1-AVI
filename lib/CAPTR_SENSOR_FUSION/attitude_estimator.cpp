@@ -76,7 +76,7 @@ void Attitude::predict(double dt, Eigen::Vector3d w_m) {
 
 
     // Serial.printf("%.2f, %.2f, %.2f\n%.2f, %.2f, %.2f\n%.2f, %.2f, %.2f\n", covSqrt(0, 0), covSqrt(0, 1), covSqrt(0, 2), covSqrt(1, 0), covSqrt(1, 1), covSqrt(1, 2), covSqrt(2, 0), covSqrt(2, 1), covSqrt(2, 2));
-
+    
     q_k_.s = x_hat_(0); q_k_.v_1 = x_hat_(1); q_k_.v_2 = x_hat_(2); q_k_.v_3 = x_hat_(3);
 
     sigma_points.block<P_DIM, 1>(0, 0) = Eigen::Vector3d(0, 0, 0);

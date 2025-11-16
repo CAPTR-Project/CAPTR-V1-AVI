@@ -4,8 +4,8 @@
 // ========================== General configuration ===========================
 
 #define LOGGING_FREQUENCY 50 // [Hz] The frequency at which to log data.
-#define CONTROL_FREQUENCY 200 // [Hz] The frequency at which to run the control loop.
-#define CONTROL_OUTER_RATE_DIVISION 2 // The division factor between the inner and outer control loops.
+#define CONTROL_FREQUENCY 400 // [Hz] The frequency at which to run the control loop.
+#define CONTROL_OUTER_RATE_DIVISION 4 // The division factor between the inner and outer control loops.
 #define FSM_FREQUENCY 30 // [Hz] The frequency at which to run the finite state machine.
 #define DOWNLINK_FREQUENCY 10 // [Hz] The frequency at which to send data via radio.
 
