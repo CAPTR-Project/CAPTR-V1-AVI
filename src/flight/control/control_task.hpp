@@ -45,18 +45,18 @@ inline double attitude_dt_ = (1.0 * CONTROL_OUTER_RATE_DIVISION) / CONTROL_FREQU
 inline double rate_dt_ = 1.0 / CONTROL_FREQUENCY;
 
 // gains in x, y, z
-inline Eigen::Vector3d attKp_{6, 6, 0};  
-inline Eigen::Vector3d attKi_{3, 3, 0};
+inline Eigen::Vector3d attKp_{10, 10, 10};  
+inline Eigen::Vector3d attKi_{0, 0, 0};
 inline Eigen::Vector3d attKd_{0, 0, 0};
-inline Eigen::Vector3d attIntegClamp_{0.05, 0.05, 0};
+inline Eigen::Vector3d attIntegClamp_{0.05, 0.05, 0.05};
 inline float attAlpha_ = 1;
 inline float attTau_ = 0;
 
-inline Eigen::Vector3d rateKp_{0.038, 0.038, 0};
-inline Eigen::Vector3d rateKi_{0.03, 0.03, 0};
-inline Eigen::Vector3d rateKd_{0.0012, 0.0012, 0};
-inline Eigen::Vector3d rateIntegClamp_{maxServoPos / 3, maxServoPos / 3, 0};
-inline float rateAlpha_ = 0.2;
+inline Eigen::Vector3d rateKp_{0.035355, 0.035355, 0.035355};
+inline Eigen::Vector3d rateKi_{0.01688, 0.01688, 0.01688};
+inline Eigen::Vector3d rateKd_{0.00219, 0.00219, 0.00219};
+inline Eigen::Vector3d rateIntegClamp_{LIMIT_PITCH / 4, LIMIT_YAW / 4, LIMIT_YAW / 4};
+inline float rateAlpha_ = 0.3;
 inline float rateTau_ = 0.01;
 
 // TVC mount object

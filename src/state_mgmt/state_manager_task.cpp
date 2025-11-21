@@ -28,6 +28,7 @@ namespace state_manager {
         sensors::IMU_main::IMUInit();
         sensors::mag::magInit();
         // sensors::gps::gpsInit();
+        // xTaskCreate(sd_logging::sd_logging_task, "SD Logging", 4096, NULL, 2, &sd_logging::taskHandle);
 
         // Initialize the state manager
         currentState = MCUState::STBY;
@@ -77,7 +78,7 @@ namespace state_manager {
                             );
                             // start attitude estimation tasks
                             xTaskCreate(att_est_tasks::att_est_predict_thread, "Attitude Estimation", 2048, NULL, 5, &att_est_tasks::predictTaskHandle_);
-                            xTaskCreate(att_est_tasks::att_est_update_thread, "Attitude Estimation", 2048, NULL, 5, &att_est_tasks::updateTaskHandle_);
+                            // xTaskCreate(att_est_tasks::att_est_update_thread, "Attitude Estimation", 2048, NULL, 5, &att_est_tasks::updateTaskHandle_);
                             // start launch detection task
                             // xTaskCreate(launch_detect::launch_detect_task, "Launch Detect", 2048, NULL, 5, &launch_detect::taskHandle);
                             // start controller
@@ -123,6 +124,16 @@ namespace state_manager {
                     //         Serial.println("Landed");
                     //     }
                     //     break;
+                    case MCUState::ERROR:
+                        Serial.println("Entering ERROR state from state: " + String(static_cast<int>(currentState)));
+                        // stop all other tasks
+                        currentState = MCUState::ERROR;
+                        calibration_worker::stop_calibration();
+                        // att_est_tasks::stop();
+                        // launch_detect::stop();
+                        // control::stop();
+                        // sd_logging::stop();
+                        break;
 
                     default:
                         Serial.println("Unknown state requested: " + String(static_cast<int>(newState)));

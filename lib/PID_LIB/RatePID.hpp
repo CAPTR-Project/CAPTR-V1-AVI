@@ -28,7 +28,6 @@ public:
         pidZ_.reset();
     }
 
-private:
     PID pidX_;
     PID pidY_;
     PID pidZ_;

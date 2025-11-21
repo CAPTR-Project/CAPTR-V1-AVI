@@ -3,7 +3,7 @@
 
 // ========================== General configuration ===========================
 
-#define LOGGING_FREQUENCY 50 // [Hz] The frequency at which to log data.
+#define LOGGING_FREQUENCY 100 // [Hz] The frequency at which to log data.
 #define CONTROL_FREQUENCY 400 // [Hz] The frequency at which to run the control loop.
 #define CONTROL_OUTER_RATE_DIVISION 4 // The division factor between the inner and outer control loops.
 #define FSM_FREQUENCY 30 // [Hz] The frequency at which to run the finite state machine.
@@ -17,13 +17,13 @@
 
 // ====================== Control System configuration ========================
 
-#define RATE_EMA_CUTOFF 100 // [Hz] Cutoff frequency for rate EMA filter.
+#define RATE_EMA_CUTOFF 40 // [Hz] Cutoff frequency for rate EMA filter.
 #define MAX_CTRL_ATT_RATE 3.0 // [rad/s] Maximum attitude rate command for control
 
 // ====================== State estimation configuration ======================
 
-#define Q_MATRIX (Eigen::Matrix<double, Q_DIM, Q_DIM>::Identity() * 0.1) // The process noise matrix.
-#define R_MATRIX (Eigen::Matrix<double, Z_DIM, Z_DIM>::Identity() * 0.01) // The measurement noise matrix.
+#define Q_MATRIX (Eigen::Matrix<double, Q_DIM, Q_DIM>::Identity() * 0) // The process noise matrix.
+#define R_MATRIX (Eigen::Matrix<double, Z_DIM, Z_DIM>::Identity() * 0.04) // The measurement noise matrix.
 
 // ============================ Peripheral configuration ==========================
 
@@ -41,7 +41,7 @@
 #define MAG_X_OFFSET 28.09  // [uT]
 #define MAG_Y_OFFSET -35.62 // [uT]
 #define MAG_Z_OFFSET -43.49 // [uT]
-#define MAG_DATARATE LIS3MDL_DATARATE_10_HZ
+#define MAG_DATARATE LIS3MDL_DATARATE_20_HZ
 #define MAG_INT_PIN 38 // The pin to which the magnetometer interrupt is connected.
 
 // Barometer
@@ -59,12 +59,12 @@
 
 // TVC mount configuration
 #define SERVO_PITCH_PIN 22
-#define SCALING_PITCH 1.3
-#define OFFSET_PITCH 0.0
-#define LIMIT_PITCH 9.0 * M_PI / 180
-#define SERVO_YAW_PIN 23
-#define SCALING_YAW 1.3
-#define OFFSET_YAW 0.0
-#define LIMIT_YAW 9.0 * M_PI / 180
+#define SCALING_PITCH 2.3
+#define OFFSET_PITCH 0.08
+#define LIMIT_PITCH 0.122
 
+#define SERVO_YAW_PIN 23
+#define SCALING_YAW 2.22
+#define OFFSET_YAW -0.03
+#define LIMIT_YAW 0.122
 #endif // CONFIG_HPP

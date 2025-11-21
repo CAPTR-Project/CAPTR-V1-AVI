@@ -26,6 +26,7 @@ Desc: Header file for Attitude Estimation Thread
 #include "sensors/IMU/imu_main.hpp"
 #include "sensors/mag/mag.hpp"
 #include "sensors/barometer/baro.hpp"
+#include "flight/control/control_task.hpp"
 
 namespace calibration_worker {
 

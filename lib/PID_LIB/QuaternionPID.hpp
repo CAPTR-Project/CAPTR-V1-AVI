@@ -32,7 +32,6 @@ public:
         qpidZ_.reset();
     }
 
-private:
     Quaternion errorQuat_;
     PID qpidX_;
     PID qpidY_;

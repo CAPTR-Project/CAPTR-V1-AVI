@@ -115,6 +115,14 @@ namespace calibration_worker {
 
         // Serial.printf("Mag vector in inertial frame: %.2f, %.2f, %.2f\n",
         //       mag_vec_(0), mag_vec_(1), mag_vec_(2));
+
+        control::tvcMount_.move_mount(0, 0);
+        
+        control::tvcMount_.preflight_test();
+        while (control::tvcMount_.busy) {
+            vTaskDelay(pdMS_TO_TICKS(100));
+        }
+        vTaskDelay(pdMS_TO_TICKS(500));
        
         calibration_done = true;
 

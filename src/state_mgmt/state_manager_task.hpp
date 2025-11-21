@@ -24,6 +24,7 @@ Desc: Header file for state manager thread
 #include "preflight/launch_detect_task.hpp"
 #include "flight/ascent_task.hpp"
 #include "flight/control/control_task.hpp"
+#include "CDH/sd_logging_task.hpp"
 
 namespace state_manager {
 

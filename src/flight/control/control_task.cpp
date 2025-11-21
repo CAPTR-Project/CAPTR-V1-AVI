@@ -57,20 +57,27 @@ void control_task(void*) {
         // call the pids to compute corrections
         if (loop_cnt % CONTROL_OUTER_RATE_DIVISION == 0) {
             euler = currentAttitude.to_euler();
-            Serial.println("Current quaternion: " + String(currentAttitude.s) + ", " + String(currentAttitude.v_1) + ", " + String(currentAttitude.v_2) + ", " + String(currentAttitude.v_3));
-            Serial.println("Current Attitude: yaw" + String(euler(0) * 180 / M_PI) + ", pitch" + String(euler(1) * 180 / M_PI) + ", roll" + String(euler(2) * 180 / M_PI));
-            Serial.println("Current Gyro: x" + String(currentGyroData.x) + ", y" + String(currentGyroData.y) + ", z" + String(currentGyroData.z));
-            Serial.println("Current Magnetometer: x" + String(sensors::mag::magData_.x) + ", y" + String(sensors::mag::magData_.y) + ", z" + String(sensors::mag::magData_.z));
-
+            
             targetRate_ = attitudePID.compute(targetAttitude_, currentAttitude);
             loop_cnt = 0;
+            Serial.println("Time: " + String(xTaskGetTickCount()/10) + " ms");
+            Serial.println("Current quaternion: " + String(currentAttitude.s) + ", " + String(currentAttitude.v_1) + ", " + String(currentAttitude.v_2) + ", " + String(currentAttitude.v_3));
+            Serial.println("Current Attitude: yaw" + String(euler(0) * 180 / M_PI) + ", pitch" + String(euler(1) * 180 / M_PI) + ", roll" + String(euler(2) * 180 / M_PI));
+            Serial.println("Current Filtered Gyro: z" + String(currentRates_[0]) + ", y" + String(currentRates_[1]) + ", z" + String(currentRates_[2]));
+            Serial.println("Current Magnetometer: x" + String(sensors::mag::magData_.x) + ", y" + String(sensors::mag::magData_.y) + ", z" + String(sensors::mag::magData_.z));
+            Serial.println("Rate Targets: pitch " + String(targetRate_(1)) + ", yaw " + String(targetRate_(0)));
+            Serial.println("Rate Derivative pitch:" + String(ratePID.pidY_.derivative_) + " yaw: " + String(ratePID.pidZ_.derivative_));
+            Serial.println("Rate Integral pitch:" + String(ratePID.pidY_.integral_) + " yaw: " + String(ratePID.pidZ_.integral_));
+            Serial.println("Attitude Derivative pitch:" + String(attitudePID.qpidY_.derivative_) + " yaw: " + String(attitudePID.qpidY_.derivative_));
+            Serial.println("Actuator Outputs: pitch " + String(actuatorOutputs_(1)) + ", yaw " + String(actuatorOutputs_(0)));
+
         }
         loop_cnt++;
 
         actuatorOutputs_ = ratePID.compute(targetRate_, currentRates_);  // z, y, x for servos
-        tvcMount_.move_mount(-actuatorOutputs_(1), -actuatorOutputs_(0));
+        tvcMount_.move_mount(0, -actuatorOutputs_(0));
 
-        xWasDelayed = xTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(int(1000 / CONTROL_FREQUENCY)));
+        xWasDelayed = xTaskDelayUntil(&xLastWakeTime, configTICK_RATE_HZ/CONTROL_FREQUENCY);
         if (!xWasDelayed) {
             // state_manager::setError(ErrorState::CONTROL);
             Serial.println("Control loop delayed");
